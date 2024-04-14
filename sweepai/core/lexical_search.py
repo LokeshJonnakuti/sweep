@@ -69,8 +69,10 @@ class CustomIndex:
 
         return results_with_metadata
 
+
 word_pattern = re.compile(r"\b\w+\b")
 variable_pattern = re.compile(r"([A-Z][a-z]+|[a-z]+|[A-Z]+(?=[A-Z]|$))")
+
 
 def tokenize_call(code):
     def check_valid_token(token):
@@ -99,7 +101,7 @@ def tokenize_call(code):
                     pos += 1
                 offset += len(part) + 1
         elif parts := variable_pattern.findall(text):  # pascal and camelcase
-             # first one "MyVariable" second one "myVariable" third one "MYVariable"
+            # first one "MyVariable" second one "myVariable" third one "MYVariable"
             offset = 0
             for part in parts:
                 if check_valid_token(part):
