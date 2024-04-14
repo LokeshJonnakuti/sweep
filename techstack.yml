@@ -1,0 +1,3451 @@
+repo_name: LokeshJonnakuti/sweep
+report_id: cedd2a916d5130d7a4081e12950ff9e0
+version: 0.1
+repo_type: Public
+timestamp: '2024-04-14T10:56:41+00:00'
+requested_by: web-flow
+provider: github
+branch: main
+detected_tools_count: 232
+tools:
+- name: JavaScript
+  description: Lightweight, interpreted, object-oriented language with first-class
+    functions
+  website_url: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1209/javascript.jpeg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: Jinja
+  description: Full featured template engine for Python
+  website_url: https://palletsprojects.com/p/jinja/
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Templating Languages & Extensions
+  image_url: https://img.stackshare.io/service/2303/New_Project__20_.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Python
+  description: A clear and powerful object-oriented programming language, comparable
+    to Perl, Ruby, Scheme, or Java.
+  website_url: https://www.python.org
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/993/pUBY5pVj.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: TypeScript
+  description: A superset of JavaScript that compiles to clean JavaScript output
+  website_url: http://www.typescriptlang.org
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1612/bynNY5dJ.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: FastAPI
+  description: A high performance, easy to learn, fast to code, ready for production
+    web framework
+  website_url: https://fastapi.tiangolo.com/
+  version: 0.68.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Microframeworks (Backend)
+  image_url: https://img.stackshare.io/service/25014/default_f6ff39141b468e832d1bc59fc98a060df604d44d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/minis3/requirements.txt
+  detection_source: minis3/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-20 18:45:34.000000000 Z
+- name: Matplotlib
+  description: A plotting library for the Python programming language
+  website_url: http://matplotlib.org
+  open_source: false
+  hosted_saas: false
+  category: Libraries
+  sub_category: Charting Libraries
+  image_url: https://img.stackshare.io/service/2993/2DZC4KaA_400x400.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Next.js
+  description: A small framework for server-rendered universal JavaScript apps
+  website_url: https://nextjs.org/
+  version: 13.0.6
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Frameworks (Full Stack)
+  image_url: https://img.stackshare.io/service/5936/nextjs.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-17 05:21:48.000000000 Z
+- name: Node.js
+  description: A platform built on Chrome's JavaScript runtime for easily building
+    fast, scalable network applications
+  website_url: http://nodejs.org/
+  version: 20.5.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Frameworks (Full Stack)
+  image_url: https://img.stackshare.io/service/1011/n1JRsFeB_400x400.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/tests/js_tests/yarn.lock
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-17 05:21:48.000000000 Z
+- name: Protobuf
+  description: Google's data interchange format
+  website_url: https://developers.google.com/protocol-buffers/
+  version: 4.24.3
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Serialization Frameworks
+  image_url: https://img.stackshare.io/service/4393/ma2jqJKH_400x400.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: React
+  description: A JavaScript library for building user interfaces
+  website_url: https://reactjs.org/
+  version: 18.2.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Javascript UI Libraries
+  image_url: https://img.stackshare.io/service/1020/OYIaJ1KK.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/components/PRPreview.jsx
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-11 05:52:12.000000000 Z
+- name: MongoDB
+  description: The database for giant ideas
+  website_url: http://www.mongodb.com/
+  version: 0.2.0
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Databases
+  image_url: https://img.stackshare.io/service/1030/leaf-360x360.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-17 01:09:52.000000000 Z
+- name: Redis
+  description: Open source (BSD licensed), in-memory data structure store
+  website_url: http://redis.io/
+  version: 5.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: In-Memory Databases
+  image_url: https://img.stackshare.io/service/1031/default_cbce472cd134adc6688572f999e9122b9657d4ba.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: SQLAlchemy
+  description: The Python SQL Toolkit and Object Relational Mapper
+  website_url: http://www.sqlalchemy.org/
+  version: 2.0.21
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Object Relational Mapper (ORM)
+  image_url: https://img.stackshare.io/service/1839/q5uAkmy7.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Docker
+  description: Enterprise Container Platform for High-Velocity Innovation.
+  website_url: https://www.docker.com/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Virtual Machine Platforms & Containers
+  image_url: https://img.stackshare.io/service/586/n4u37v9t_400x400.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: GitHub Actions
+  description: Automate your workflow from idea to production
+  website_url: https://github.com/features/actions
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/11563/actions.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/.github/workflows/black.yml
+  detection_source: ".github/workflows/black.yml"
+  last_updated_by: sweep-nightly[bot]
+  last_updated_on: 2023-07-06 01:24:13.000000000 Z
+- name: Jest
+  description: Painless JavaScript Unit Testing
+  website_url: http://facebook.github.io/jest/
+  version: 29.6.4
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Javascript Testing Framework
+  image_url: https://img.stackshare.io/service/830/jest.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/self_deploy/package-lock.json
+  detection_source: self_deploy/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-30 10:19:01.000000000 Z
+- name: Octokit
+  description: GitHub API Client Library for .NET
+  website_url: https://github.com/octokit/octokit.net
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Tools for GitHub
+  image_url: https://img.stackshare.io/service/9827/octokit-dotnet_2.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 08:43:41.000000000 Z
+- name: Parcel
+  description: "\U0001F4E6\U0001F680  A fast, zero configuration web application bundler"
+  website_url: https://parceljs.org/
+  version: 2.9.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: JS Build Tools / JS Task Runners
+  image_url: https://img.stackshare.io/service/8054/fC6Wad-S_400x400.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-15 05:05:25.000000000 Z
+- name: Prettier
+  description: Prettier is an opinionated code formatter.
+  website_url: https://prettier.io/
+  version: 3.0.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Code Review
+  image_url: https://img.stackshare.io/service/7035/default_66f265943abed56bcdbfca1c866a4261b1fbb063.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/package.json
+  detection_source: package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 05:16:37.000000000 Z
+- name: PyPI
+  description: A repository of software for the Python programming language
+  website_url: https://pypi.org/
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Hosted Package Repository
+  image_url: https://img.stackshare.io/service/12572/-RIWgodF_400x400.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: Pylint
+  description: Source-code, bug and quality checker for the Python programming language
+  website_url: https://www.pylint.org/
+  version: 2.17.4
+  license: GPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Code Review
+  image_url: https://img.stackshare.io/service/4837/py.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: sandbox/requirements.txt
+  last_updated_by: 3mooth1e
+  last_updated_on: 2023-10-19 00:49:38.000000000 Z
+- name: Yarn
+  description: A new package manager for JavaScript
+  website_url: https://yarnpkg.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Front End Package Manager
+  image_url: https://img.stackshare.io/service/5848/44mC-kJ3.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/tests/js_tests/yarn.lock
+  detection_source: tests/js_tests/yarn.lock
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-15 04:30:06.000000000 Z
+- name: npm
+  description: The package manager for JavaScript.
+  website_url: https://www.npmjs.com/
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Front End Package Manager
+  image_url: https://img.stackshare.io/service/1120/lejvzrnlpb308aftn31u.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/self_deploy/package.json
+  detection_source: self_deploy/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-30 10:19:01.000000000 Z
+- name: pnpm
+  description: Fast, disk space efficient package manager
+  website_url: https://pnpm.js.org/
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/service/10903/JLVo_YPe_400x400.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 02:49:37.000000000 Z
+- name: Pandoc
+  description: A universal document converter
+  website_url: https://pandoc.org/
+  open_source: true
+  hosted_saas: false
+  category: Assets and Media
+  sub_category: File Conversion
+  image_url: https://img.stackshare.io/service/2330/no-img-open-source.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Pillow
+  description: Python Imaging Library
+  website_url: https://python-pillow.github.io/
+  open_source: true
+  hosted_saas: false
+  category: Assets and Media
+  sub_category: Image Processing and Management
+  image_url: https://img.stackshare.io/service/2375/default_1f67b0ca7416a9f52beb655f90b5602d5ef74b75.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Replicate
+  description: Run machine learning models with a few lines of code
+  website_url: https://replicate.com/
+  version: 0.15.4
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Application Utilities
+  sub_category: Machine Learning as a Service
+  image_url: https://img.stackshare.io/service/21709/default_e8df7b9f7533c3ea041cf8ded59b2c12e7466b67.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Effy
+  last_updated_on: 2023-10-20 21:59:32.000000000 Z
+- name: Claude
+  description: A next-generation AI assistant for your tasks, no matter the scale
+  website_url: https://www.anthropic.com/product
+  version: 0.2.10
+  open_source: false
+  hosted_saas: false
+  category: Communications
+  sub_category: Large Language Models
+  image_url: https://img.stackshare.io/service/101883/default_fddf1fbe1d52baf4dac573b2b7fc24b78cc729b1.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: IPython
+  description: A command shell for interactive computing in multiple programming languages
+  website_url: http://ipython.org/index.html
+  open_source: false
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Shells
+  image_url: https://img.stackshare.io/service/4477/820a0bb9a44fe5a1d640993ab1e6fd84_400x400.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Jupyter
+  description: Multi-language interactive computing environments.
+  website_url: http://jupyter.org
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Application Utilities
+  sub_category: Data Science Notebooks
+  image_url: https://img.stackshare.io/service/4190/fGBUdNf__400x400.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: LLaMA
+  description: A foundational, 65-billion-parameter large language model (By Facebook)
+  website_url: https://ai.meta.com/blog/large-language-model-llama-meta-ai/
+  open_source: true
+  hosted_saas: false
+  category: Communications
+  sub_category: Large Language Models
+  image_url: https://img.stackshare.io/service/101870/default_110df704ee9867cb49e02a51b680222cc0b61823.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-06-14 10:07:48.000000000 Z
+- name: LlamaIndex
+  description: A central interface to connect your LLMs with external data
+  website_url: https://gpt-index.readthedocs.io/en/latest/
+  open_source: true
+  hosted_saas: false
+  category: Communications
+  sub_category: Large Language Model Tools
+  image_url: https://img.stackshare.io/service/48791/default_350cf2fa84700345e34d9eef2ecc1aa29319e91a.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-30 00:50:05.000000000 Z
+- name: NumPy
+  description: Fundamental package for scientific computing with Python
+  website_url: http://www.numpy.org/
+  version: 1.25.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Data Science Tools
+  image_url: https://img.stackshare.io/service/2179/default_332f874a2edb2686f578aa6389313efcea1eec41.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: OpenAI
+  description: Creating safe AGI that benefits all
+  website_url: https://openai.com/
+  version: 1.3.5
+  open_source: false
+  hosted_saas: false
+  category: Communications
+  sub_category: Large Language Models
+  image_url: https://img.stackshare.io/service/48786/default_8b1119bcbb159cebebc2f6cfc9cd2e359b169d22.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-06-14 10:07:48.000000000 Z
+- name: Sandbox
+  description: Quick and easy mock RESTful API and SOAP webservices
+  website_url: https://getsandbox.com/
+  open_source: false
+  hosted_saas: false
+  category: Application Utilities
+  sub_category: API Tools
+  image_url: https://img.stackshare.io/service/4850/default_184acc5bd4db3f48b142e147c175de6b2e06850c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docker-compose.yml
+  detection_source: docker-compose.yml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-09 22:04:53.000000000 Z
+- name: SciPy
+  description: Scientific Computing Tools for Python
+  website_url: http://www.scipy.org
+  version: 1.9.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Data Science Tools
+  image_url: https://img.stackshare.io/service/3303/scipyshiny_small.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: Shell
+  description: A shell is a text-based terminal, used for manipulating programs and
+    files. Shell scripts typically manage program execution.
+  website_url: https://en.wikipedia.org/wiki/Shell_script
+  open_source: false
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/4631/default_c2062d40130562bdc836c13dbca02d318205a962.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep
+  detection_source: Repo Metadata
+- name: Sweep
+  description: Open-source AI-powered junior developer
+  website_url: https://sweep.dev/
+  license: AGPL-3.0
+  open_source: true
+  hosted_saas: false
+  category: Application Utilities
+  sub_category: Tools for GitHub
+  image_url: https://img.stackshare.io/service/101999/default_e6ebe8ffdcd761f90bf430280cdc8b1592ee3ad3.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docker-compose.yml
+  detection_source: docker-compose.yml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-20 18:45:34.000000000 Z
+- name: Vercel AI SDK
+  description: An interoperable, streaming-enabled, edge-ready software development
+    kit for AI apps
+  website_url: https://sdk.vercel.ai/docs
+  version: 1.0.1
+  open_source: true
+  hosted_saas: false
+  category: Communications
+  sub_category: Large Language Model Tools
+  image_url: https://img.stackshare.io/service/101756/default_4f2991cba3ec7fdd1cc87de69f4868157b0f2001.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-01 01:24:36.000000000 Z
+- name: Websockets
+  description: A technology that makes it possible to open a two-way interactive communication
+  website_url: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+  version: 11.0.3
+  open_source: false
+  hosted_saas: false
+  image_url: https://img.stackshare.io/service/4220/LNPwoiWi_400x400.jpg
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: GitPython
+  description: Python Git Library
+  package_url: https://pypi.org/project/GitPython
+  version: 3.1.31
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19867/default_bd86f80ade48cfe191d5781a2efa0e66fa22163a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-21 01:14:39.000000000 Z
+  vulnerabilities:
+  - name: GitPython vulnerable to remote code execution due to insufficient sanitization
+      of input arguments
+    cve_id: CVE-2023-40267
+    cve_url: https://github.com/advisories/GHSA-pr76-5cm5-w9cj
+    detected_date: Aug 12
+    severity: critical
+    first_patched: 3.1.32
+  - name: Untrusted search path under some conditions on Windows allows arbitrary
+      code execution
+    cve_id: CVE-2024-22190
+    cve_url: https://github.com/advisories/GHSA-2mqj-m65w-jghx
+    detected_date: Jan 11
+    severity: high
+    first_patched: 3.1.41
+  - name: Blind local file inclusion
+    cve_id: CVE-2023-41040
+    cve_url: https://github.com/advisories/GHSA-cwvm-v4w8-q58c
+    detected_date: Sep 7
+    severity: moderate
+    first_patched: 3.1.37
+- name: langchain
+  description: Building applications with LLMs through composability
+  package_url: https://pypi.org/project/langchain
+  version: 0.0.300
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: LangChain vulnerable to arbitrary code execution
+    cve_id: CVE-2023-39659
+    cve_url: https://github.com/advisories/GHSA-prgp-w7vf-ch62
+    detected_date: Dec 8
+    severity: critical
+    first_patched: 0.0.325
+  - name: langchain vulnerable to arbitrary code execution
+    cve_id: CVE-2023-36281
+    cve_url: https://github.com/advisories/GHSA-7gfq-f96f-g85j
+    detected_date: Dec 8
+    severity: critical
+    first_patched: 0.0.312
+  - name: Langchain vulnerable to arbitrary code execution via the evaluate function
+      in the numexpr library
+    cve_id: CVE-2023-39631
+    cve_url: https://github.com/advisories/GHSA-f73w-4m7g-ch9x
+    detected_date: Dec 8
+    severity: critical
+    first_patched: 0.0.308
+  - name: Langchain Server-Side Request Forgery vulnerability
+    cve_id: CVE-2023-32786
+    cve_url: https://github.com/advisories/GHSA-6h8p-4hx9-w66c
+    detected_date: Dec 8
+    severity: high
+    first_patched: 0.0.329
+  - name: LangChain Server Side Request Forgery vulnerability
+    cve_id: CVE-2023-46229
+    cve_url: https://github.com/advisories/GHSA-655w-fm8m-m478
+    detected_date: Dec 8
+    severity: high
+    first_patched: 0.0.317
+  - name: LangChain directory traversal vulnerability
+    cve_id: CVE-2024-28088
+    cve_url: https://github.com/advisories/GHSA-h59x-p739-982c
+    detected_date: Mar 7
+    severity: low
+    first_patched: 0.0.339
+  - name: langchain Server-Side Request Forgery vulnerability
+    cve_id: CVE-2024-0243
+    cve_url: https://github.com/advisories/GHSA-h9j7-5xvc-qhg5
+    detected_date: Feb 27
+    severity: low
+    first_patched: 0.1.0
+- name: aiohttp
+  description: Async http client/server framework
+  package_url: https://pypi.org/project/aiohttp
+  version: 3.8.5
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19852/default_d748224707283d9d8a73c2323730c87bda6b313a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: aiohttp's ClientSession is vulnerable to CRLF injection via version
+    cve_id: CVE-2023-49081
+    cve_url: https://github.com/advisories/GHSA-q3qx-c6g2-7pw2
+    detected_date: Nov 28
+    severity: high
+    first_patched: 3.9.0
+  - name: aiohttp is vulnerable to directory traversal
+    cve_id: CVE-2024-23334
+    cve_url: https://github.com/advisories/GHSA-5h86-8mv2-jq9f
+    detected_date: Jan 30
+    severity: moderate
+    first_patched: 3.9.2
+  - name: AIOHTTP has problems in HTTP parser (the python one, not llhttp)
+    cve_id: CVE-2023-47627
+    cve_url: https://github.com/advisories/GHSA-gfw2-4jvh-wgfg
+    detected_date: Nov 15
+    severity: moderate
+    first_patched: 3.8.6
+  - name: aiohttp has vulnerable dependency that is vulnerable to request smuggling
+    cve_id:
+    cve_url: https://github.com/advisories/GHSA-pjjw-qhg8-p2p9
+    detected_date: Nov 29
+    severity: moderate
+    first_patched: 3.8.6
+  - name: aiohttp's ClientSession is vulnerable to CRLF injection via method
+    cve_id: CVE-2023-49082
+    cve_url: https://github.com/advisories/GHSA-qvrw-v9rv-5rjx
+    detected_date: Nov 28
+    severity: moderate
+    first_patched: 3.9.0
+  - name: aiohttp's HTTP parser (the python one, not llhttp) still overly lenient
+      about separators
+    cve_id: CVE-2024-23829
+    cve_url: https://github.com/advisories/GHSA-8qpw-xqxj-h4r2
+    detected_date: Jan 30
+    severity: moderate
+    first_patched: 3.9.2
+- name: celery
+  description: Distributed Task Queue
+  package_url: https://pypi.org/project/celery
+  version: 5.1.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19901/default_4f4fb10b6f169603a907dcb35a5a356d784e3bd3.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: William Zeng
+  last_updated_on: 2023-09-05 06:31:17.000000000 Z
+  vulnerabilities:
+  - name: OS Command Injection in celery
+    cve_id: CVE-2021-23727
+    cve_url: https://github.com/advisories/GHSA-q4xr-rc97-m4xx
+    detected_date: Jan 7
+    severity: high
+    first_patched: 5.2.2
+- name: cryptography
+  description: Cryptography is a package which provides cryptographic recipes and
+    primitives to Python developers
+  package_url: https://pypi.org/project/cryptography
+  version: 41.0.4
+  license: BSD-3-Clause,Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19850/default_db2ab2702f70e20c272f6ce65251108fb2b8f1ea.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: cryptography NULL pointer dereference with pkcs12.serialize_key_and_certificates
+      when called with a non-matching certificate and private key and an hmac_hash
+      override
+    cve_id: CVE-2024-26130
+    cve_url: https://github.com/advisories/GHSA-6vqw-3v5j-54x4
+    detected_date: Feb 22
+    severity: high
+    first_patched: 42.0.4
+  - name: Python Cryptography package vulnerable to Bleichenbacher timing oracle attack
+    cve_id: CVE-2023-50782
+    cve_url: https://github.com/advisories/GHSA-3ww4-gg4f-jr7f
+    detected_date: Feb 6
+    severity: high
+    first_patched: 42.0.0
+  - name: Null pointer dereference in PKCS12 parsing
+    cve_id: CVE-2024-0727
+    cve_url: https://github.com/advisories/GHSA-9v9h-cgj8-h64p
+    detected_date: Feb 17
+    severity: moderate
+    first_patched: 42.0.2
+  - name: cryptography vulnerable to NULL-dereference when loading PKCS7 certificates
+    cve_id: CVE-2023-49083
+    cve_url: https://github.com/advisories/GHSA-jfhm-5ghh-2f97
+    detected_date: Nov 29
+    severity: moderate
+    first_patched: 41.0.6
+- name: fonttools
+  description: Tools to manipulate font files
+  package_url: https://pypi.org/project/fonttools
+  version: 4.42.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20488/default_13373c456cf04faa5b7f33cd4c4095cbd571dfce.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: fonttools XML External Entity Injection (XXE) Vulnerability
+    cve_id: CVE-2023-45139
+    cve_url: https://github.com/advisories/GHSA-6673-4983-2vx5
+    detected_date: Jan 10
+    severity: high
+    first_patched: 4.43.0
+- name: jupyterlab
+  description: The JupyterLab notebook server extension
+  package_url: https://pypi.org/project/jupyterlab
+  version: 4.0.6
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20376/default_e6c4d6b6295b7d6934a5e16b2a16a7aa07991d65.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: JupyterLab vulnerable to potential authentication and CSRF tokens leak
+    cve_id: CVE-2024-22421
+    cve_url: https://github.com/advisories/GHSA-44cc-43rp-5947
+    detected_date: Jan 20
+    severity: high
+    first_patched: 4.0.11
+  - name: JupyterLab vulnerable to SXSS in Markdown Preview
+    cve_id: CVE-2024-22420
+    cve_url: https://github.com/advisories/GHSA-4m77-cmpx-vjc4
+    detected_date: Jan 20
+    severity: moderate
+    first_patched: 4.0.11
+- name: notebook
+  description: A web-based notebook environment for interactive computing
+  package_url: https://pypi.org/project/notebook
+  version: 7.0.4
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20024/default_fd02050783f95269bfcc5c4d11f1c75dd423cd1d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: JupyterLab vulnerable to potential authentication and CSRF tokens leak
+    cve_id: CVE-2024-22421
+    cve_url: https://github.com/advisories/GHSA-44cc-43rp-5947
+    detected_date: Jan 20
+    severity: high
+    first_patched: 7.0.7
+  - name: JupyterLab vulnerable to SXSS in Markdown Preview
+    cve_id: CVE-2024-22420
+    cve_url: https://github.com/advisories/GHSA-4m77-cmpx-vjc4
+    detected_date: Jan 20
+    severity: moderate
+    first_patched: 7.0.7
+- name: starlette
+  description: The little ASGI library that shines
+  package_url: https://pypi.org/project/starlette
+  version: 0.26.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20295/default_640b00772a7025571fa2ac02de971e76f9662aa9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: python-multipart vulnerable to Content-Type Header ReDoS
+    cve_id: CVE-2024-24762
+    cve_url: https://github.com/advisories/GHSA-2jv5-9r88-3w3p
+    detected_date: Feb 17
+    severity: high
+    first_patched: 0.36.2
+  - name: 'Duplicate Advisory: Starlette Content-Type Header ReDoS'
+    cve_id:
+    cve_url: https://github.com/advisories/GHSA-93gm-qmq6-w238
+    detected_date: Feb 6
+    severity: high
+    first_patched: 0.36.2
+  - name: 'Duplicate Advisory: Starlette vulnerable to directory traversal'
+    cve_id:
+    cve_url: https://github.com/advisories/GHSA-qj8w-rv5x-2v9h
+    detected_date: Jun 6
+    severity: high
+    first_patched: 0.27.0
+  - name: Starlette has Path Traversal vulnerability in StaticFiles
+    cve_id: CVE-2023-29159
+    cve_url: https://github.com/advisories/GHSA-v5gw-mw7f-84px
+    detected_date: May 17
+    severity: low
+    first_patched: 0.27.0
+- name: black
+  description: The uncompromising code formatter
+  package_url: https://pypi.org/project/black
+  version: 23.11.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20099/default_029b9bbfb6be2cd34bebeda5b8e1e80a1d22441c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-13 23:13:37.000000000 Z
+  vulnerabilities:
+  - name: Black vulnerable to Regular Expression Denial of Service (ReDoS)
+    cve_id: CVE-2024-21503
+    cve_url: https://github.com/advisories/GHSA-fj7x-q9j7-g6q6
+    detected_date: Mar 21
+    severity: moderate
+    first_patched: 24.3.0
+- name: dnspython
+  description: DNS toolkit
+  package_url: https://pypi.org/project/dnspython
+  version: 2.4.2
+  license: Other
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20249/default_47b8ee8db82e43d9eef35923435bd8cc855f3a1b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+  vulnerabilities:
+  - name: Potential DoS via the Tudoor mechanism in eventlet and dnspython
+    cve_id: CVE-2023-29483
+    cve_url: https://github.com/advisories/GHSA-3rq5-2g8h-59hc
+    detected_date: Apr 13
+    severity: moderate
+    first_patched: 2.6.1
+- name: eventlet
+  description: Highly concurrent networking library
+  package_url: https://pypi.org/project/eventlet
+  version: 0.33.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20017/default_70556f9333e0a39c148cac0c36ca24235943f270.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: William Zeng
+  last_updated_on: 2023-09-05 06:31:17.000000000 Z
+  vulnerabilities:
+  - name: Potential DoS via the Tudoor mechanism in eventlet and dnspython
+    cve_id: CVE-2023-29483
+    cve_url: https://github.com/advisories/GHSA-3rq5-2g8h-59hc
+    detected_date: Apr 13
+    severity: moderate
+    first_patched: 0.35.2
+- name: idna
+  description: Internationalized Domain Names in Applications
+  package_url: https://pypi.org/project/idna
+  version: '3.4'
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19863/default_f24e00e4cb7620e436f9d06e0305070e1335922a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+  vulnerabilities:
+  - name: Internationalized Domain Names in Applications (IDNA) vulnerable to denial
+      of service from specially crafted inputs to idna.encode
+    cve_id: CVE-2024-3651
+    cve_url: https://github.com/advisories/GHSA-jjg7-2v4v-x38h
+    detected_date: Apr 12
+    severity: moderate
+    first_patched: '3.7'
+- name: pymongo
+  description: Python driver for MongoDB &lt;http://www.mongodb.org&gt;
+  package_url: https://pypi.org/project/pymongo
+  version: 4.4.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19865/default_7975a21f3bf03129dc3bc4168cf7cb7ee2cc14cc.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-01 09:05:24.000000000 Z
+  vulnerabilities:
+  - name: PyMongo Out-of-bounds Read in the bson module
+    cve_id: CVE-2024-21506
+    cve_url: https://github.com/advisories/GHSA-cr6f-gf5w-vhrc
+    detected_date: Apr 9
+    severity: moderate
+    first_patched: 4.6.3
+- name: requests
+  description: Python HTTP for Humans
+  package_url: https://pypi.org/project/requests
+  version: 2.28.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19826/default_d7c684bf2673f008a9f02ac93901229297a22d7e.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-06-14 10:07:48.000000000 Z
+  vulnerabilities:
+  - name: Unintended leak of Proxy-Authorization header in requests
+    cve_id: CVE-2023-32681
+    cve_url: https://github.com/advisories/GHSA-j8r2-6x86-q33q
+    detected_date: May 23
+    severity: moderate
+    first_patched: 2.31.0
+- name: urllib3
+  description: HTTP library with thread-safe connection pooling
+  package_url: https://pypi.org/project/urllib3
+  version: 2.0.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19842/default_4604ff5dcb7f4d9c7b3833591c2142493951b19c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: asc11cat
+  last_updated_on: 2023-07-09 12:41:33.000000000 Z
+  vulnerabilities:
+  - name: urllib3's request body not stripped after redirect from 303 status changes
+      request method to GET
+    cve_id: CVE-2023-45803
+    cve_url: https://github.com/advisories/GHSA-g4mx-q9vg-27p4
+    detected_date: Oct 18
+    severity: moderate
+    first_patched: 2.0.7
+  - name: "`Cookie` HTTP header isn't stripped on cross-origin redirects"
+    cve_id: CVE-2023-43804
+    cve_url: https://github.com/advisories/GHSA-v845-jxx5-vc9f
+    detected_date: Oct 3
+    severity: moderate
+    first_patched: 2.0.6
+- name: Babel
+  description: Internationalization utilities
+  package_url: https://pypi.org/project/Babel
+  version: 2.12.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19888/default_680f9274a97353753534797409b2c06b6bd32266.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: MarkupSafe
+  description: Safely add untrusted strings to HTML/XML markup
+  package_url: https://pypi.org/project/MarkupSafe
+  version: 2.1.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19945/default_0b0a94e1bdf3e64deeccb23892ca2335bdc30e4f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: PyGithub
+  description: Use the full Github API v3
+  package_url: https://pypi.org/project/PyGithub
+  version: 1.58.2
+  license: LGPL-3.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19957/default_f0290ff2792e2af7d13f5c82ed82206842ec288d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-24 03:26:00.000000000 Z
+- name: PyJWT
+  description: JSON Web Token implementation in Python
+  package_url: https://pypi.org/project/PyJWT
+  version: 2.6.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19883/default_3863c7bb51d307217c188e059f67ca417c51efe3.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-01 09:05:24.000000000 Z
+- name: PyNaCl
+  description: Python binding to the Networking and Cryptography
+  package_url: https://pypi.org/project/PyNaCl
+  version: 1.5.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20262/default_1842575018db691e6f93d8a9a1aa65cdc2a55c20.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: PyYAML
+  description: YAML parser and emitter for Python
+  package_url: https://pypi.org/project/PyYAML
+  version: 6.0.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19829/default_74a61b43bdb9fc0cba2978316b9976f43545029b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-11 03:25:28.000000000 Z
+- name: Pygments
+  description: Pygments is a syntax highlighting package written in Python
+  package_url: https://pypi.org/project/Pygments
+  version: 2.16.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19858/default_4d761b2257a1435539d6dc92346974d9f1d55c70.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: QtPy
+  description: Provides an abstraction layer on top of the various Qt bindings
+  package_url: https://pypi.org/project/QtPy
+  version: 2.4.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20622/default_63066aa0234404e124cf566de6710b3ef8042728.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Send2Trash
+  description: Send file to trash natively under Mac OS X
+  package_url: https://pypi.org/project/Send2Trash
+  version: 1.8.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20395/default_5d8ceeeb4f37c8c5984e00abce1dab5113e27b56.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: Whoosh
+  description: Fast
+  package_url: https://pypi.org/project/Whoosh
+  version: 2.7.4
+  license: BSD-1-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20717/default_9315a80ef1afabd8064bd5f94ebf2a19bc9765f1.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: aiobotocore
+  description: Async client for aws services using botocore and aiohttp
+  package_url: https://pypi.org/project/aiobotocore
+  version: 2.6.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20798/default_3af1d2878445b1b0d771d7e87e7010b7fe2194fc.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: aiofiles
+  description: File support for asyncio
+  package_url: https://pypi.org/project/aiofiles
+  version: 0.7.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20183/default_3d320a0aa731f16ceb0e7b6999ca7f7cd784aee2.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/minis3/requirements.txt
+  detection_source: minis3/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-20 18:45:34.000000000 Z
+- name: altair
+  description: 'Altair: A declarative statistical visualization library for Python'
+  package_url: https://pypi.org/project/altair
+  version: 5.1.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: altgraph
+  description: Python graph
+  package_url: https://pypi.org/project/altgraph
+  version: 0.17.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: amqp
+  description: Low-level AMQP client for Python
+  package_url: https://pypi.org/project/amqp
+  version: 5.1.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20296/default_fbb28b4e332d257da7e7f1277d3ce073b5270511.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: anthropic
+  description: The official Python library for the anthropic API
+  package_url: https://pypi.org/project/anthropic
+  version: 0.2.10
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: anyio
+  description: High level compatibility layer for multiple asynchronous event loop
+    implementations
+  package_url: https://pypi.org/project/anyio
+  version: 3.7.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20757/default_c1e4fc9b7faffe723aa1e18d3dd3049b39849e4d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: argon2-cffi
+  description: The secure Argon2 password hashing algorithm
+  package_url: https://pypi.org/project/argon2-cffi
+  version: 23.1.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: arrow
+  description: Better dates &amp; times for Python
+  package_url: https://pypi.org/project/arrow
+  version: 1.2.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19891/default_87fc2af3f2409064833512bb6fc5b04443a2e6aa.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: asgiref
+  description: ASGI specs, helper code, and adapters
+  package_url: https://pypi.org/project/asgiref
+  version: 3.7.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20739/default_88a4948f616ae7ccb7210803d2bd72b72851b6e9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: astroid
+  description: An abstract syntax tree for Python with inference support
+  package_url: https://pypi.org/project/astroid
+  version: 2.15.7
+  license: LGPL-2.1
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20125/default_63b818b0ea63c702db9131c12dd2fd2fad35ca3b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: asttokens
+  description: Annotate AST trees with source code positions
+  package_url: https://pypi.org/project/asttokens
+  version: 2.4.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20745/default_c90b3e514872112e4562f3131a3c6b68b0d05009.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: async-timeout
+  description: Timeout context manager for asyncio programs
+  package_url: https://pypi.org/project/async-timeout
+  version: 4.0.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20820/default_33e8d7fbba8bfff26ed0101b65f3a3af5fd63b4e.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: attrs
+  description: Classes Without Boilerplate
+  package_url: https://pypi.org/project/attrs
+  version: 23.1.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19857/default_4a8a8fdc10130068bf295812b98e9b72fb42fe70.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: backcall
+  description: Specifications for callback functions passed in to an API
+  package_url: https://pypi.org/project/backcall
+  version: 0.2.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: backoff
+  description: Function decoration for backoff and retry
+  package_url: https://pypi.org/project/backoff
+  version: 2.2.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19988/default_aa331bbc48e2faa54aa26e08880b772595f833b8.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-01 09:05:24.000000000 Z
+- name: beautifulsoup4
+  description: Screen-scraping library
+  package_url: https://pypi.org/project/beautifulsoup4
+  version: 4.12.2
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19838/default_85689b353a3a9409328e253ea28d859d29151e0c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: billiard
+  description: Python multiprocessing fork with improvements and bugfixes
+  package_url: https://pypi.org/project/billiard
+  version: 4.1.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20470/default_54107e01f42ee7fb9e6c385c975ec134753aae0a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: bleach
+  description: An easy safelist-based HTML-sanitizing tool
+  package_url: https://pypi.org/project/bleach
+  version: 6.0.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20045/default_b0b684477aefb2da4c92a4bafd91d26e16511cd1.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: boto3
+  description: The AWS SDK for Python
+  package_url: https://pypi.org/project/boto3
+  version: 1.28.17
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19840/default_1c41e593803157c668b26f27387160254f0f5371.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: botocore
+  description: Low-level, data-driven core of boto 3
+  package_url: https://pypi.org/project/botocore
+  version: 1.31.17
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19884/default_b8be3f20d4af87021ae3618d5c50b72c985ea31f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: certifi
+  description: Python package for providing Mozilla's CA Bundle
+  package_url: https://pypi.org/project/certifi
+  version: 2023.7.22
+  license: MPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19849/default_75c38a39b9f0062814489e2ec2cbfca0ca15d9ba.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: cffi
+  description: Foreign Function Interface for Python calling C code
+  package_url: https://pypi.org/project/cffi
+  version: 1.15.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19909/default_67f813d4aac73d024261bcfded6ef2b918e384a0.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: charset-normalizer
+  description: The Real First Universal Charset Detector
+  package_url: https://pypi.org/project/charset-normalizer
+  version: 3.2.0
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: click
+  description: Composable command line interface toolkit
+  package_url: https://pypi.org/project/click
+  version: 8.1.7
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19830/default_74a61b43bdb9fc0cba2978316b9976f43545029b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: click-plugins
+  description: An extension module for click to enable registering CLI commands via
+    setuptools entry-points
+  package_url: https://pypi.org/project/click-plugins
+  version: 1.1.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20361/default_a54cbb457d7aac7ab53484c3473848dbdd84d806.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: cloudpickle
+  description: Extended pickling support for Python objects
+  package_url: https://pypi.org/project/cloudpickle
+  version: 2.0.0
+  license: BSD-1-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20066/default_bb49fb0188726b8922387d8bb6e9b2cd0c3c0ea9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: coverage
+  description: Code coverage measurement for Python
+  package_url: https://pypi.org/project/coverage
+  version: 7.3.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19904/default_1d0eb6da6bdd342bb15f73d8f1721516ebacd1dc.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-19 00:39:02.000000000 Z
+- name: dataclasses-json
+  description: Easily serialize dataclasses to and from JSON
+  package_url: https://pypi.org/project/dataclasses-json
+  version: 0.6.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20519/default_ded6d17aa418fbd05ff28b85345c77ab878c6b37.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: decorator
+  description: Decorators for Humans
+  package_url: https://pypi.org/project/decorator
+  version: 5.1.1
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19911/default_bc82f0b22ca8fd942e21c317967f4ab61f43eb2c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: defusedxml
+  description: XML bomb protection for Python stdlib modules
+  package_url: https://pypi.org/project/defusedxml
+  version: 0.7.1
+  license: Python-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20210/default_6796c4086c025d18cdc673750b208b846d8e0914.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: dill
+  description: Serialize all of python
+  package_url: https://pypi.org/project/dill
+  version: 0.3.7
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19972/default_735d20726524f3a2b12f956af25bde52f942f85a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: distlib
+  description: Distribution utilities
+  package_url: https://pypi.org/project/distlib
+  version: 0.3.7
+  license: Python-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20388/default_dbae17f97e8212cfa7ac5c2981eb06a9bf0f7b40.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: entrypoints
+  description: Discover and load entry points from installed packages
+  package_url: https://pypi.org/project/entrypoints
+  version: '0.4'
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20424/default_6d9e48c73a51a5ed50a36bba10e7dc73dd24c660.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: exceptiongroup
+  description: Backport of PEP 654
+  package_url: https://pypi.org/project/exceptiongroup
+  version: 1.1.3
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: executing
+  description: Get the currently executing AST node of a frame
+  package_url: https://pypi.org/project/executing
+  version: 1.2.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: fastjsonschema
+  description: Fastest Python implementation of JSON schema
+  package_url: https://pypi.org/project/fastjsonschema
+  version: 2.18.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: filelock
+  description: A platform independent file lock
+  package_url: https://pypi.org/project/filelock
+  version: 3.12.4
+  license: Unlicense
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20204/default_645e4030c04804ccf56eaad54caf7b7a73a44c64.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: flake8
+  description: 'The modular source code checker: pep8, pyflakes and co'
+  package_url: https://pypi.org/project/flake8
+  version: 6.0.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19920/default_c8be5290cb8d8a8b578535a2c6475d1057ff4ea4.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-15 06:01:32.000000000 Z
+- name: fsspec
+  description: File-system specification
+  package_url: https://pypi.org/project/fsspec
+  version: 2023.9.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: fuzzywuzzy
+  description: Fuzzy string matching in python
+  package_url: https://pypi.org/project/fuzzywuzzy
+  version: 0.18.0
+  license: GPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20071/default_bb49fb0188726b8922387d8bb6e9b2cd0c3c0ea9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-05 01:38:09.000000000 Z
+- name: geographiclib
+  description: The geodesic routines from GeographicLib
+  package_url: https://pypi.org/project/geographiclib
+  version: '2.0'
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: geopy
+  description: Python Geocoding Toolbox
+  package_url: https://pypi.org/project/geopy
+  version: 2.3.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20597/default_765f8741ddac0d2e816e17438b35e7fda5019b4a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Lucas Jagg
+  last_updated_on: 2023-08-10 22:30:43.000000000 Z
+- name: gitdb
+  description: Git Object Database
+  package_url: https://pypi.org/project/gitdb
+  version: 4.0.10
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: googleapis-common-protos
+  description: Common protobufs used in Google APIs
+  package_url: https://pypi.org/project/googleapis-common-protos
+  version: 1.60.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20036/default_a7a70921d2d3189665c78015850dc968f41705a1.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: graphviz
+  description: Simple Python interface for Graphviz
+  package_url: https://pypi.org/project/graphviz
+  version: 0.20.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19981/default_ccb381b493daf0d966e015380e1894fdbc637ad3.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-20 02:07:04.000000000 Z
+- name: greenlet
+  description: Lightweight in-process concurrent programming
+  package_url: https://pypi.org/project/greenlet
+  version: 2.0.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20137/default_e3ea003987b13e5c9b8c9000c748b25a9c0d9ecd.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-30 00:50:05.000000000 Z
+- name: grpcio
+  description: HTTP/2-based RPC framework
+  package_url: https://pypi.org/project/grpcio
+  version: 1.58.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19903/default_1d0eb6da6bdd342bb15f73d8f1721516ebacd1dc.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: h11
+  description: A pure-Python
+  package_url: https://pypi.org/project/h11
+  version: 0.14.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: h2
+  description: HTTP/2 State-Machine based protocol implementation
+  package_url: https://pypi.org/project/h2
+  version: 4.1.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20795/default_9ca241da01759150a631f1a4419765b91249245f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: httpx
+  description: The next generation HTTP client
+  package_url: https://pypi.org/project/httpx
+  version: 0.25.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20315/default_5f4e928dbcb1c4db4050881fc2e0229785fc931c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: huggingface-hub
+  description: Client library to download and publish models
+  package_url: https://pypi.org/project/huggingface-hub
+  version: 0.17.2
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: identify
+  description: File identification library for Python
+  package_url: https://pypi.org/project/identify
+  version: 2.5.29
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: importlib-metadata
+  description: Read metadata from Python packages
+  package_url: https://pypi.org/project/importlib-metadata
+  version: 6.8.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20000/default_7c419d5d5f0cfad7886b95266eae7ba305cedacf.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: ipykernel
+  description: IPython Kernel for Jupyter
+  package_url: https://pypi.org/project/ipykernel
+  version: 6.23.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20282/default_23dd4b159eaa2c5b085470b39bf396fcc6cf2c38.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-29 03:17:48.000000000 Z
+- name: ipywidgets
+  description: IPython HTML widgets for Jupyter
+  package_url: https://pypi.org/project/ipywidgets
+  version: 8.1.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: isort
+  description: A Python utility / library to sort Python imports
+  package_url: https://pypi.org/project/isort
+  version: 5.12.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20117/default_9cf91bfbbfb266fc12a914cdc09d9e4b55c773bb.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: jedi
+  description: An autocompletion tool for Python that can be used for text editors
+  package_url: https://pypi.org/project/jedi
+  version: 0.19.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20260/default_9a53068260c70b2274df0967716480e7e3f74b0d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: wwzeng1
+  last_updated_on: 2023-11-08 02:42:16.000000000 Z
+- name: joblib
+  description: 'Lightweight pipelining: using Python functions as pipeline jobs'
+  package_url: https://pypi.org/project/joblib
+  version: 1.3.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20033/default_5a21cf44b42c3ef13f57dcd42ae753240ea7e808.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: jsonpatch
+  description: Apply JSON-Patches
+  package_url: https://pypi.org/project/jsonpatch
+  version: '1.33'
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20389/default_dbae17f97e8212cfa7ac5c2981eb06a9bf0f7b40.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: jsonpointer
+  description: Identify specific nodes in a JSON document
+  package_url: https://pypi.org/project/jsonpointer
+  version: '2.4'
+  license: Zed
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: jsonschema
+  description: An implementation of JSON Schema validation for Python
+  package_url: https://pypi.org/project/jsonschema
+  version: 4.19.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19854/default_3fbfa1d88b4408e903227ac391490e8efb8dea58.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: jupyter_client
+  description: Jupyter protocol implementation and client libraries
+  package_url: https://pypi.org/project/jupyter_client
+  version: 8.3.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: jupyter_core
+  description: Jupyter core package
+  package_url: https://pypi.org/project/jupyter_core
+  version: 5.3.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: kiwisolver
+  description: A fast implementation of the Cassowary constraint solver
+  package_url: https://pypi.org/project/kiwisolver
+  version: 1.4.5
+  license: Other
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20772/default_b92e3d801a6b8cc7a378e4f7c25f52a138a86391.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: kombu
+  description: Messaging library for Python
+  package_url: https://pypi.org/project/kombu
+  version: 5.3.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20085/default_36085c16346155862c5c1303e8a0a70416453533.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: lazy-object-proxy
+  description: A fast and thorough lazy object proxy
+  package_url: https://pypi.org/project/lazy-object-proxy
+  version: 1.9.0
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20270/default_8197520bb021ab2bc2cb991350ef948366688c94.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: loguru
+  description: Python logging made
+  package_url: https://pypi.org/project/loguru
+  version: 0.6.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20043/default_15ea2ed8281eccea374610791971ca44800f16ec.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-06-14 10:07:48.000000000 Z
+- name: lxml
+  description: Powerful and Pythonic XML processing library combining libxml2/libxslt
+    with the ElementTree API
+  package_url: https://pypi.org/project/lxml
+  version: 4.9.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19835/default_85689b353a3a9409328e253ea28d859d29151e0c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-02 00:14:00.000000000 Z
+- name: marshmallow
+  description: A lightweight library for converting complex datatypes to and from
+    native Python datatypes
+  package_url: https://pypi.org/project/marshmallow
+  version: 3.20.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19893/default_f716e4bc541a9eb6e3f5b7a20d7c35355075b0b4.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: mccabe
+  description: McCabe checker, plugin for flake8
+  package_url: https://pypi.org/project/mccabe
+  version: 0.7.0
+  license: Saxpath
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20323/default_cafc15de82628e6c121e1ea9ce941c1410268b49.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: mistune
+  description: The fastest markdown parser in pure Python
+  package_url: https://pypi.org/project/mistune
+  version: 3.0.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20077/default_1b6ee2407cdedc6ad8878ee707164428880e399a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: monotonic
+  description: An implementation of time.monotonic
+  package_url: https://pypi.org/project/monotonic
+  version: '1.6'
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20126/default_5c04115b22cdadfa4cb3de74c5ab15c454f7c405.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: mpmath
+  description: Python library for arbitrary-precision floating-point arithmetic
+  package_url: https://pypi.org/project/mpmath
+  version: 1.3.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: msgpack
+  description: MessagePack
+  package_url: https://pypi.org/project/msgpack
+  version: 1.0.6
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19934/default_63c8e7696ded615c51302c06e54b0d0c8ae9af3f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: multidict
+  description: Multidict implementation
+  package_url: https://pypi.org/project/multidict
+  version: 6.0.4
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20160/default_8822b1755ae0c97a622ebcb1aa9cafa328004f81.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: multiprocess
+  description: Better multiprocessing and multithreading in python
+  package_url: https://pypi.org/project/multiprocess
+  version: 0.70.15
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20654/default_4658783a4f70e14bc0c2a151840ea9736539842c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: nbconvert
+  description: Converting Jupyter Notebooks
+  package_url: https://pypi.org/project/nbconvert
+  version: 7.8.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20059/default_07febc56eb57b6d4c91eb3ad11874d5d88882ab0.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: nbformat
+  description: The Jupyter Notebook format
+  package_url: https://pypi.org/project/nbformat
+  version: 5.9.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20035/default_a3692729f5b4ca7eb94218522ed4260bba4a5c15.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: nest-asyncio
+  description: Patch asyncio to allow nested event loops
+  package_url: https://pypi.org/project/nest-asyncio
+  version: 1.5.8
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20756/default_3b89e4079f3032d1be4fc7657dcb47e23c973660.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: networkx
+  description: Python package for creating and manipulating graphs and networks
+  package_url: https://pypi.org/project/networkx
+  version: '3.1'
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19877/default_8902c10687fbcd6273bdbe119fff40fa1180763f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: nltk
+  description: Natural Language Toolkit
+  package_url: https://pypi.org/project/nltk
+  version: 3.8.1
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20023/default_b0d1a54f127d7017fce41c15f5e85568fb7019ed.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: nodeenv
+  description: Node.js virtual environment builder
+  package_url: https://pypi.org/project/nodeenv
+  version: 1.8.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: numexpr
+  description: Fast numerical expression evaluator for NumPy
+  package_url: https://pypi.org/project/numexpr
+  version: 2.8.6
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20289/default_bae4ec34e549383af798a405820088989f617ff0.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: openai
+  description: The official Python library for the openai API
+  package_url: https://pypi.org/project/openai
+  version: 1.3.5
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-23 08:36:28.000000000 Z
+- name: opentelemetry-api
+  description: OpenTelemetry Python API
+  package_url: https://pypi.org/project/opentelemetry-api
+  version: 1.19.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: overrides
+  description: A decorator to automatically detect mismatch when overriding a method
+  package_url: https://pypi.org/project/overrides
+  version: 7.4.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: packaging
+  description: Core utilities for Python packages
+  package_url: https://pypi.org/project/packaging
+  version: '23.1'
+  license: BSD-3-Clause,Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19894/default_f716e4bc541a9eb6e3f5b7a20d7c35355075b0b4.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pandas
+  description: Powerful data structures for data analysis
+  package_url: https://pypi.org/project/pandas
+  version: 2.1.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19837/default_85689b353a3a9409328e253ea28d859d29151e0c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pandocfilters
+  description: Utilities for writing pandoc filters in python
+  package_url: https://pypi.org/project/pandocfilters
+  version: 1.5.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20528/default_1977a1f74deaf220f3f454ab642f7526a744ed5f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: parso
+  description: A Python Parser
+  package_url: https://pypi.org/project/parso
+  version: 0.8.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20216/default_d4dd0466552a9776ca8535b869e22a3362790c94.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pathos
+  description: Parallel graph management and execution in heterogeneous computing
+  package_url: https://pypi.org/project/pathos
+  version: 0.3.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20414/default_834dddd57f7b1404b19fa6cd08f22a7da3156be5.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pathspec
+  description: Utility library for gitignore style pattern matching of file paths
+  package_url: https://pypi.org/project/pathspec
+  version: 0.11.2
+  license: MPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20261/default_24e344cf78482d8a66297ae9ebea86f00b570483.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pexpect
+  description: Pexpect allows easy control of interactive console applications
+  package_url: https://pypi.org/project/pexpect
+  version: 4.8.0
+  license: ISC
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20078/default_1b6ee2407cdedc6ad8878ee707164428880e399a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pickleshare
+  description: Tiny 'shelve'-like database with concurrency support
+  package_url: https://pypi.org/project/pickleshare
+  version: 0.7.5
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20603/default_705055e61b43e314c99bd16582ed1fac9638127e.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pox
+  description: Utilities for filesystem exploration and automated builds
+  package_url: https://pypi.org/project/pox
+  version: 0.3.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: pre-commit
+  description: A framework for managing and maintaining multi-language pre-commit
+    hooks
+  package_url: https://pypi.org/project/pre-commit
+  version: 3.3.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20560/default_d975dcf643a054134f39226d51d4a5fea9320efe.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-29 03:17:48.000000000 Z
+- name: prompt-toolkit
+  description: Library for building powerful interactive command lines in Python
+  package_url: https://pypi.org/project/prompt-toolkit
+  version: 3.0.39
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20821/default_807bb6c1af3ee7076c92bf3b4deb3e13b204d369.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: psutil
+  description: Cross-platform lib for process and system monitoring in Python
+  package_url: https://pypi.org/project/psutil
+  version: 5.9.5
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19851/default_ac77a75c05474acf9389d56b1f5cc8241af4c384.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-05 22:35:19.000000000 Z
+- name: ptyprocess
+  description: Run a subprocess in a pseudo terminal
+  package_url: https://pypi.org/project/ptyprocess
+  version: 0.7.0
+  license: ISC
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20391/default_ec7f908dc4ac3533950df7d8e371292c0bdc3812.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pycodestyle
+  description: Python style guide checker
+  package_url: https://pypi.org/project/pycodestyle
+  version: 2.11.0
+  license: Saxpath
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20145/default_a55249b25c76872ebbee6b173a63c5fce36136f9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pycparser
+  description: C parser in Python
+  package_url: https://pypi.org/project/pycparser
+  version: '2.21'
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20072/default_d7fc4eabe57370d13c2a8ad2f7f6bb876c96c66d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pydantic
+  description: Data validation and settings management using python 3.6 type hinting
+  package_url: https://pypi.org/project/pydantic
+  version: 1.10.12
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20022/default_b0d1a54f127d7017fce41c15f5e85568fb7019ed.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pydub
+  description: Manipulate audio with an simple and easy high level interface
+  package_url: https://pypi.org/project/pydub
+  version: 0.25.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pyee
+  description: A port of node.js's EventEmitter to python
+  package_url: https://pypi.org/project/pyee
+  version: 9.0.4
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pyflakes
+  description: Passive checker of Python programs
+  package_url: https://pypi.org/project/pyflakes
+  version: 3.1.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20155/default_00b4278983e5385b6d5b93c4ffc4ef51d53270e9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-15 06:01:32.000000000 Z
+- name: pylint-plugin-utils
+  description: Utilities and helpers for writing Pylint plugins
+  package_url: https://pypi.org/project/pylint-plugin-utils
+  version: 0.8.2
+  license: GPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: 3mooth1e
+  last_updated_on: 2023-10-19 00:49:38.000000000 Z
+- name: pyparsing
+  description: Python parsing module
+  package_url: https://pypi.org/project/pyparsing
+  version: 3.1.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19881/default_2270bfab784e3d2c2d999d26b11ee478a9dad238.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pytest
+  description: 'Pytest: simple powerful testing with Python'
+  package_url: https://pypi.org/project/pytest
+  version: 7.4.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19843/default_4604ff5dcb7f4d9c7b3833591c2142493951b19c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-09 07:49:00.000000000 Z
+- name: python-Levenshtein
+  description: Python extension for computing string edit distances and similarities
+  package_url: https://pypi.org/project/python-Levenshtein
+  version: 0.21.1
+  license: GPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20140/default_927321425328d95d5d3f0c8b9fe47f1a2cffb5bf.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-21 01:14:39.000000000 Z
+- name: python-dateutil
+  description: Extensions to the standard Python datetime module
+  package_url: https://pypi.org/project/python-dateutil
+  version: 2.8.2
+  license: NRL
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19833/default_58dbe7b4d7ec447b62773209af0f9a31bbabf5bd.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: python-dotenv
+  description: Add .env support to your django/flask apps in development and deployments
+  package_url: https://pypi.org/project/python-dotenv
+  version: 1.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20095/default_3141eabecdd8efa55de73a33c43f2ac0d5bbf954.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-21 01:14:39.000000000 Z
+- name: python-json-logger
+  description: A python library adding a json log formatter
+  package_url: https://pypi.org/project/python-json-logger
+  version: 2.0.7
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20268/default_ac8229927eda3d44316aa5b5d6704388a231bb77.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pytz
+  description: World timezone definitions, modern and historical
+  package_url: https://pypi.org/project/pytz
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19841/default_bb711fa267b2329ed689711a5adb7d9e74610b20.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: pyzmq
+  description: Python bindings for 0MQ
+  package_url: https://pypi.org/project/pyzmq
+  version: 25.1.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19913/default_37434feaacace26053e41d6e4802560af16ebe44.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: qtconsole
+  description: Jupyter Qt console
+  package_url: https://pypi.org/project/qtconsole
+  version: 5.4.4
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: regex
+  description: Alternative regular expression module, to replace re
+  package_url: https://pypi.org/project/regex
+  version: 2023.8.8
+  license: Python-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19923/default_c8be5290cb8d8a8b578535a2c6475d1057ff4ea4.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: rope
+  description: A python refactoring library..
+  package_url: https://pypi.org/project/rope
+  version: 1.10.0
+  license: LGPL-3.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-28 21:51:35.000000000 Z
+- name: s3transfer
+  description: An Amazon S3 Transfer Manager
+  package_url: https://pypi.org/project/s3transfer
+  version: 0.6.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20042/default_15ea2ed8281eccea374610791971ca44800f16ec.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: scikit-learn
+  description: A set of python modules for machine learning and data mining
+  package_url: https://pypi.org/project/scikit-learn
+  version: 1.3.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19898/default_4343f8bba4f6051641ffca8b4fbe9b099402c84d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: semantic-version
+  description: A library implementing the 'SemVer' scheme
+  package_url: https://pypi.org/project/semantic-version
+  version: 2.10.0
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20254/default_49d350d2ae446ec5a00ebd45eeeaa0c300409a71.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: setuptools-scm
+  description: The blessed package to manage your versions by scm tags
+  package_url: https://pypi.org/project/setuptools-scm
+  version: 8.0.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20434/default_ddb692c01567b84e62be2bdf1939b66f9ea202da.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: six
+  description: Python 2 and 3 compatibility utilities
+  package_url: https://pypi.org/project/six
+  version: 1.16.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19827/default_74a61b43bdb9fc0cba2978316b9976f43545029b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: soupsieve
+  description: A modern CSS selector implementation for Beautiful Soup
+  package_url: https://pypi.org/project/soupsieve
+  version: '2.5'
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20367/default_f96848c380cbdcec99ab678e027c29229da52205.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: sympy
+  description: Computer algebra system
+  package_url: https://pypi.org/project/sympy
+  version: '1.12'
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19976/default_29192d68c64b1a3be468b1b73c2a129fc390c4f4.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tabulate
+  description: Pretty-print tabular data
+  package_url: https://pypi.org/project/tabulate
+  version: 0.9.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19864/default_7975a21f3bf03129dc3bc4168cf7cb7ee2cc14cc.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-06 04:44:07.000000000 Z
+- name: tblib
+  description: Traceback serialization library
+  package_url: https://pypi.org/project/tblib
+  version: 2.0.0
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20533/default_dade38abdfe446f4188d4c4755440d2748167b86.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tenacity
+  description: Retry code until it succeeds
+  package_url: https://pypi.org/project/tenacity
+  version: 8.2.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20027/default_fd02050783f95269bfcc5c4d11f1c75dd423cd1d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: terminado
+  description: Terminals served to xterm.js using Tornado websockets
+  package_url: https://pypi.org/project/terminado
+  version: 0.17.1
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20664/default_7a811a73f70dc50b94351ae6cb030cc7b1540ea6.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tinycss2
+  description: Low-level CSS parser for Python
+  package_url: https://pypi.org/project/tinycss2
+  version: 1.2.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: toml
+  description: Python Library for Tom's Obvious, Minimal Language
+  package_url: https://pypi.org/project/toml
+  version: 0.10.2
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19912/default_bc82f0b22ca8fd942e21c317967f4ab61f43eb2c.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tomli
+  description: A lil' TOML parser
+  package_url: https://pypi.org/project/tomli
+  version: 2.0.1
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tomlkit
+  description: Style preserving TOML library
+  package_url: https://pypi.org/project/tomlkit
+  version: 0.12.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20350/default_af2b356cd035e5e1c010a45df43c17b898af8c44.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: toolz
+  description: List processing tools and functional utilities
+  package_url: https://pypi.org/project/toolz
+  version: 0.12.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20079/default_7ab6b1c940c208874d4a483f0d832c7b45b3d24e.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: torch
+  description: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+  package_url: https://pypi.org/project/torch
+  license: BSD-1-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20038/default_a7a70921d2d3189665c78015850dc968f41705a1.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Effy
+  last_updated_on: 2023-10-20 21:59:32.000000000 Z
+- name: torchvision
+  description: Image and video datasets and models for torch deep learning
+  package_url: https://pypi.org/project/torchvision
+  version: 0.15.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20377/default_86c41789cbd5dc6b872b122419740f58f5d2f18a.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tornado
+  description: Tornado is a Python web framework and asynchronous networking library
+  package_url: https://pypi.org/project/tornado
+  version: 6.3.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19860/default_4a8a8fdc10130068bf295812b98e9b72fb42fe70.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: tqdm
+  description: Fast, Extensible Progress Meter
+  package_url: https://pypi.org/project/tqdm
+  version: 4.66.1
+  license: MPL-2.0,MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19846/default_accee5d2b8ed75c2245f13504daf75b1cbc8cc9f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-08 07:25:58.000000000 Z
+- name: traitlets
+  description: Traitlets Python config system
+  package_url: https://pypi.org/project/traitlets
+  version: 5.10.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20029/default_73018c8841403fdd7d8f629d056cba8f938c5589.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: typing-inspect
+  description: Runtime inspection utilities for typing module
+  package_url: https://pypi.org/project/typing-inspect
+  version: 0.9.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: uvicorn
+  description: The lightning-fast ASGI server
+  package_url: https://pypi.org/project/uvicorn
+  version: 0.15.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20431/default_f824837db22536768ec317b67275fa384fad7d47.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/minis3/requirements.txt
+  detection_source: minis3/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-20 18:45:34.000000000 Z
+- name: vine
+  description: Promises, promises, promises
+  package_url: https://pypi.org/project/vine
+  version: 5.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: virtualenv
+  description: Virtual Python Environment builder
+  package_url: https://pypi.org/project/virtualenv
+  version: 20.24.5
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19970/default_1c8812e05cf754e8f654b8d86b3f025827f5bfb6.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: vulture
+  description: Find dead code
+  package_url: https://pypi.org/project/vulture
+  version: '2.10'
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-11-28 06:57:53.000000000 Z
+- name: wcwidth
+  description: Measures number of Terminal column cells of wide-character codes
+  package_url: https://pypi.org/project/wcwidth
+  version: 0.2.6
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20026/default_77bb3e5ea95c1543fd636eba30e7257b80fbd4f6.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: webcolors
+  description: A library for working with color names and color values formats defined
+    by HTML and CSS
+  package_url: https://pypi.org/project/webcolors
+  version: '1.13'
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20536/default_204c8420775bf241799cfda883755b8613757a78.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: webencodings
+  description: Character encoding aliases for legacy web content
+  package_url: https://pypi.org/project/webencodings
+  version: 0.5.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20327/default_1342a7e78c3c34f58715077849cd487ffddd263d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: websocket-client
+  description: WebSocket client for Python. hybi13 is supported
+  package_url: https://pypi.org/project/websocket-client
+  version: 1.6.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19910/default_67f813d4aac73d024261bcfded6ef2b918e384a0.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: websockets
+  description: An implementation of the WebSocket Protocol
+  package_url: https://pypi.org/project/websockets
+  version: 11.0.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19951/default_fbe690a687f1af7dc36ac3d526708be3294c4cc9.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: wrapt
+  description: Module for decorators, wrappers and monkey patching
+  package_url: https://pypi.org/project/wrapt
+  version: 1.15.0
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19946/default_0b0a94e1bdf3e64deeccb23892ca2335bdc30e4f.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: yamllint
+  description: A linter for YAML files
+  package_url: https://pypi.org/project/yamllint
+  version: 1.32.0
+  license: GPL-3.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20506/default_dcfd16fdf7f5ec686bd8934c31e6383c6da8356b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/pyproject.toml
+  detection_source: pyproject.toml
+  last_updated_by: 3mooth1e
+  last_updated_on: 2023-10-19 01:04:16.000000000 Z
+- name: yarl
+  description: Yet another URL library
+  package_url: https://pypi.org/project/yarl
+  version: 1.9.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20083/default_d8789f2f1b5b4e9994bef68371453a20460b4d6e.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-09-09 22:04:53.000000000 Z
+- name: zipp
+  description: Backport of pathlib-compatible object wrapper for zip files
+  package_url: https://pypi.org/project/zipp
+  version: 3.17.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20247/default_47b8ee8db82e43d9eef35923435bd8cc855f3a1b.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/sandbox/requirements.txt
+  detection_source: sandbox/requirements.txt
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-10-06 00:14:38.000000000 Z
+- name: "@emotion/core"
+  description: "&gt; Simple styling in React"
+  package_url: https://www.npmjs.com/@emotion/core
+  version: 11.0.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16475/default_482cf308e8fc087eee8e154f29cc142c834abc51.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 08:43:41.000000000 Z
+- name: "@emotion/styled"
+  description: Styled API for emotion
+  package_url: https://www.npmjs.com/@emotion/styled
+  version: 11.11.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16702/default_4b738bf1758d38dddd276589bbea47fca5a990df.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 02:49:37.000000000 Z
+- name: "@types/node"
+  description: TypeScript definitions for Node.js
+  package_url: https://www.npmjs.com/@types/node
+  version: 20.5.7
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15809/default_5e5e8ac63beda29f31f1844df64d4b8247570a66.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/self_deploy/package-lock.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-07-17 05:21:48.000000000 Z
+- name: "@vercel/analytics"
+  description: Gain real-time traffic insights with Vercel Web Analytics
+  package_url: https://www.npmjs.com/@vercel/analytics
+  version: 1.0.1
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package/npm/image.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-01 01:24:36.000000000 Z
+- name: chokidar
+  description: A neat wrapper around node.js fs.watch / fs.watchFile / fsevents
+  package_url: https://www.npmjs.com/chokidar
+  version: 3.5.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16043/default_5fd43aeff4d6a935abc13737de01a0355210499d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 02:49:37.000000000 Z
+- name: nock
+  description: HTTP server mocking and expectations library for Node.js
+  package_url: https://www.npmjs.com/nock
+  version: 13.3.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16036/default_5fd43aeff4d6a935abc13737de01a0355210499d.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/self_deploy/package-lock.json
+  detection_source: self_deploy/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-30 10:19:01.000000000 Z
+- name: node
+  description: Node
+  package_url: https://www.npmjs.com/node
+  version: 20.5.0
+  license: ISC
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/17983/default_fc5f66cf44024e173fd07c415d4f30ca58b4cbad.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/tests/js_tests/yarn.lock
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-15 02:46:44.000000000 Z
+- name: process
+  description: Process information for node.js and browsers
+  package_url: https://www.npmjs.com/process
+  version: 0.11.10
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/17866/default_99a4718ac3f2beccb28962b727b0a38010c9b496.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 02:49:37.000000000 Z
+- name: react-dom
+  description: React package for working with the DOM
+  package_url: https://www.npmjs.com/react-dom
+  version: 18.2.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15808/default_14fd11531839d935f920b6d55bd6f3528c890ad7.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-09 10:34:46.000000000 Z
+- name: react-icons
+  description: SVG React icons of popular icon packs using ES6 imports
+  package_url: https://www.npmjs.com/react-icons
+  version: 4.10.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16909/default_7b9968788548874538c601457e8dcd9c74bd2051.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-09 10:34:46.000000000 Z
+- name: react-markdown
+  description: Renders Markdown as React components
+  package_url: https://www.npmjs.com/react-markdown
+  version: 8.0.7
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/17056/default_d17bbf7e4f3b102e29ff09c01b8165e7ba600319.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/docs/package.json
+  detection_source: docs/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-09 10:34:46.000000000 Z
+- name: tsc
+  description: Latest code from microsoft/typescript packaged and released
+  package_url: https://www.npmjs.com/tsc
+  version: 2.0.4
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/18739/default_45da7a7c78da21b4de04db19cc949c3490185f5e.png
+  detection_source_url: https://github.com/LokeshJonnakuti/sweep/blob/main/extension/package.json
+  detection_source: extension/package.json
+  last_updated_by: Kevin Lu
+  last_updated_on: 2023-08-14 02:49:37.000000000 Z
