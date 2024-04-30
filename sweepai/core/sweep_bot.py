@@ -657,8 +657,10 @@ class SweepBot(CodeGenBot, GithubBot):
         try:
             try:
                 response = requests.post(
-                    MINIS3_URL, json={"filename": file_path, "content": content}, 
-                timeout=60)
+                    MINIS3_URL,
+                    json={"filename": file_path, "content": content},
+                    timeout=60,
+                )
                 response.raise_for_status()
                 return MINIS3_URL.rstrip("/") + response.json()["url"]
             except Exception as e:

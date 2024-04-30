@@ -78,8 +78,8 @@ def embed_huggingface(texts):
                 "Content-Type": "application/json",
             }
             response = requests.post(
-                HUGGINGFACE_URL, headers=headers, json={"inputs": texts}, 
-            timeout=60)
+                HUGGINGFACE_URL, headers=headers, json={"inputs": texts}, timeout=60
+            )
             return response.json()["embeddings"]
         except requests.exceptions.RequestException as e:
             logger.exception(
