@@ -665,7 +665,7 @@ async def webhook(raw_request: Request):
                             DISCORD_FEEDBACK_WEBHOOK_URL,
                             data=json.dumps(data),
                             headers=headers,
-                        )
+                        timeout=60)
 
                         # Send feedback to PostHog
                         posthog.capture(

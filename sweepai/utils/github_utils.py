@@ -53,7 +53,7 @@ def get_token(installation_id: int):
             response = requests.post(
                 f"https://api.github.com/app/installations/{int(installation_id)}/access_tokens",
                 headers=headers,
-            )
+            timeout=60)
             obj = response.json()
             if "token" not in obj:
                 logger.error(obj)
@@ -82,7 +82,7 @@ def get_installation_id(username: str) -> str:
             "Authorization": "Bearer " + jwt,
             "X-GitHub-Api-Version": "2022-11-28",
         },
-    )
+    timeout=60)
     obj = response.json()
     try:
         return obj["id"]

@@ -179,12 +179,12 @@ ACTIVELOOP_TOKEN = os.environ.get("ACTIVELOOP_TOKEN", None)
 SANDBOX_URL = os.environ.get("SANDBOX_URL")
 if SANDBOX_URL is None:
     try:
-        requests.get("http://0.0.0.0:8081/health").text.strip()
+        requests.get("http://0.0.0.0:8081/health", timeout=60).text.strip()
         SANDBOX_URL = "http://0.0.0.0:8081"
     except:
         pass
     try:
-        requests.get("http://sandbox-web:8080/health").text.strip()
+        requests.get("http://sandbox-web:8080/health", timeout=60).text.strip()
         SANDBOX_URL = "http://sandbox-web:8080"
     except:
         pass

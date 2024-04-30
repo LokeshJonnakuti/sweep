@@ -42,7 +42,7 @@ def download_logs(repo_full_name: str, run_id: int, installation_id: int):
     response = requests.get(
         f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs",
         headers=headers,
-    )
+    timeout=60)
 
     logs_str = ""
     if response.status_code == 200:
