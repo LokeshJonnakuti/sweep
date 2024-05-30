@@ -1140,6 +1140,7 @@ def on_ticket(
                         )
                         return True
                 return False
+
             changed_files = []
             for item in generator:
                 if isinstance(item, dict):
