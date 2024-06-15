@@ -18,6 +18,7 @@ from redis import Redis
 from redis.backoff import ExponentialBackoff
 from redis.exceptions import BusyLoadingError, ConnectionError, TimeoutError
 from redis.retry import Retry
+from security import safe_requests
 
 from sweepai.config.client import SweepConfig
 from sweepai.config.server import GITHUB_APP_ID, GITHUB_APP_PEM, REDIS_URL
@@ -25,7 +26,6 @@ from sweepai.logn import logger
 from sweepai.utils.ctags import CTags
 from sweepai.utils.ctags_chunker import get_ctags_for_file
 from sweepai.utils.tree_utils import DirectoryTree
-from security import safe_requests
 
 MAX_FILE_COUNT = 50
 
@@ -76,7 +76,8 @@ def get_github_client(installation_id: int):
 
 def get_installation_id(username: str) -> str:
     jwt = get_jwt()
-    response = safe_requests.get(f"https://api.github.com/users/{username}/installation",
+    response = safe_requests.get(
+        f"https://api.github.com/users/{username}/installation",
         headers={
             "Accept": "application/vnd.github+json",
             "Authorization": "Bearer " + jwt,
@@ -163,7 +164,9 @@ class ClonedRepo:
                 repo = git.Repo.clone_from(self.clone_url, self.cached_dir)
             logger.info("Repo already cached, copying")
         logger.info("Copying repo...")
-        shutil.copytree(self.cached_dir, self.repo_dir, symlinks=True, copy_function=shutil.copy)
+        shutil.copytree(
+            self.cached_dir, self.repo_dir, symlinks=True, copy_function=shutil.copy
+        )
         logger.info("Done copying")
         repo = git.Repo(self.repo_dir)
         return repo

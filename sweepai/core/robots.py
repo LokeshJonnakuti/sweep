@@ -1,4 +1,5 @@
 import traceback
+
 from robotexclusionrulesparser import RobotExclusionRulesParser
 from security import safe_requests
 

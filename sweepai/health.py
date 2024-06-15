@@ -4,9 +4,9 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from loguru import logger
 from pymongo import MongoClient
+from security import safe_requests
 
 from sweepai.config.server import IS_SELF_HOSTED, MONGODB_URI, REDIS_URL, SANDBOX_URL
-from security import safe_requests
 
 app = FastAPI()
 

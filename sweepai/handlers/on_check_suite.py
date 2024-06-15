@@ -6,11 +6,12 @@ import re
 import time
 import zipfile
 
+from security import safe_requests
+
 from sweepai.config.client import get_gha_enabled
 from sweepai.core.entities import PRChangeRequest
 from sweepai.events import CheckRunCompleted
 from sweepai.utils.github_utils import get_github_client, get_token
-from security import safe_requests
 
 log_message = """GitHub actions yielded the following error.
 
@@ -38,7 +39,8 @@ def download_logs(repo_full_name: str, run_id: int, installation_id: int):
         "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28",
     }
-    response = safe_requests.get(f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs",
+    response = safe_requests.get(
+        f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs",
         headers=headers,
     )
 
