@@ -1,7 +1,6 @@
 import re
-
-import requests
 from bs4 import BeautifulSoup
+from security import safe_requests
 
 # from llama_index import download_loader
 
@@ -50,7 +49,7 @@ def download_html(url: str) -> str:
     # loader = SimpleWebPageReader()
     # document, *_ = loader.load_data(urls=[url])
     # return document.text
-    return requests.get(url).text
+    return safe_requests.get(url).text
 
 
 def extract_info(url):

@@ -25,6 +25,7 @@ from sweepai.logn import logger
 from sweepai.utils.ctags import CTags
 from sweepai.utils.ctags_chunker import get_ctags_for_file
 from sweepai.utils.tree_utils import DirectoryTree
+from security import safe_requests
 
 MAX_FILE_COUNT = 50
 
@@ -75,8 +76,7 @@ def get_github_client(installation_id: int):
 
 def get_installation_id(username: str) -> str:
     jwt = get_jwt()
-    response = requests.get(
-        f"https://api.github.com/users/{username}/installation",
+    response = safe_requests.get(f"https://api.github.com/users/{username}/installation",
         headers={
             "Accept": "application/vnd.github+json",
             "Authorization": "Bearer " + jwt,
