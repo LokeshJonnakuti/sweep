@@ -44,7 +44,7 @@ class Sandbox(BaseModel):
 
     @classmethod
     def from_yaml(cls, yaml_string: str):
-        config = yaml.load(yaml_string, Loader=yaml.FullLoader)
+        config = yaml.load(yaml_string, Loader=yaml.SafeLoader)
         return cls(**config.get("sandbox", {}))
 
     @classmethod
@@ -99,7 +99,7 @@ def copy_to(container):
 
 def get_sandbox_from_config():
     if os.path.exists("sweep.yaml"):
-        config = yaml.load(open("sweep.yaml", "r"), Loader=yaml.FullLoader)
+        config = yaml.load(open("sweep.yaml", "r"), Loader=yaml.SafeLoader)
         return Sandbox(**config.get("sandbox", {}))
     else:
         return Sandbox()
