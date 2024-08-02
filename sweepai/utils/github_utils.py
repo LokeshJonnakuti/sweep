@@ -53,7 +53,8 @@ def get_token(installation_id: int):
             response = requests.post(
                 f"https://api.github.com/app/installations/{int(installation_id)}/access_tokens",
                 headers=headers,
-            timeout=60)
+                timeout=60,
+            )
             obj = response.json()
             if "token" not in obj:
                 logger.error(obj)
@@ -82,7 +83,8 @@ def get_installation_id(username: str) -> str:
             "Authorization": "Bearer " + jwt,
             "X-GitHub-Api-Version": "2022-11-28",
         },
-    timeout=60)
+        timeout=60,
+    )
     obj = response.json()
     try:
         return obj["id"]
@@ -163,7 +165,9 @@ class ClonedRepo:
                 repo = git.Repo.clone_from(self.clone_url, self.cached_dir)
             logger.info("Repo already cached, copying")
         logger.info("Copying repo...")
-        shutil.copytree(self.cached_dir, self.repo_dir, symlinks=True, copy_function=shutil.copy)
+        shutil.copytree(
+            self.cached_dir, self.repo_dir, symlinks=True, copy_function=shutil.copy
+        )
         logger.info("Done copying")
         repo = git.Repo(self.repo_dir)
         return repo

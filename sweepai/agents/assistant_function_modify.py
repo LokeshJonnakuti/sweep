@@ -1,11 +1,11 @@
 import traceback
 
-from sweepai.agents.assistant_wrapper import openai_assistant_call
 from loguru import logger
-from sweepai.logn.cache import file_cache
 
 from sweepai.agents.assistant_functions import search_and_replace_schema
+from sweepai.agents.assistant_wrapper import openai_assistant_call
 from sweepai.core.entities import AssistantRaisedException, Message
+from sweepai.logn.cache import file_cache
 from sweepai.utils.chat_logger import ChatLogger, discord_log_error
 from sweepai.utils.diff import generate_diff
 from sweepai.utils.progress import AssistantConversation, TicketProgress

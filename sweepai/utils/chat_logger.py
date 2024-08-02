@@ -210,7 +210,9 @@ def discord_log_error(content, priority=0):
 
         data = {"content": content}
         headers = {"Content-Type": "application/json"}
-        response = requests.post(url, data=json.dumps(data), headers=headers, timeout=60)
+        response = requests.post(
+            url, data=json.dumps(data), headers=headers, timeout=60
+        )
         # Success: response.status_code == 204:
     except SystemExit:
         raise SystemExit
