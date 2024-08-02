@@ -54,7 +54,7 @@ def _asgi_app():
             "client_secret": os.environ.get("GITHUB_CLIENT_SECRET"),
             "code": code,
         }
-        response = requests.post(GITHUB_OAUTH_URL, params=params)
+        response = requests.post(GITHUB_OAUTH_URL, params=params, timeout=60)
         if response.status > 400:
             return response.text
         else:

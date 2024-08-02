@@ -7,7 +7,7 @@ from robotexclusionrulesparser import RobotExclusionRulesParser
 def is_url_allowed(url, user_agent="*"):
     robots_url = "/".join(url.split("/")[:3]) + "/robots.txt"
     try:
-        response = requests.get(robots_url)
+        response = requests.get(robots_url, timeout=60)
         robots_txt = response.text
 
         rerp = RobotExclusionRulesParser()
