@@ -1,3 +1,4 @@
+import secrets
 
 from loguru import logger
 from openai import AzureOpenAI, OpenAI
@@ -15,7 +16,6 @@ from sweepai.config.server import (
     OPENAI_API_VERSION,
 )
 from sweepai.logn.cache import file_cache
-import secrets
 
 if BASERUN_API_KEY is not None:
     pass
@@ -63,7 +63,8 @@ class OpenAIProxy:
             # multi region config is a list of tuples of (region_url, api_key)
             # we will try each region in order until we get a response
             # randomize the order of the list
-            SHUFFLED_MULTI_REGION_CONFIG = secrets.SystemRandom().sample(MULTI_REGION_CONFIG, len(MULTI_REGION_CONFIG)
+            SHUFFLED_MULTI_REGION_CONFIG = secrets.SystemRandom().sample(
+                MULTI_REGION_CONFIG, len(MULTI_REGION_CONFIG)
             )
             for region_url, api_key in SHUFFLED_MULTI_REGION_CONFIG:
                 try:
