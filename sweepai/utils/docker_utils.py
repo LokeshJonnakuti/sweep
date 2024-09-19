@@ -1,7 +1,6 @@
 import urllib
 from datetime import datetime, timedelta, timezone
-
-import requests
+from security import safe_requests
 
 
 def get_latest_docker_version():
@@ -21,7 +20,7 @@ def get_latest_docker_version():
 
     url = "https://hub.docker.com/v2/namespaces/sweepai/repositories/sweep/tags"
     try:
-        response = requests.get(url, timeout=(1, 1))
+        response = safe_requests.get(url, timeout=(1, 1))
         response.raise_for_status()  # Raises HTTPError for bad responses (4xx and 5xx)
         data = response.json()
         truncated_time = data["results"][0]["last_updated"].split(".")[0]

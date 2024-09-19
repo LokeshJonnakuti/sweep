@@ -1,19 +1,19 @@
 import psutil
 import redis
-import requests
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from loguru import logger
 from pymongo import MongoClient
 
 from sweepai.config.server import IS_SELF_HOSTED, MONGODB_URI, REDIS_URL, SANDBOX_URL
+from security import safe_requests
 
 app = FastAPI()
 
 
 def check_sandbox_health() -> str:
     try:
-        response = requests.get(SANDBOX_URL, timeout=2)
+        response = safe_requests.get(SANDBOX_URL, timeout=2)
         response.raise_for_status()
         return "UP"
     except Exception as e:
