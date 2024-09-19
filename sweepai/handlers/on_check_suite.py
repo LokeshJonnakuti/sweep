@@ -6,11 +6,12 @@ import re
 import time
 import zipfile
 
+from security import safe_requests
+
 from sweepai.config.client import get_gha_enabled
 from sweepai.core.entities import PRChangeRequest
 from sweepai.events import CheckRunCompleted
 from sweepai.utils.github_utils import get_github_client, get_token
-from security import safe_requests
 
 log_message = """GitHub actions yielded the following error.
 
