@@ -83,7 +83,7 @@ class Sandbox(BaseModel):
 
     @classmethod
     def from_yaml(cls, yaml_string: str):
-        config = yaml.load(yaml_string, Loader=yaml.FullLoader)
+        config = yaml.load(yaml_string, Loader=yaml.SafeLoader)
         return cls(**config.get("sandbox", {}))
 
     @classmethod
