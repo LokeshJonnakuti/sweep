@@ -2,10 +2,11 @@ import re
 import traceback
 from typing import TypeVar
 
+from loguru import logger
+
 from sweepai.config.server import DEFAULT_GPT4_MODEL
 from sweepai.core.chat import ChatGPT
 from sweepai.core.entities import Message, RegexMatchableBaseModel
-from loguru import logger
 
 system_prompt = """You are a brilliant and meticulous engineer assigned to review the following commit diffs and make sure the file conforms to the user's rules.
 If the diffs do not conform to the rules, we should create a GitHub issue telling the user what changes should be made.
@@ -63,7 +64,9 @@ class IssueTitleAndDescription(RegexMatchableBaseModel):
     issue_description: str
 
     @classmethod
-    def from_string(cls: type["IssueTitleAndDescription"], string: str, **kwargs) -> "IssueTitleAndDescription":
+    def from_string(
+        cls: type["IssueTitleAndDescription"], string: str, **kwargs
+    ) -> "IssueTitleAndDescription":
         changes_required_pattern = (
             r"""<changes_required>(\n)?(?P<changes_required>.*)</changes_required>"""
         )

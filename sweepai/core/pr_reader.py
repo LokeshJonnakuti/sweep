@@ -2,9 +2,9 @@ import re
 from itertools import islice
 
 from github.Repository import Repository
+from loguru import logger
 from pydantic import BaseModel
 
-from loguru import logger
 from sweepai.config.client import SweepConfig
 
 summary_format_brief = """# Pull Request #{id_}
@@ -48,7 +48,9 @@ class PRReader(BaseModel):
             _match.group("pr_id") for _match in set(re.finditer(pattern_1, content))
         ] + [_match.group("pr_id") for _match in set(re.finditer(pattern_2, content))]
 
-    def extract_summary_from_pr_id(self, pr_id: int, sweep_config: SweepConfig = None) -> str:
+    def extract_summary_from_pr_id(
+        self, pr_id: int, sweep_config: SweepConfig = None
+    ) -> str:
         pr = self.repo.get_pull(int(pr_id))
         diff = ""
         files = list(islice(pr.get_files(), 51))
@@ -62,9 +64,11 @@ class PRReader(BaseModel):
         return summary_format.format(
             id_=pr_id, pr_title=pr.title, pr_summary=pr.body, diff=diff
         )
-    
+
     # output a truncated version of the pr summary
-    def extract_summary_from_pr_id_brief(self, pr_id: int, sweep_config: SweepConfig = None) -> str:
+    def extract_summary_from_pr_id_brief(
+        self, pr_id: int, sweep_config: SweepConfig = None
+    ) -> str:
         pr = self.repo.get_pull(int(pr_id))
         files_touched = ""
         files = list(islice(pr.get_files(), 101))
@@ -87,7 +91,11 @@ class PRReader(BaseModel):
             summaries = []
             result = ""
             for pr_id in pr_reader.extract_pr_ids(content):
-                summaries.append(pr_reader.extract_summary_from_pr_id(pr_id, sweep_config = sweep_config))
+                summaries.append(
+                    pr_reader.extract_summary_from_pr_id(
+                        pr_id, sweep_config=sweep_config
+                    )
+                )
                 result += summaries[-1]
             if result:
                 result = (
@@ -95,13 +103,17 @@ class PRReader(BaseModel):
                     + result
                     + "\nBe sure to follow the PRs as a reference when making code changes. If the user instructs you to follow the referenced PR, limit the scope of your changes to the referenced PR."
                 )
-            
+
             # output brief version
             if len(result) > sweep_config.truncation_cutoff:
                 brief_summaries = []
                 result = ""
                 for pr_id in pr_reader.extract_pr_ids(content):
-                    brief_summaries.append(pr_reader.extract_summary_from_pr_id_brief(pr_id, sweep_config = sweep_config))
+                    brief_summaries.append(
+                        pr_reader.extract_summary_from_pr_id_brief(
+                            pr_id, sweep_config=sweep_config
+                        )
+                    )
                     result += brief_summaries[-1]
                 if result:
                     result = (
@@ -110,7 +122,9 @@ class PRReader(BaseModel):
                         + "\nBe sure to follow the PRs as a reference when making code changes. If the user instructs you to follow the referenced PR, limit the scope of your changes to the referenced PR."
                     )
 
-            return result[:sweep_config.max_github_comment_body_length] # enforce hard cut off
+            return result[
+                : sweep_config.max_github_comment_body_length
+            ]  # enforce hard cut off
         except Exception as e:
             logger.error(f"Failed to extract PRs from content: {e}")
             return ""

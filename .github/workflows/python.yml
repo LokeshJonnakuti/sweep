@@ -1,6 +1,6 @@
 name: Python CI All
 
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 

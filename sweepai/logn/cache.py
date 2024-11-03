@@ -15,6 +15,7 @@ MAX_DEPTH = 6
 #     logger.debug("File cache is disabled.")
 redis_client = Redis.from_url(REDIS_URL) if REDIS_URL else None
 
+
 def recursive_hash(value, depth=0, ignore_params=[]):
     """Hash primitives recursively with maximum depth."""
     if depth > MAX_DEPTH:
@@ -58,10 +59,12 @@ def file_cache(ignore_params=[], ignore_contents=False, verbose=False, redis=Fal
     def decorator(func):
         if FILE_CACHE_DISABLED:
             return func
-        func_source_code_hash = hash_code(inspect.getsource(func)) if not ignore_contents else ""
+        func_source_code_hash = (
+            hash_code(inspect.getsource(func)) if not ignore_contents else ""
+        )
 
         def wrapper(*args, **kwargs):
-            if kwargs.get('do_not_use_file_cache', False):
+            if kwargs.get("do_not_use_file_cache", False):
                 return func(*args, **kwargs)
             cache_dir = CACHE_DIRECTORY + "/file_cache"
             os.makedirs(cache_dir, exist_ok=True)
@@ -84,11 +87,9 @@ def file_cache(ignore_params=[], ignore_contents=False, verbose=False, redis=Fal
                 + func_source_code_hash
             )
             cache_key = f"{func.__module__}_{func.__name__}_{arg_hash}"
-            cache_file = os.path.join(
-                cache_dir, f"{cache_key}.pickle"
-            )
+            cache_file = os.path.join(cache_dir, f"{cache_key}.pickle")
             redis_cache_hit = False
-            if redis and redis_client: # only use this for LLM calls
+            if redis and redis_client:  # only use this for LLM calls
                 try:
                     cached_result = redis_client.get(cache_key)
                     if cached_result:
@@ -112,13 +113,17 @@ def file_cache(ignore_params=[], ignore_contents=False, verbose=False, redis=Fal
             if result is None:
                 result = func(*args, **kwargs)
             # hydrate both caches in all cases
-            if redis and redis_client and not redis_cache_hit: # cache this to redis as well
+            if (
+                redis and redis_client and not redis_cache_hit
+            ):  # cache this to redis as well
                 try:
                     # Cache the result using the unique cache key only if it wasn't a redis cache hit
                     redis_client.set(cache_key, pickle.dumps(result))
                 except Exception as e:
                     if verbose:
-                        print(f"Redis caching failed for function: {func.__name__}, Error: {e}")
+                        print(
+                            f"Redis caching failed for function: {func.__name__}, Error: {e}"
+                        )
             if isinstance(result, Exception):
                 logger.info(f"Function {func.__name__} returned an exception")
             elif not os.path.exists(cache_file):
@@ -156,9 +161,13 @@ def redis_cache(ignore_params=[], verbose=False):
 
             # Create a unique cache key
             cache_key = (
-                func.__module__ + ":" + func.__name__ + ":"
+                func.__module__
+                + ":"
+                + func.__name__
+                + ":"
                 + recursive_hash((args_dict, kwargs), ignore_params=ignore_params)
-                + ":" + func_source_code_hash
+                + ":"
+                + func_source_code_hash
             )
 
             # Attempt to retrieve the cached result
@@ -183,7 +192,9 @@ def redis_cache(ignore_params=[], verbose=False):
 
     return decorator
 
+
 if __name__ == "__main__":
+
     @file_cache(redis=True)
     def test_func(a, b):
         time.sleep(3)

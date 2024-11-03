@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from typing import Literal
 
 
-
 @dataclass
 class GHAFix:
     suite_url: str
     logs: str = ""
-    status: Literal["pending"] | Literal["skipped"] | Literal["planning"] | Literal["modifying"] | Literal["done"] = "pending"
+    status: Literal["pending"] | Literal["skipped"] | Literal["planning"] | Literal[
+        "modifying"
+    ] | Literal["done"] = "pending"
     # starts with pending, skip if suite passes
     # if it errors we first plan changes and then mark as done
     fix_commit_hash: str = ""

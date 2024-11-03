@@ -1,9 +1,9 @@
 import traceback
 
-from loguru import logger
 import resend
 from github import Github
 from github.AppAuthentication import AppAuthentication
+from loguru import logger
 from pydantic import BaseModel
 
 from sweepai.config.server import (

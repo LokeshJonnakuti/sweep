@@ -92,13 +92,13 @@ return np.array(embeddings)
 
 ## Implementation Details
 1. The first nuance is that we only truncate the text if we get a BadRequestError. This is because truncation is slow, and we only want to do it if we have to. This is optional, and you can truncate beforehand if you prefer.
-2. It's important to prune empty strings. Otherwise openai will throw an error without telling you why. We added this line to handle it. 
+2. It's important to prune empty strings. Otherwise openai will throw an error without telling you why. We added this line to handle it.
     `texts = [text if text else " " for text in texts]`
 
 ## Design Choices
 We designed our vector database in this way because it’s simple and reliable. We don’t have to worry about managing separate infrastructure, and we can handle a lot of reads/writes.
 
-#### Requirements 
+#### Requirements
 
 - We need to handle hundreds of codebases with frequent updates
     - This architecture does not require any indices. Typically in Pinecone you’d have separate repositories under different namespaces (https://docs.pinecone.io/reference/fetch).
@@ -109,7 +109,7 @@ We designed our vector database in this way because it’s simple and reliable. 
     - Learning how to use a new API and manage new infrastructure was not worth it in this case.
 
 #### Non-requirements
-- This approach is relatively slow (~1 second per query). We don’t need sub-second latency for our generating pull requests because our GPT4 calls are much slower. 
+- This approach is relatively slow (~1 second per query). We don’t need sub-second latency for our generating pull requests because our GPT4 calls are much slower.
     - This is because we process/cache the entire index at runtime. We key our cache on the actual content’s SHA256 hash.
     - A codebase doesn’t tend to change a substantial percentage of it’s files day-to-day. So if we use the actual contents as a hash, we only have to re-embed the diffs. This lets us completely skip offline indexing, simplifying our vector db implementation.
 

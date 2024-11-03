@@ -2,11 +2,11 @@ import os
 
 from loguru import logger
 from tqdm import tqdm
+
 from sweepai.config.client import SweepConfig
 from sweepai.core.repo_parsing_utils import FILE_THRESHOLD, filter_file
 from sweepai.utils.github_utils import ClonedRepo, get_installation_id
 from sweepai.utils.timer import Timer
-
 
 if __name__ == "__main__":
     REPO_FULL_NAME = os.environ.get("REPO_FULL_NAME")
@@ -37,6 +37,7 @@ if __name__ == "__main__":
                         yield entry.path
         except NotADirectoryError:
             yield file_path
+
     with Timer():
         file_list = dfs()
         file_list = [
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     def render_directory_tree(file_list, max_depth=None):
         tree = {}
         for path in file_list:
-            parts = path.split('/')
+            parts = path.split("/")
             current = tree
             for part in parts:
                 current = current.setdefault(part, {})
@@ -64,29 +65,34 @@ if __name__ == "__main__":
             return dir_tree_string
 
         return render_tree(tree).strip()
+
     print(render_directory_tree(truncated_file_list))
+
     def analyze_subfolder_distribution(file_list):
         subfolders = {}
         for path in file_list:
-            parts = path.split('/')
+            parts = path.split("/")
             for i in range(len(parts)):
-                subfolder = '/'.join(parts[:i+1])
+                subfolder = "/".join(parts[: i + 1])
                 subfolders[subfolder] = subfolders.get(subfolder, 0) + 1
 
         total_files = len(file_list)
         print(f"Total files: {total_files}")
-        print("File distribution by subfolder (>0.5% of total files or parent not included):")
+        print(
+            "File distribution by subfolder (>0.5% of total files or parent not included):"
+        )
 
         def should_include(subfolder):
             percentage = (subfolders[subfolder] / total_files) * 100
             if percentage > 0.5:
                 return True
-            parent = '/'.join(subfolder.split('/')[:-1])
+            parent = "/".join(subfolder.split("/")[:-1])
             return parent and parent not in subfolders
 
         for subfolder, count in subfolders.items():
             if subfolder and should_include(subfolder):
                 percentage = (count / total_files) * 100
                 print(f"{subfolder}: {count} files ({percentage:.2f}%)")
+
     print(analyze_subfolder_distribution(truncated_file_list))
     breakpoint()

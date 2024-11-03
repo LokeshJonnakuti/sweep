@@ -1,6 +1,7 @@
 # as an mvp this will take a pr and then review the code to generate a summary, then a comprehensive list of valid concerns
 # todo: citations, more complex code analysis
 import os
+
 from dotenv import load_dotenv
 from github import Github
 from loguru import logger
@@ -19,6 +20,7 @@ pr_number = int(url.split("/pull/")[1].split("/")[0])
 
 GITHUB_PAT = os.environ.get("GITHUB_PAT", None)
 
+
 # Get the repository and pull request objects
 def temp_pr_changes(url):
     g = Github(GITHUB_PAT)
@@ -28,10 +30,16 @@ def temp_pr_changes(url):
     pr_changes, _, _ = get_pr_changes(repo, pr)
     return pr_changes
 
+
 pr_changes = temp_pr_changes(url)
 breakpoint()
 # breakpoint()
 # exit()
-chat_logger=ChatLogger({"username": "Code Review","title": "Code Review Test",})
+chat_logger = ChatLogger(
+    {
+        "username": "Code Review",
+        "title": "Code Review Test",
+    }
+)
 review_bot = PRReviewBot()
 breakpoint()

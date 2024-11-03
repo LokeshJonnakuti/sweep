@@ -1,6 +1,8 @@
 import base64
+
 import chardet
 from github.Repository import Repository
+
 
 # attempts to decode a file with the following encodings
 def read_file_with_fallback_encodings(
@@ -22,6 +24,7 @@ def read_file_with_fallback_encodings(
         f"Could not decode {file_path} with any of the specified encodings: {encodings}"
     )
 
+
 # attempts to incode a string using the following encodings
 def encode_file_with_fallback_encodings(
     file_contents: str, encodings=["utf-8", "windows-1252", "iso-8859-1"]
@@ -38,12 +41,7 @@ def encode_file_with_fallback_encodings(
     )
 
 
-def safe_decode(
-    repo: Repository,
-    path: str,
-    *args,
-    **kwargs
-):
+def safe_decode(repo: Repository, path: str, *args, **kwargs):
     """
     By default, this function will decode the file contents from the repo.
     But if the file > 1MB, we will fetch the raw content and then decode it manually ourselves.
@@ -54,7 +52,9 @@ def safe_decode(
         contents = repo.get_contents(path, *args, **kwargs)
         if contents.encoding == "none":
             blob = repo.get_git_blob(contents.sha)
-            detected_encoding = chardet.detect(base64.b64decode(blob.content))['encoding']
+            detected_encoding = chardet.detect(base64.b64decode(blob.content))[
+                "encoding"
+            ]
             if detected_encoding is None:
                 return None
             else:

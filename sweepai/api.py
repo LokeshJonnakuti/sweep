@@ -6,21 +6,16 @@ import threading
 import time
 from typing import Optional
 
-from fastapi import (
-    Body,
-    Depends,
-    FastAPI,
-    Header,
-    HTTPException,
-    Path,
-    Request,
-)
+import sentry_sdk
+from fastapi import Body, Depends, FastAPI, Header, HTTPException, Path, Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
-from github.Commit import Commit
 from github import GithubException
+from github.Commit import Commit
+from sentry_sdk import set_user
 
+from sweepai.chat.api import app as chat_app
 from sweepai.config.client import (
     RESTART_SWEEP_BUTTON,
     REVERT_CHANGED_FILES_TITLE,
@@ -40,25 +35,16 @@ from sweepai.config.server import (
     IS_SELF_HOSTED,
     SENTRY_URL,
 )
-from sweepai.chat.api import app as chat_app
 from sweepai.core.entities import PRChangeRequest
 from sweepai.global_threads import global_threads
-from sweepai.handlers.review_pr import review_pr
-from sweepai.handlers.create_pr import (  # type: ignore
-    create_gha_pr,
-)
+from sweepai.handlers.create_pr import create_gha_pr  # type: ignore
 from sweepai.handlers.on_button_click import handle_button_click
-from sweepai.handlers.on_check_suite import (  # type: ignore
-    clean_gh_logs,
-    download_logs,
-)
+from sweepai.handlers.on_check_suite import clean_gh_logs, download_logs  # type: ignore
 from sweepai.handlers.on_comment import on_comment
 from sweepai.handlers.on_jira_ticket import handle_jira_ticket
 from sweepai.handlers.on_ticket import on_ticket
-from sweepai.utils.buttons import (
-    check_button_activated,
-    check_button_title_match,
-)
+from sweepai.handlers.review_pr import review_pr
+from sweepai.utils.buttons import check_button_activated, check_button_title_match
 from sweepai.utils.chat_logger import ChatLogger
 from sweepai.utils.event_logger import logger, posthog
 from sweepai.utils.github_utils import CURRENT_USERNAME, get_github_client
@@ -77,8 +63,6 @@ from sweepai.web.events import (
     PRRequest,
 )
 from sweepai.web.health import health_check
-import sentry_sdk
-from sentry_sdk import set_user
 
 version = time.strftime("%y.%m.%d.%H")
 
@@ -87,7 +71,7 @@ if SENTRY_URL:
         dsn=SENTRY_URL,
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
-        release=version
+        release=version,
     )
 
 app = FastAPI()
@@ -102,6 +86,7 @@ security = HTTPBearer()
 
 templates = Jinja2Templates(directory="sweepai/web")
 logger.bind(application="webhook")
+
 
 def run_on_ticket(*args, **kwargs):
     tracking_id = get_hash()
@@ -121,6 +106,7 @@ def run_on_comment(*args, **kwargs):
         tracking_id=tracking_id,
     ):
         on_comment(*args, **kwargs, tracking_id=tracking_id)
+
 
 def run_review_pr(*args, **kwargs):
     tracking_id = get_hash()
@@ -179,6 +165,7 @@ def call_on_ticket(*args, **kwargs):
     thread.start()
     global_threads.append(thread)
 
+
 def call_on_comment(
     *args, **kwargs
 ):  # TODO: if its a GHA delete all previous GHA and append to the end
@@ -207,6 +194,7 @@ def call_on_comment(
         thread = threading.Thread(target=worker, name=key)
         thread.start()
         global_threads.append(thread)
+
 
 # add a review by sweep on the pr
 def call_review_pr(*args, **kwargs):
@@ -240,7 +228,12 @@ def home(request: Request):
         logger.warning(e)
         license_expired = True
     return templates.TemplateResponse(
-        name="index.html", context={"version": version, "request": request, "license_expired": license_expired}
+        name="index.html",
+        context={
+            "version": version,
+            "request": request,
+            "license_expired": license_expired,
+        },
     )
 
 
@@ -275,11 +268,14 @@ def handle_request(request_dict, event=None):
 # @app.post("/")
 async def validate_signature(
     request: Request,
-    x_hub_signature: Optional[str] = Header(None, alias="X-Hub-Signature-256")
+    x_hub_signature: Optional[str] = Header(None, alias="X-Hub-Signature-256"),
 ):
     payload_body = await request.body()
-    if not verify_signature(payload_body=payload_body, signature_header=x_hub_signature):
+    if not verify_signature(
+        payload_body=payload_body, signature_header=x_hub_signature
+    ):
         raise HTTPException(status_code=403, detail="Request signatures didn't match!")
+
 
 @app.post("/", dependencies=[Depends(validate_signature)])
 def webhook(
@@ -293,6 +289,7 @@ def webhook(
         logger.info(f"Received event: {x_github_event}, {action}")
         return handle_request(request_dict, event=x_github_event)
 
+
 @app.post("/jira")
 def jira_webhook(
     request_dict: dict = Body(...),
@@ -300,7 +297,9 @@ def jira_webhook(
     def call_jira_ticket(*args, **kwargs):
         thread = threading.Thread(target=handle_jira_ticket, args=args, kwargs=kwargs)
         thread.start()
+
     call_jira_ticket(event=request_dict)
+
 
 # Set up cronjob for this
 @app.get("/update_sweep_prs_v2")
@@ -360,20 +359,25 @@ def update_sweep_prs_v2(repo_full_name: str, installation_id: int):
     except Exception:
         logger.warning("Failed to update sweep PRs")
 
+
 def should_handle_comment(request: CommentCreatedRequest | IssueCommentRequest):
     comment = request.comment.body
     return (
         (
-            comment.lower().startswith("sweep:") # we will handle all comments (with or without label) that start with "sweep:"
+            comment.lower().startswith(
+                "sweep:"
+            )  # we will handle all comments (with or without label) that start with "sweep:"
         )
-        and request.comment.user.type == "User" # ensure it's a user comment
-        and request.comment.user.login not in BLACKLISTED_USERS # ensure it's not a blacklisted user
-        and BOT_SUFFIX not in comment # we don't handle bot commnents
+        and request.comment.user.type == "User"  # ensure it's a user comment
+        and request.comment.user.login
+        not in BLACKLISTED_USERS  # ensure it's not a blacklisted user
+        and BOT_SUFFIX not in comment  # we don't handle bot commnents
     )
+
 
 def handle_event(request_dict, event):
     action = request_dict.get("action")
-    
+
     username = request_dict.get("sender", {}).get("login")
     if username:
         set_user({"username": username})
@@ -472,12 +476,20 @@ def handle_event(request_dict, event):
                     pr = repo.get_pull(request_dict["pull_request"]["number"])
                     # check if review_pr is restricted
                     allowed_repos = os.environ.get("PR_REVIEW_REPOS", "")
-                    allowed_repos_set = set(allowed_repos.split(',')) if allowed_repos else set()
+                    allowed_repos_set = (
+                        set(allowed_repos.split(",")) if allowed_repos else set()
+                    )
                     allowed_usernames = os.environ.get("PR_REVIEW_USERNAMES", "")
-                    allowed_usernames_set = set(allowed_usernames.split(',')) if allowed_usernames else set()
+                    allowed_usernames_set = (
+                        set(allowed_usernames.split(","))
+                        if allowed_usernames
+                        else set()
+                    )
                     # only call review pr if user names are allowed
                     # defaults to all users/repos if not set
-                    if (not allowed_repos or repo.name in allowed_repos_set) and (not allowed_usernames or pr.user.login in allowed_usernames_set):
+                    if (not allowed_repos or repo.name in allowed_repos_set) and (
+                        not allowed_usernames or pr.user.login in allowed_usernames_set
+                    ):
                         # run pr review
                         call_review_pr(
                             username=pr.user.login,
@@ -493,9 +505,9 @@ def handle_event(request_dict, event):
                 try:
                     pr_request = PRLabeledRequest(**request_dict)
                     # run only if sweep label is added to the pull request
-                    if (
-                        GITHUB_LABEL_NAME in [label.name.lower() for label in pr_request.pull_request.labels] 
-                    ):
+                    if GITHUB_LABEL_NAME in [
+                        label.name.lower() for label in pr_request.pull_request.labels
+                    ]:
                         _, g = get_github_client(request_dict["installation"]["id"])
                         repo = g.get_repo(request_dict["repository"]["full_name"])
                         pr = repo.get_pull(request_dict["pull_request"]["number"])
@@ -535,8 +547,13 @@ def handle_event(request_dict, event):
                                 description=GITHUB_LABEL_DESCRIPTION,
                             )
                         except GithubException as e:
-                            if e.status == 422 and any(error.get("code") == "already_exists" for error in e.data.get("errors", [])):
-                                logger.warning(f"Label '{GITHUB_LABEL_NAME}' already exists in the repository")
+                            if e.status == 422 and any(
+                                error.get("code") == "already_exists"
+                                for error in e.data.get("errors", [])
+                            ):
+                                logger.warning(
+                                    f"Label '{GITHUB_LABEL_NAME}' already exists in the repository"
+                                )
                             else:
                                 raise e
                     current_issue = repo.get_issue(number=request.issue.number)
@@ -629,7 +646,9 @@ def handle_event(request_dict, event):
                     and request.comment.user.login not in BLACKLISTED_USERS
                 ):
                     if should_handle_comment(request):
-                        logger.info(f"Handling comment on PR: {request.issue.pull_request}")
+                        logger.info(
+                            f"Handling comment on PR: {request.issue.pull_request}"
+                        )
                         pr_change_request = PRChangeRequest(
                             params={
                                 "comment_type": "comment",
@@ -649,7 +668,7 @@ def handle_event(request_dict, event):
                 request = IssueRequest(**request_dict)
                 if (
                     GITHUB_LABEL_NAME
-                    in [label.name.lower() for label in request.issue.labels]  
+                    in [label.name.lower() for label in request.issue.labels]
                     and request.sender.type == "User"
                     and not request.sender.login.startswith("sweep")
                 ):
@@ -808,7 +827,9 @@ def handle_event(request_dict, event):
                         pr = repo.get_pull(request.pull_request.number)
                         # check if review_pr is restricted
                         allowed_repos = os.environ.get("PR_REVIEW_REPOS", "")
-                        allowed_repos_set = set(allowed_repos.split(',')) if allowed_repos else set()
+                        allowed_repos_set = (
+                            set(allowed_repos.split(",")) if allowed_repos else set()
+                        )
                         if not allowed_repos or repo.name in allowed_repos_set:
                             # run pr review
                             call_review_pr(
@@ -843,7 +864,7 @@ def handle_event(request_dict, event):
                     pr = g.get_repo(pr_request.repository.full_name).get_pull(
                         pr_request.number
                     )
-                    
+
                     total_lines_in_commit = 0
                     total_lines_edited_by_developer = 0
                     edited_by_developers = False
@@ -853,7 +874,11 @@ def handle_event(request_dict, event):
                         if commit.author.login != CURRENT_USERNAME:
                             total_lines_edited_by_developer += lines_modified
                     # this was edited by a developer if at least 25% of the lines were edited by a developer
-                    edited_by_developers = total_lines_in_commit > 0 and (total_lines_edited_by_developer / total_lines_in_commit) >= 0.25
+                    edited_by_developers = (
+                        total_lines_in_commit > 0
+                        and (total_lines_edited_by_developer / total_lines_in_commit)
+                        >= 0.25
+                    )
                     posthog.capture(
                         merged_by,
                         event_name,

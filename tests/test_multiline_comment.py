@@ -1,9 +1,8 @@
 from sweepai.dataclasses.comments import CommentDiffSpan
-from sweepai.utils.github_utils import get_github_client, get_installation_id
 from sweepai.utils.diff import get_diff_spans
+from sweepai.utils.github_utils import get_github_client, get_installation_id
 
-
-old_content = '''
+old_content = """
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -11,13 +10,13 @@ old_content = '''
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta 
+    <meta
       name="description"
       content="Sweep is an AI coding assistant."
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <meta
-      property="og:title" 
+      property="og:title"
       content="Sweep: turn bugs and feature requests into code changes."
     />
     <meta
@@ -57,9 +56,9 @@ old_content = '''
   </body>
 </html>
 
-'''
+"""
 
-new_content = '''
+new_content = """
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -67,13 +66,13 @@ new_content = '''
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
-    <meta 
+    <meta
       name="description"
       content="Sweep is an AI coding assistant."
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <meta
-      property="og:title" 
+      property="og:title"
       content="Sweep: turn bugs and feature requests into code changes."
     />
     <meta
@@ -109,7 +108,7 @@ new_content = '''
   </body>
 </html>
 
-'''
+"""
 
 file_name = "public/index.html"
 
@@ -123,17 +122,19 @@ repo = g.get_repo(f"{org_name}/{repo_name}")
 pr = repo.get_pull(pr_number)
 diff_spans = get_diff_spans(old_content, new_content, file_name)
 
+
 def start_review(pr):
     import requests
+
     api_url = f"https://api.github.com/repos/{repo.full_name}/pulls/{pr_number}/reviews"
     headers = {
         "Authorization": f"Bearer {_token}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github.v3+json",
     }
     data = {
         "commit_id": pr.get_commits().reversed[0].sha,
         "body": "Starting a review for suggestion comments",
-        "event": "COMMENT"
+        "event": "COMMENT",
     }
     response = requests.post(api_url, headers=headers, json=data)
     if response.status_code == 200:
@@ -143,12 +144,16 @@ def start_review(pr):
         print(f"Error message: {response.text}")
         return None
 
+
 def create_review_comment(pr, diff_span: CommentDiffSpan, review_id: int) -> bool:
     import requests
-    api_url = f"https://api.github.com/repos/{repo.full_name}/pulls/{pr_number}/comments"
+
+    api_url = (
+        f"https://api.github.com/repos/{repo.full_name}/pulls/{pr_number}/comments"
+    )
     headers = {
         "Authorization": f"Bearer {_token}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github.v3+json",
     }
     data = {
         "body": f"```suggestion\n{diff_span.new_code}\n```",
@@ -156,7 +161,7 @@ def create_review_comment(pr, diff_span: CommentDiffSpan, review_id: int) -> boo
         "line": diff_span.old_end_line,
         "start_line": diff_span.old_start_line,
         "side": "RIGHT",
-        "pull_request_review_id": review_id
+        "pull_request_review_id": review_id,
     }
     response = requests.post(api_url, headers=headers, json=data)
     if response.status_code == 201:
@@ -166,22 +171,23 @@ def create_review_comment(pr, diff_span: CommentDiffSpan, review_id: int) -> boo
         print(f"Error message: {response.text}")
     return response.status_code == 201
 
+
 def submit_review(pr, review_id: int):
     import requests
+
     api_url = f"https://api.github.com/repos/{repo.full_name}/pulls/{pr_number}/reviews/{review_id}/events"
     headers = {
         "Authorization": f"Bearer {_token}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github.v3+json",
     }
-    data = {
-        "event": "COMMENT"
-    }
+    data = {"event": "COMMENT"}
     response = requests.post(api_url, headers=headers, json=data)
     if response.status_code == 200:
         print("Review submitted successfully!")
     else:
         print(f"Failed to submit review. Status code: {response.status_code}")
         print(f"Error message: {response.text}")
+
 
 review_id = start_review(pr)
 if review_id:

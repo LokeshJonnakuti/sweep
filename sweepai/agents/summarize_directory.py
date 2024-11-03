@@ -2,17 +2,17 @@ import os
 
 from loguru import logger
 
-from sweepai.core.entities import SNIPPET_FORMAT
 from sweepai.config.client import SweepConfig
 from sweepai.core.chat import call_llm
-from sweepai.core.entities import Snippet
+from sweepai.core.entities import SNIPPET_FORMAT, Snippet
 from sweepai.logn.cache import file_cache
 from sweepai.utils.github_utils import ClonedRepo
 from sweepai.utils.timer import Timer
 
 FILE_THRESHOLD = 240
 
-@file_cache() # cache for now, later investigate why this is so slow
+
+@file_cache()  # cache for now, later investigate why this is so slow
 def count_descendants(directory: str):
     descendant_count = {}
     dir_file_count = {}
@@ -52,9 +52,13 @@ def count_descendants(directory: str):
 
 instructions = "Do NOT list the files, just explain what types of content this directory contains (code, documentation, configs, assets, tests etc.). Explain the purpose of the directory. Only list describe contents that appear in multiple files.  Be concise and optimize for informational density. One paragraph."
 
-system_prompt = "Your job is to summarize the following directory from the repository. " + instructions
+system_prompt = (
+    "Your job is to summarize the following directory from the repository. "
+    + instructions
+)
 
-user_prompt = """Summarize the following directory from the repository.
+user_prompt = (
+    """Summarize the following directory from the repository.
 
 Repository:
 {repo_name}
@@ -66,7 +70,10 @@ Directory:
 {snippets_string}
 </example_files>
 
-""" + instructions
+"""
+    + instructions
+)
+
 
 def summarize_directory(
     directory: str,
@@ -74,14 +81,21 @@ def summarize_directory(
     cloned_repo: ClonedRepo,
     directory_summaries: dict[str, str] = {},
 ):
-    snippets_string = "\n\n".join([SNIPPET_FORMAT.format(
-        denotation=snippet.denotation,
-        contents=snippet.expand(50).get_snippet(False, False)
-    ) for snippet in snippets])
+    snippets_string = "\n\n".join(
+        [
+            SNIPPET_FORMAT.format(
+                denotation=snippet.denotation,
+                contents=snippet.expand(50).get_snippet(False, False),
+            )
+            for snippet in snippets
+        ]
+    )
 
     for subdir, summary in directory_summaries.items():
         if subdir.startswith(directory) and summary:
-            snippets_string += f"\n\nHere is a summary of the subdirectory {subdir}:\n\n" + summary
+            snippets_string += (
+                f"\n\nHere is a summary of the subdirectory {subdir}:\n\n" + summary
+            )
             # breakpoint()
 
     response = call_llm(
@@ -92,12 +106,14 @@ def summarize_directory(
             "directory": directory,
             "snippets_string": snippets_string.strip(),
         },
-        verbose=False
+        verbose=False,
     )
 
     return response
 
+
 NUM_SNIPPET_EXAMPLES = 10
+
 
 def recursively_summarize_directory(
     snippets: list[Snippet],
@@ -112,14 +128,17 @@ def recursively_summarize_directory(
         if descendant_counts[subdir] <= 5:
             continue
         logger.info(f"Summarizing {subdir}")
-        snippets_in_subdir = [snippet for snippet in snippets if snippet.file_path.removeprefix(cloned_repo.repo_dir).removeprefix("/").startswith(subdir)][:NUM_SNIPPET_EXAMPLES]
+        snippets_in_subdir = [
+            snippet
+            for snippet in snippets
+            if snippet.file_path.removeprefix(cloned_repo.repo_dir)
+            .removeprefix("/")
+            .startswith(subdir)
+        ][:NUM_SNIPPET_EXAMPLES]
         if not snippets_in_subdir:
             continue
         directory_summaries[subdir] = summarize_directory(
-            subdir,
-            snippets_in_subdir,
-            cloned_repo,
-            directory_summaries
+            subdir, snippets_in_subdir, cloned_repo, directory_summaries
         )
     for subdir, summary in directory_summaries.items():
         print(subdir)
@@ -129,8 +148,9 @@ def recursively_summarize_directory(
 
 
 if __name__ == "__main__":
-    from sweepai.utils.github_utils import MockClonedRepo
     from sweepai.core.lexical_search import prepare_lexical_search_index
+    from sweepai.utils.github_utils import MockClonedRepo
+
     cloned_repo = MockClonedRepo("/tmp/sweep", "sweepai/sweep")
     directory = "docs"
     directory = "sweepai/core"

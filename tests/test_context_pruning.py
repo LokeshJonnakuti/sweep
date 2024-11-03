@@ -1,11 +1,14 @@
 import unittest
-from sweepai.core.context_pruning import (
-    build_full_hierarchy,
-    load_graph_from_file,
-    RepoContextManager,
-    get_relevant_context,
-)
+
 import networkx as nx
+
+from sweepai.core.context_pruning import (
+    RepoContextManager,
+    build_full_hierarchy,
+    get_relevant_context,
+    load_graph_from_file,
+)
+
 
 class TestContextPruning(unittest.TestCase):
     def test_build_full_hierarchy(self):
@@ -47,4 +50,8 @@ class TestContextPruning(unittest.TestCase):
         )
         self.assertIsInstance(rcm, RepoContextManager)
         self.assertTrue(len(rcm.current_top_snippets) > 0)
-        self.assertTrue(any("client.py" in snippet.file_path for snippet in rcm.current_top_snippets))
+        self.assertTrue(
+            any(
+                "client.py" in snippet.file_path for snippet in rcm.current_top_snippets
+            )
+        )

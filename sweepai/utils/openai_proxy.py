@@ -2,8 +2,15 @@ import os
 import random
 
 import backoff
+from anthropic import Anthropic
 from loguru import logger
-from openai import APITimeoutError, AzureOpenAI, InternalServerError, OpenAI, RateLimitError
+from openai import (
+    APITimeoutError,
+    AzureOpenAI,
+    InternalServerError,
+    OpenAI,
+    RateLimitError,
+)
 from openai.types.chat.chat_completion import ChatCompletion
 
 from sweepai.config.server import (
@@ -23,7 +30,6 @@ from sweepai.config.server import (
 from sweepai.core.entities import Message
 from sweepai.logn.cache import file_cache
 from sweepai.utils.timer import Timer
-from anthropic import Anthropic
 
 OPENAI_TIMEOUT = 120
 
@@ -101,9 +107,7 @@ class OpenAIProxy:
                     except RateLimitError as e:
                         logger.exception(f"Rate Limit Error calling Azure: {e}")
                 else:
-                    logger.info(
-                        f"Calling OpenAI with model {model}."
-                    )
+                    logger.info(f"Calling OpenAI with model {model}.")
                     with Timer():
                         return self.set_openai_default_api_parameters(
                             model=model,
@@ -198,7 +202,9 @@ class OpenAIProxy:
             )
         return response
 
-    def call_azure_api(self, model, messages, tools, max_tokens, temperature) -> ChatCompletion:
+    def call_azure_api(
+        self, model, messages, tools, max_tokens, temperature
+    ) -> ChatCompletion:
         client = AzureOpenAI(
             api_key=AZURE_API_KEY,
             azure_endpoint=OPENAI_API_BASE,
@@ -251,12 +257,12 @@ class OpenAIProxy:
                 stream=True,
             )
             text = ""
-            for chunk in response: # pylint: disable=E1133
+            for chunk in response:  # pylint: disable=E1133
                 new_content = chunk.choices[0].delta.content
                 text += new_content if new_content else ""
                 if new_content:
                     print(new_content, end="", flush=True)
-            print() # clear the line
+            print()  # clear the line
             return text
         else:
             response = client.chat.completions.create(
@@ -266,7 +272,7 @@ class OpenAIProxy:
                 max_tokens=max_tokens,
                 temperature=temperature,
                 timeout=OPENAI_TIMEOUT,
-                seed=SEED,  
+                seed=SEED,
             )
             return response.choices[0].message.content
 
@@ -274,21 +280,13 @@ class OpenAIProxy:
 def get_client():
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
     OPENAI_API_TYPE = os.environ.get("OPENAI_API_TYPE", "openai")
-    OPENAI_API_BASE = os.environ.get(
-        "OPENAI_API_BASE", None
-    )
-    AZURE_API_KEY = os.environ.get(
-        "AZURE_API_KEY", None
-    )
-    AZURE_OPENAI_DEPLOYMENT = os.environ.get(
-        "AZURE_OPENAI_DEPLOYMENT", None
-    )
-    OPENAI_API_VERSION = os.environ.get(
-        "OPENAI_API_VERSION", None
-    )
+    OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
+    AZURE_API_KEY = os.environ.get("AZURE_API_KEY", None)
+    AZURE_OPENAI_DEPLOYMENT = os.environ.get("AZURE_OPENAI_DEPLOYMENT", None)
+    OPENAI_API_VERSION = os.environ.get("OPENAI_API_VERSION", None)
     if OPENAI_API_TYPE == "anthropic":
         client = Anthropic()
-        model="claude-3-opus-20240229"
+        model = "claude-3-opus-20240229"
     if OPENAI_API_TYPE == "openai":
         client = OpenAI(api_key=OPENAI_API_KEY, timeout=90) if OPENAI_API_KEY else None
         model = DEFAULT_GPT4_MODEL
@@ -298,10 +296,11 @@ def get_client():
             api_key=AZURE_API_KEY,
             api_version=OPENAI_API_VERSION,
         )
-        model=AZURE_OPENAI_DEPLOYMENT
+        model = AZURE_OPENAI_DEPLOYMENT
     else:
         raise ValueError(f"Invalid OPENAI_API_TYPE: {OPENAI_API_TYPE}")
     return model, client
+
 
 def get_embeddings_client() -> OpenAI | AzureOpenAI:
     client = None
@@ -318,6 +317,7 @@ def get_embeddings_client() -> OpenAI | AzureOpenAI:
         raise ValueError("No Valid API key found for OpenAI or Azure!")
     return client
 
+
 def test_openai_proxy():
     openai_proxy = OpenAIProxy()
     response = openai_proxy.call_openai(
@@ -332,6 +332,7 @@ def test_openai_proxy():
     )
     print((response))
 
+
 def test_get_client():
     model, client = get_client()
     client.beta.assistants.create(
@@ -341,19 +342,22 @@ def test_get_client():
         instructions="Say this is a test",
     )
 
+
 if __name__ == "__main__":
     model, client = get_client()
     response = client.chat.completions.create(
         model=model,
-        messages=[Message(
-            role="user",
-            content="Say this is a test",
-        ).to_openai()],
+        messages=[
+            Message(
+                role="user",
+                content="Say this is a test",
+            ).to_openai()
+        ],
         stream=True,
     )
     print("Generating response...", flush=True)
     text = ""
-    for chunk in response: # pylint: disable=E1133
+    for chunk in response:  # pylint: disable=E1133
         new_content = chunk.choices[0].delta.content
         text += new_content if new_content else ""
         if new_content:

@@ -4,6 +4,7 @@ It is only called by the webhook handler in sweepai/api.py.
 """
 
 import difflib
+import hashlib
 import io
 import os
 import re
@@ -11,35 +12,22 @@ import zipfile
 
 import markdown
 import requests
-from github import Repository, IncompletableObject
-from github.PullRequest import PullRequest
+from github import IncompletableObject, Repository
 from github.Issue import Issue
+from github.PullRequest import PullRequest
 from loguru import logger
 from tqdm import tqdm
-import hashlib
-
 
 from sweepai.agents.pr_description_bot import PRDescriptionBot
-from sweepai.config.client import (
-    RESTART_SWEEP_BUTTON,
-    SweepConfig,
-)
-from sweepai.core.entities import (
-    SandboxResponse,
-)
+from sweepai.config.client import RESTART_SWEEP_BUTTON, SweepConfig
+from sweepai.core.entities import SandboxResponse
 from sweepai.dataclasses.codereview import CodeReview, CodeReviewIssue
-from sweepai.handlers.create_pr import (
-    safe_delete_sweep_branch,
-)
+from sweepai.handlers.create_pr import safe_delete_sweep_branch
 from sweepai.handlers.on_check_suite import clean_gh_logs, remove_ansi_tags
 from sweepai.utils.buttons import create_action_buttons
 from sweepai.utils.chat_logger import ChatLogger
 from sweepai.utils.concurrency_utils import fire_and_forget_wrapper
-from sweepai.utils.github_utils import (
-    CURRENT_USERNAME,
-    get_github_client,
-    get_token,
-)
+from sweepai.utils.github_utils import CURRENT_USERNAME, get_github_client, get_token
 from sweepai.utils.str_utils import (
     BOT_SUFFIX,
     blockquote,
@@ -52,7 +40,6 @@ from sweepai.utils.str_utils import (
     stars_suffix,
 )
 from sweepai.utils.user_settings import UserSettings
-
 
 sweeping_gif = """<a href="https://github.com/sweepai/sweep"><img class="swing" src="https://raw.githubusercontent.com/sweepai/sweep/main/.assets/sweeping.gif" width="100" style="width:50px; margin-bottom:10px" alt="Sweeping"></a>"""
 
@@ -102,8 +89,10 @@ Propose a fix to the failing github actions. You must edit the source code, not 
 
 SWEEP_PR_REVIEW_HEADER = "# Sweep: PR Review"
 
+
 def center(text: str) -> str:
     return f"<div align='center'>{text}</div>"
+
 
 # Add :eyes: emoji to ticket
 def add_emoji(issue: Issue, comment_id: int = None, reaction_content="eyes"):
@@ -159,6 +148,7 @@ def create_error_logs(
         else ""
     )
 
+
 # takes in a list of workflow runs and returns a list of messages containing the logs of the failing runs
 def get_failing_gha_logs(runs, installation_id) -> str:
     token = get_token(installation_id)
@@ -173,7 +163,8 @@ def get_failing_gha_logs(runs, installation_id) -> str:
                 "Authorization": f"Bearer {token}",
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-        timeout=60)
+            timeout=60,
+        )
         if jobs_response.status_code == 200:
             failed_jobs = []
             jobs = jobs_response.json()["jobs"]
@@ -186,7 +177,7 @@ def get_failing_gha_logs(runs, installation_id) -> str:
                 # add failed steps
                 for step in job["steps"]:
                     if step["conclusion"] == "failure":
-                        parsed_name = step['name'].replace('/','')
+                        parsed_name = step["name"].replace("/", "")
                         failed_jobs_name_list.append(
                             f"{job['name']}/{step['number']}_{parsed_name}"
                         )
@@ -210,7 +201,8 @@ def get_failing_gha_logs(runs, installation_id) -> str:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
             allow_redirects=True,
-        timeout=60)
+            timeout=60,
+        )
         # Check if the request was successful
         if logs_response.status_code == 200:
             zip_data = io.BytesIO(logs_response.content)
@@ -523,9 +515,7 @@ def get_payment_messages(chat_logger: ChatLogger):
         if not is_paying_user and not is_consumer_tier
         else ""
     )
-    user_type = (
-        "💎 <b>Sweep Pro</b>" if is_paying_user else "⚡ <b>Sweep Basic Tier</b>"
-    )
+    user_type = "💎 <b>Sweep Pro</b>" if is_paying_user else "⚡ <b>Sweep Basic Tier</b>"
     gpt_tickets_left_message = (
         f"{ticket_count} Sweep issues left for the month"
         if not is_paying_user
@@ -572,7 +562,7 @@ def render_code_review_issues(
     pr: PullRequest,
     code_review: CodeReview,
     issue_type: str = "",
-    sorted_issues: list[CodeReviewIssue] = [], # changes how issues are rendered
+    sorted_issues: list[CodeReviewIssue] = [],  # changes how issues are rendered
 ):
     files_to_blobs = {file.filename: file.blob_url for file in list(pr.get_files())}
     # generate the diff urls
@@ -589,12 +579,8 @@ def render_code_review_issues(
     code_issues_string = ""
     for issue in code_issues:
         if issue.file_name in files_to_blobs:
-            issue_blob_url = (
-                f"{files_to_blobs[issue.file_name]}#L{issue.line_number}"
-            )
-            issue_diff_url = (
-                f"{files_to_diffs[issue.file_name]}R{issue.line_number}"
-            )
+            issue_blob_url = f"{files_to_blobs[issue.file_name]}#L{issue.line_number}"
+            issue_diff_url = f"{files_to_diffs[issue.file_name]}R{issue.line_number}"
             if sorted_issues:
                 code_issues_string += f"<li>In `{issue.file_name}`: {issue.issue_description}</li>\n\n{issue_blob_url}\n[View Diff]({issue_diff_url})"
             else:
@@ -643,8 +629,7 @@ def format_code_sections(text: str) -> str:
 
 
 def create_review_comments_for_code_issues(
-    pr: PullRequest,
-    code_issues: list[CodeReviewIssue]
+    pr: PullRequest, code_issues: list[CodeReviewIssue]
 ):
     commit_sha = pr.head.sha
     commits = list(pr.get_commits())
@@ -658,10 +643,7 @@ def create_review_comments_for_code_issues(
         comment_line = int(issue.line_number)
         comment_path = os.path.normpath(issue.file_name)
         pr.create_review_comment(
-            body=comment_body, 
-            commit=pr_commit, 
-            path=comment_path, 
-            line=comment_line
+            body=comment_body, commit=pr_commit, path=comment_path, line=comment_line
         )
 
 
@@ -679,14 +661,18 @@ def render_pr_review_by_file(
     body = f"{SWEEP_PR_REVIEW_HEADER}\n"
     pr_summary = ""
     if pr_authors:
-        body += f"Authors: {pr_authors}\n" if ", " in pr_authors else f"Author: {pr_authors}\n" 
+        body += (
+            f"Authors: {pr_authors}\n"
+            if ", " in pr_authors
+            else f"Author: {pr_authors}\n"
+        )
     # pull request summary goes to the bottom
     if pull_request_summary:
         pr_summary += f"\n<h3>Summary</h3>\n{pull_request_summary}\n<hr>\n"
     issues_section = ""
     potential_issues_section = ""
     # build issues section
-        # create review comments for all the issues
+    # create review comments for all the issues
     all_issues = []
     all_potential_issues = []
     for _, code_review in code_review_by_file.items():
@@ -726,14 +712,16 @@ def render_pr_review_by_file(
     if len(all_issues) == 0 and len(all_potential_issues) == 0:
         issues_section = "The Pull Request looks good! Sweep did not find any issues."
         if not formatted_comment_threads:
-            issues_section = "The Pull Request looks good! Sweep did not find any new issues."
+            issues_section = (
+                "The Pull Request looks good! Sweep did not find any new issues."
+            )
     elif len(all_issues) == 0:
         issues_section = "The Pull Request looks good! Sweep did not find any issues but found some potential issues that you may want to take a look at."
         if not formatted_comment_threads:
             issues_section = "The Pull Request looks good! Sweep did not find any new issues but found some potential issues that you may want to take a look at."
     else:
         if len(all_issues) == 1:
-            issues_section = f"\n\nSweep found `{len(all_issues)}` new issue.\n\n" 
+            issues_section = f"\n\nSweep found `{len(all_issues)}` new issue.\n\n"
         else:
             issues_section = f"\n\nSweep found `{len(all_issues)}` new issues.\n\n"
         issues_section += "Sweep has left comments on the pull request for you to review. \nYou may respond to any comment Sweep made your feedback will be taken into consideration if you run the review again. If Sweep made a mistake, you can resolve the comment or let Sweep know by responding to the comment."
@@ -775,7 +763,9 @@ def create_update_review_pr_comment(
             if author:
                 pr_authors.add(f"{author.login}")
         except IncompletableObject as e:
-            logger.error(f"Failed to retrieve author {author} for commit {commit.sha}: {str(e)}")
+            logger.error(
+                f"Failed to retrieve author {author} for commit {commit.sha}: {str(e)}"
+            )
     pr_authors = ", ".join(pr_authors)
 
     # comment has not yet been created
@@ -810,4 +800,3 @@ def create_update_review_pr_comment(
         sweep_comment.edit(rendered_pr_review)
     comment_id = sweep_comment.id
     return comment_id
-

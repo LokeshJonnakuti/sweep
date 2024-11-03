@@ -27,7 +27,7 @@ For example, to modify code we'll input the old code, any relevant context, and 
     <img src="/assets/multi_llm_step.png" alt="Multiple llm steps being chained" style={{ height: "400px" }} />
 </div>
 
-A typical improvement involves tweaking a small part of our pipeline (like improving our planning algorithm), then running the entire pipeline again. 
+A typical improvement involves tweaking a small part of our pipeline (like improving our planning algorithm), then running the entire pipeline again.
 We use pdb (python's native debugger) to set breakpoints and inspect the state of our prompts, input values, and parsing logic.
 For example, we can check whether a certain string matches a regex:
 ```shell
@@ -51,10 +51,10 @@ LLM calls are slow but their inputs and outputs are easy to cache, saving a lot 
 
 lru_cache is great for memoizing repeated function calls, but it doesn't support two key features.
 
-1. we need to persist the cache between runs. 
+1. we need to persist the cache between runs.
    - lru_cache stores the results in-memory, which means that the next time you run the program the cache will be empty. file_cache stores the results on disk. We also considered using Redis, but writing to disk is easier to set up/manage.
 
-2. lru_cache doesn't support ignoring arguments that invalidate the cache. 
+2. lru_cache doesn't support ignoring arguments that invalidate the cache.
     - We'll use a custom `chat_logger` which stores the chats for visualization. It contains the current timestamp `chat_logger.expiration`, which will invalidate the cache if it's serialized.
     - To counteract this we added ignored parameters, used like this: `file_cache(ignore_params=["chat_logger"])`. This removes `chat_logger` from the cache key construction and prevents bad invalidation due to the constantly changing `expiration`.
 
@@ -82,7 +82,7 @@ except Exception as e:
     print(e) # -> this doesn't work
 ```
 
-hashlib.md5 alone doesn't work for objects, giving us the error: `TypeError: object supporting the buffer API required`. 
+hashlib.md5 alone doesn't work for objects, giving us the error: `TypeError: object supporting the buffer API required`.
 We use recursive_hash, which works for arbitrary python objects.
 
 ```python /recursive_hash(item, depth + 1, ignore_params)/ /recursive_hash(key, depth + 1, ignore_params)/ /+ recursive_hash(val, depth + 1, ignore_params)/ /recursive_hash(value.__dict__, depth + 1, ignore_params)/
@@ -114,7 +114,7 @@ def recursive_hash(value, depth=0, ignore_params=[]):
         return recursive_hash(value.__dict__, depth + 1, ignore_params)
     else:
         return hashlib.md5("unknown".encode()).hexdigest()
-``` 
+```
 
 ### file_cache
 file_cache is a decorator that handles the caching logic for us.

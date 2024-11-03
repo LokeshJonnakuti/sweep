@@ -218,14 +218,14 @@ Error #0: Summary of the error
 You will first think step-by-step about the error, and then either rewrite the instructions with the corrected fix, or drop the task.
 
 <thinking>
-Analyze extremely carefully in great detail what went wrong, including the file path and the specific code block that needs to be modified. 
+Analyze extremely carefully in great detail what went wrong, including the file path and the specific code block that needs to be modified.
 If you have failed to copy code verbatim, describe precisely what is different between the code you provided and the code in the actual file. Reference the exact lines in the diff provided showing the difference between your original code and what is in the file.
 </thinking>
 
 Then, let's resolve the errors in your proposed plan. You MUST pick ONE of the following options:
 a. If you would like to patch the corresponding task of the plan, create a modify block with an index. The index should be equivalent to the error number of this error_resolution block, so it must be one of the following allowed integers: {allowed_indices}.
 b. If the error is a file path, correct the file path. This is preferred if the code does not need to be changed.
-c. Otherwise, if you absolutely cannot resolve the error, drop the task. 
+c. Otherwise, if you absolutely cannot resolve the error, drop the task.
 
 You must pick exactly ONE option from the three options presented above. Follow this format:
 
@@ -333,13 +333,13 @@ b. List ALL relevant read-only utility modules from the provided set and specify
 </issue_analysis>
 
 # 2. Plan:
-<plan>  
+<plan>
 <create file="file_path_1">
 Instructions for creating the new file. Reference imports and entity names. Include relevant type definitions, interfaces, and schemas.
 </create>
 [additional creates]
 
-<modify file="file_path_2"> 
+<modify file="file_path_2">
 One sentence explanation of the change. Instructions for modifying one section of the file.
 
 1. Reference the original code in <original_code> tags, copying them VERBATIM from the file. Do NOT paraphrase or abbreviate the source code. Placeholder comments like "# existing code" are not permitted. This block must NOT be empty.
@@ -362,8 +362,8 @@ Use multiple <modify> blocks for the same file to separate distinct changes.
 
 # 3. Relevant Modules:
 <relevant_modules>
-[List of all relevant files to reference while making changes, one per line] 
-</relevant_modules>""" # + files_to_change_example TODO: test separately
+[List of all relevant files to reference while making changes, one per line]
+</relevant_modules>"""  # + files_to_change_example TODO: test separately
 
 gha_files_to_change_system_prompt = """You are an AI assistant for analyzing failing errors in a developer's code. You will be provided code files, a description of the issue, the error log, relevant parts of the codebase, and the changes he's made.
 
@@ -428,7 +428,7 @@ For each unique error log identified in the previous step, you will need to prov
 
 Guidelines:
 <guidelines>
-- Always include the full file path and reference the provided files 
+- Always include the full file path and reference the provided files
 - Prioritize using existing code and utility methods to minimize writing new code
 - Break the task into small steps, with each <modify> section for each logical code block worth of change. Use multiple <modify> blocks for the same file if there are multiple distinct changes to make in that file, such as for imports.
 - A <modify> block must contain exactly one change in one <new_code> tag.
@@ -450,7 +450,7 @@ Error message 1/n: Identify the error message.
 
 Then, based on the analysis, propose a fix by following the format below. If the error has already been fixed, you can skip this step.
 
-<modify file="file_path"> 
+<modify file="file_path">
 Instructions for modifying one section of the file. Each block must have exactly one original_code and one new_code block.
 
 a. Describe the section of code that needs to be modified.
@@ -477,11 +477,11 @@ Do not attempt to fix multiple issues with a single modify block, each issue mus
 [additional <error_analysis> blocks as needed, for ALL error messages in the error logs
 </plan>"""
 
-plan_selection_prompt = """Critique the pros and cons of each plan based on the following guidelines, prioritizing thoroughness and correctness over potential performance overhead: 
-- Correctness: The code change should fully address the original issue or requirement without introducing new bugs, security vulnerabilities, or performance problems. Follow defensive programming practices, such as avoiding implicit assumptions, validating inputs, and handling edge cases. Consider the potential impact on all relevant data structures and ensure the solution maintains data integrity and consistency. Thoroughness is a top priority. 
-- Backwards Compatibility: When possible, avoid breaking changes to public APIs, data formats, or behaviors that existing code depends on. 
-- Clarity: The code change should be readable, well-structured, and easy for other developers to understand and maintain. Follow existing conventions and style guides, and include documentation and comments for complex or non-obvious logic. 
-- Simplicity: Strive for a solution that is as simple as possible while still being complete and correct. Favor straightforward and easily understandable code. Performance overhead should not be a factor in evaluating simplicity. 
+plan_selection_prompt = """Critique the pros and cons of each plan based on the following guidelines, prioritizing thoroughness and correctness over potential performance overhead:
+- Correctness: The code change should fully address the original issue or requirement without introducing new bugs, security vulnerabilities, or performance problems. Follow defensive programming practices, such as avoiding implicit assumptions, validating inputs, and handling edge cases. Consider the potential impact on all relevant data structures and ensure the solution maintains data integrity and consistency. Thoroughness is a top priority.
+- Backwards Compatibility: When possible, avoid breaking changes to public APIs, data formats, or behaviors that existing code depends on.
+- Clarity: The code change should be readable, well-structured, and easy for other developers to understand and maintain. Follow existing conventions and style guides, and include documentation and comments for complex or non-obvious logic.
+- Simplicity: Strive for a solution that is as simple as possible while still being complete and correct. Favor straightforward and easily understandable code. Performance overhead should not be a factor in evaluating simplicity.
 - Integration: Assess how well the change fits with the overall architecture and design of the system. Avoid tightly coupling components or introducing new dependencies that could complicate future development or deployment. After evaluating the plans against these criteria, select the one that provides the most thorough and correct solution within the specific context and constraints of the project. Prioritize long-term maintainability and architectural integrity.
 
 Respond using the following XML format:
@@ -505,7 +505,7 @@ Here is an example response format:
 
 context_files_to_change_system_prompt = """You are an AI assistant helping an intern plan the resolution to a GitHub issue. Code files, a description of the issue, and relevant parts of the codebase have been provided. List all of the relevant files to reference while making changes, one per line."""
 
-context_files_to_change_prompt = """Your job is to write two high quality approaches for an intern to help resolve a user's GitHub issue. 
+context_files_to_change_prompt = """Your job is to write two high quality approaches for an intern to help resolve a user's GitHub issue.
 
 Follow the below steps:
 1. Identify the root cause of the issue by referencing specific code entities in the relevant files. (1 paragraph)

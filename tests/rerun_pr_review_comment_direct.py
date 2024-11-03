@@ -8,7 +8,11 @@ from fastapi.testclient import TestClient
 
 from sweepai.api import app
 from sweepai.config.server import WEBHOOK_SECRET
-from sweepai.utils.github_utils import get_github_client, get_installation_id, get_installation
+from sweepai.utils.github_utils import (
+    get_github_client,
+    get_installation,
+    get_installation_id,
+)
 
 
 def fetch_pr_review_request(issue_url: str, __version__: str = "0"):
@@ -43,8 +47,8 @@ def fetch_pr_review_request(issue_url: str, __version__: str = "0"):
             "pull_request": pr.raw_data,
             "repository": repo.raw_data,
             "organization": org.raw_data,
-            "sender": comment.raw_data['user'],
-            "installation": installation
+            "sender": comment.raw_data["user"],
+            "installation": installation,
         }
         comment_requests.append(comment_created_request)
     return comment_requests
@@ -70,7 +74,7 @@ def update_pr_review_comments(
     print("Sending request...")
 
     client = TestClient(app)
-    
+
     for request in comment_requests:
         sha = ""
         if WEBHOOK_SECRET:
@@ -80,16 +84,17 @@ def update_pr_review_comments(
                 digestmod=hashlib.sha256,
             ).hexdigest()
         response = client.post(
-            "/", json=request, 
+            "/",
+            json=request,
             headers={
                 "X-GitHub-Event": "pull_request_review_comment",
-                "X-Hub-Signature-256": f"sha256={sha}"
+                "X-Hub-Signature-256": f"sha256={sha}",
             },
         )
         print(response)
 
-
     better_stack_link = f"{better_stack_prefix}{html.escape(pr_url)}"
+
 
 # NOTE CURRENTLY THIS SCRIPT DOES NOT IGNORE RESOLVED COMMENTS
 if __name__ == "__main__":

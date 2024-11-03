@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
-  }  
+  }
 });
 
 router.post('/login', async (req, res) => {
@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });  
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     req.session.user = user;
@@ -88,7 +88,7 @@ const cartSchema = new mongoose.Schema({
       ref: 'Product'
     },
     quantity: Number,
-    price: Number  
+    price: Number
   }]
 }, { timestamps: true });
 cartSchema.virtual('totalPrice').get(function() {
@@ -121,7 +121,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
-  }  
+  }
 });
 </snippet_contents>
 </snippet>
@@ -172,7 +172,7 @@ const userSchema = new mongoose.Schema({
   phone: String,
   isAdmin: {
     type: Boolean,
-    default: false  
+    default: false
   }
 }, { timestamps: true });
 module.exports = mongoose.model('User', userSchema);
@@ -199,7 +199,7 @@ app.use(session({
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 app.use('/auth', require('./routes/auth'));
-app.use('/cart', require('./routes/cart'));  
+app.use('/cart', require('./routes/cart'));
 app.use('/checkout', require('./routes/checkout'));
 app.use('/orders', require('./routes/order'));
 app.use('/products', require('./routes/product'));
@@ -227,7 +227,7 @@ router.post('/charge', async (req, res) => {
     });
     res.json({ message: 'Payment successful', charge });
   } catch (err) {
-    console.error(err);  
+    console.error(err);
     res.status(500).json({ message: 'Payment failed' });
   }
 });
@@ -252,7 +252,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: ['electronics', 'clothing', 'home'],
-    required: true  
+    required: true
   },
   stock: {
     type: Number,
@@ -269,7 +269,7 @@ module.exports = mongoose.model('Product', productSchema);
 <snippet_contents>
 const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
-  user: { 
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -305,7 +305,7 @@ module.exports = mongoose.model('Order', orderSchema);
 <snippet_contents>
 router.post('/add', async (req, res) => {
   const { productId, quantity } = req.body;
-  
+
   try {
     let cart = await Cart.findOne({ user: req.user._id });
     if (cart) {
@@ -325,7 +325,7 @@ router.post('/add', async (req, res) => {
     res.json(cart);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });  
+    res.status(500).json({ message: 'Server error' });
   }
 });
 </snippet_contents>
@@ -342,7 +342,7 @@ This defines the schema and model for shopping carts. A cart contains references
 order.js:5-25
 This code allows fetching the logged-in user's orders. It's used after the checkout process to display order history. It doesn't come into play until after checkout is complete.
 
-checkout.js:5-30  
+checkout.js:5-30
 This code handles the checkout process. It receives the cart ID and payment info from the request body. It finds the cart, creates a new order with the cart items and payment info, saves the order, deletes the cart, and returns the order ID. This is likely where the issue is occurring.
 
 user_model.js:1-10
@@ -361,12 +361,12 @@ order_model.js:1-15
 This defines the schema and model for orders. An order contains references to the user and product items, the total price, payment info, and status. It's important for understanding the structure of an order, but unlikely to contain bugs.
 
 cart.js:5-20
-This code handles adding items to the cart. It's used before the checkout process begins. While it's important for the overall shopping flow, it's unlikely to be directly related to a checkout bug.  
+This code handles adding items to the cart. It's used before the checkout process begins. While it's important for the overall shopping flow, it's unlikely to be directly related to a checkout bug.
 </explanations>
 
 <ranking>
 checkout.js:5-30
-payment.js:3-20  
+payment.js:3-20
 order_model.js:1-15
 cart_model.js:1-20
 index.js:10-25
@@ -438,7 +438,7 @@ This is the list of ten code snippets that you must order by relevance:
 {formatted_code_snippets}
 </code_snippets>
 
-Remember: The response format is:  
+Remember: The response format is:
 <explanations>
 file_path:start_line-end_line
 Explanation of what the code does, regardless of its relevance to the user's query. Provide context on how it fits into the overall system.
@@ -475,9 +475,9 @@ ninth_most_relevant_snippet
 tenth_most_relevant_snippet
 </ranking>
 
-As a reminder, the user query is:  
+As a reminder, the user query is:
 <user_query>
-{user_query}  
+{user_query}
 </user_query>
 
 Provide the explanations and ranking below:"""
@@ -550,7 +550,7 @@ module.exports = {
 <snippet_contents>
 const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
-  user: { 
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -596,7 +596,7 @@ const cartSchema = new mongoose.Schema({
       ref: 'Product'
     },
     quantity: Number,
-    price: Number  
+    price: Number
   }]
 }, { timestamps: true });
 cartSchema.virtual('totalPrice').get(function() {
@@ -713,7 +713,7 @@ const userSchema = new mongoose.Schema({
   phone: String,
   isAdmin: {
     type: Boolean,
-    default: false  
+    default: false
   }
 }, { timestamps: true });
 module.exports = mongoose.model('User', userSchema);
@@ -737,7 +737,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: ['electronics', 'clothing', 'home'],
-    required: true  
+    required: true
   },
   stock: {
     type: Number,
@@ -753,7 +753,7 @@ module.exports = mongoose.model('Product', productSchema);
 checkout_utils.js:5-30
 This module contains the processCheckout function which handles the main checkout logic. It takes a cart ID and payment info, finds the associated cart, creates a new order from the cart data, saves the order, deletes the cart, and returns the order ID. This is the core checkout code and the most likely place for a bug causing the described issue.
 payment_service.js:3-20
-This module handles processing payments via the Stripe API. The createPaymentCharge function takes an amount and token, makes a request to Stripe to create a charge, and returns a success or error message. If payments are failing, this code would need to be checked and possibly debugged.  
+This module handles processing payments via the Stripe API. The createPaymentCharge function takes an amount and token, makes a request to Stripe to create a charge, and returns a success or error message. If payments are failing, this code would need to be checked and possibly debugged.
 order_model.js:1-15
 This file defines the Mongoose schema and model for orders. It includes the order's user, items, total, payment info, and status. The model definition itself is unlikely to cause bugs, but it's important to understand the order data structure when debugging checkout and payment issues.
 cart_model.js:1-20
@@ -829,9 +829,10 @@ Here is an example:
 This example is for reference. Please provide explanations and rankings for the code snippets based on the user's query."""
 
 prompt_mapping = {
-  "default": reranking_prompt,
-  "graph": graph_reranking_prompt,
+    "default": reranking_prompt,
+    "graph": graph_reranking_prompt,
 }
+
 
 class RerankSnippetsBot(ChatGPT):
     def rerank_list_for_query(
@@ -868,32 +869,40 @@ class RerankSnippetsBot(ChatGPT):
         snippet_ranking = snippet_ranking.split("\n")
         # assert all snippet denotations are within our original list
         original_denotations = [snippet.denotation for snippet in code_snippets]
-        snippet_ranking = [snippet for snippet in snippet_ranking if snippet in original_denotations]
+        snippet_ranking = [
+            snippet for snippet in snippet_ranking if snippet in original_denotations
+        ]
         # dedup the list with stable ordering
         snippet_ranking = list(dict.fromkeys(snippet_ranking))
         if len(snippet_ranking) < len(code_snippets):
             # add the remaining snippets in the original order
-            remaining_snippets = [snippet.denotation for snippet in code_snippets if snippet.denotation not in snippet_ranking]
+            remaining_snippets = [
+                snippet.denotation
+                for snippet in code_snippets
+                if snippet.denotation not in snippet_ranking
+            ]
             snippet_ranking.extend(remaining_snippets)
         # sort the snippets using the snippet_ranking
-        ranked_snippets = sorted(code_snippets, key=lambda snippet: snippet_ranking.index(snippet.denotation))
+        ranked_snippets = sorted(
+            code_snippets, key=lambda snippet: snippet_ranking.index(snippet.denotation)
+        )
         return ranked_snippets
-    
+
     def format_code_snippets(self, code_snippets: list[Snippet]):
         result_str = ""
         for idx, snippet in enumerate(code_snippets):
-            snippet_str = \
-f'''
+            snippet_str = f"""
 <snippet index="{idx + 1}">
 <snippet_path>{snippet.denotation}</snippet_path>
 <source>
 {snippet.get_snippet(False, False)}
 </source>
 </snippet>
-'''
+"""
             result_str += snippet_str + "\n"
         result_removed_trailing_newlines = result_str.rstrip("\n")
         return result_removed_trailing_newlines
+
 
 @file_cache()
 def listwise_rerank_snippets(
@@ -909,12 +918,18 @@ def listwise_rerank_snippets(
     for idx in range(len(code_snippets) - stride, 0, -stride):
         # if there is no prev_chunk, rerank the bottom n items
         if not prev_chunk:
-            reranked_chunk = RerankSnippetsBot().rerank_list_for_query(user_query, code_snippets[idx - stride:idx + stride], prompt_type=prompt_type)
+            reranked_chunk = RerankSnippetsBot().rerank_list_for_query(
+                user_query,
+                code_snippets[idx - stride : idx + stride],
+                prompt_type=prompt_type,
+            )
         # if there's a prev_chunk, rerank this chunk with the prev_chunk
         else:
             # chunk_to_rerank should be 5 new items and the top 5 items of the prev_chunk
-            chunk_to_rerank = code_snippets[idx - stride:idx] + prev_chunk[:stride]
-            reranked_chunk = RerankSnippetsBot().rerank_list_for_query(user_query, chunk_to_rerank, prompt_type=prompt_type)
+            chunk_to_rerank = code_snippets[idx - stride : idx] + prev_chunk[:stride]
+            reranked_chunk = RerankSnippetsBot().rerank_list_for_query(
+                user_query, chunk_to_rerank, prompt_type=prompt_type
+            )
         # last iteration, add all items
         if idx - stride <= 0:
             final_ordering = reranked_chunk + final_ordering
@@ -923,23 +938,33 @@ def listwise_rerank_snippets(
             final_ordering = reranked_chunk[-stride:] + final_ordering
         prev_chunk = reranked_chunk
     return final_ordering
-    
+
+
 if __name__ == "__main__":
     # generate some test snippets
     def generate_snippet_obj(idx):
-        snippet = Snippet(file_path="add.py", content=("\n" * (idx - 1) + "def add(a: int, b: int) -> int:\n    return a + b"), start=idx, end=idx + 1)
+        snippet = Snippet(
+            file_path="add.py",
+            content=(
+                "\n" * (idx - 1) + "def add(a: int, b: int) -> int:\n    return a + b"
+            ),
+            start=idx,
+            end=idx + 1,
+        )
         return snippet
-    code_snippets = [
-        generate_snippet_obj(idx) for idx in range(30)
-    ]
+
+    code_snippets = [generate_snippet_obj(idx) for idx in range(30)]
     try:
         # rank them
-        final_ordering = listwise_rerank_snippets("I want to add two numbers.", code_snippets)
+        final_ordering = listwise_rerank_snippets(
+            "I want to add two numbers.", code_snippets
+        )
         print("\n".join([s.denotation for s in final_ordering]))
         # assert no duplicates or missing snippets
         assert len(set(final_ordering)) == len(final_ordering)
     except Exception as e:
-        import pdb # noqa
+        import pdb  # noqa
+
         # pylint: disable=no-member
         pdb.post_mortem()
         raise e

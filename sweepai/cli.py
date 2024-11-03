@@ -50,7 +50,9 @@ def load_config():
                 os.environ[key] = value
             except Exception as e:
                 cprint(f"Error loading config: {e}, skipping.", style="yellow")
-        os.environ["POSTHOG_DISTINCT_ID"] = str(os.environ.get("POSTHOG_DISTINCT_ID", ""))
+        os.environ["POSTHOG_DISTINCT_ID"] = str(
+            os.environ.get("POSTHOG_DISTINCT_ID", "")
+        )
         # Should contain:
         # GITHUB_PAT
         # OPENAI_API_KEY
@@ -127,9 +129,11 @@ def get_event_type(event: Event | IssueEvent):
     else:
         return pascal_to_snake(event.type)[: -len("_event")]
 
+
 @app.command()
 def test():
     cprint("Sweep AI is installed correctly and ready to go!", style="yellow")
+
 
 @app.command()
 def watch(
@@ -249,7 +253,11 @@ def init(override: bool = False):
         if os.path.exists(config_path):
             with open(config_path, "r") as f:
                 config = json.load(f)
-                if "OPENAI_API_KEY" in config and "ANTHROPIC_API_KEY" in config and "GITHUB_PAT" in config:
+                if (
+                    "OPENAI_API_KEY" in config
+                    and "ANTHROPIC_API_KEY" in config
+                    and "GITHUB_PAT" in config
+                ):
                     override = typer.confirm(
                         f"\nConfiguration already exists at {config_path}. Override?",
                         default=False,
@@ -270,8 +278,12 @@ def init(override: bool = False):
         style="yellow",
     )
     anthropic_api_key = Prompt.ask("Anthropic API Key", password=True)
-    assert len(anthropic_api_key) > 30, "Anthropic API Key must be of length at least 30."
-    assert anthropic_api_key.startswith("sk-ant-api03-"), "GitHub PAT must start with 'ghp_'."
+    assert (
+        len(anthropic_api_key) > 30
+    ), "Anthropic API Key must be of length at least 30."
+    assert anthropic_api_key.startswith(
+        "sk-ant-api03-"
+    ), "GitHub PAT must start with 'ghp_'."
     cprint(
         "\nGreat! Next, we'll need just your GitHub PAT. Here's a link with all the permissions pre-filled:\nhttps://github.com/settings/tokens/new?description=Sweep%20Self-hosted&scopes=repo,workflow\n",
         style="yellow",
@@ -285,7 +297,9 @@ def init(override: bool = False):
     )
     voyage_api_key = Prompt.ask("Voyage AI API key", password=True)
     if voyage_api_key:
-        assert len(voyage_api_key) > 30, "Voyage AI API key must be of length at least 30."
+        assert (
+            len(voyage_api_key) > 30
+        ), "Voyage AI API key must be of length at least 30."
         assert voyage_api_key.startswith("pa-"), "Voyage API key must start with 'pa-'."
 
     POSTHOG_DISTINCT_ID = None

@@ -57,7 +57,7 @@ You will analyze the provided code files, repository, and GitHub issue to unders
 
 Guidelines:
 <guidelines>
-- Always include the full file path and reference the provided files 
+- Always include the full file path and reference the provided files
 - Prioritize using existing code and utility methods to minimize writing new code, make sure to explicitly reference any class or function names
 - Break the each task into small steps that are easy to complete
 <guidelines>
@@ -99,9 +99,9 @@ d. Sort the proposed changes topologically. This means that each proposed change
 </issue_analysis>
 """
 
-plan_generation_steps_prompt = """Your job is to write a high quality, detailed, plan of how to resolve a GitHub issue. 
+plan_generation_steps_prompt = """Your job is to write a high quality, detailed, plan of how to resolve a GitHub issue.
 
-You will analyze the provided code files, repository, and GitHub issue to understand the requested change. You have been given a series of proposed changes that are meant to implement the request change. 
+You will analyze the provided code files, repository, and GitHub issue to understand the requested change. You have been given a series of proposed changes that are meant to implement the request change.
 It is now your job to put these proposed changes together into a comprehensive and cohesive plan. This plan that you create will be given to an intern who has 0 prior knowledge of coding or the codebase. The intern will follow your plan to the letter and is incapable of thinking for themselves, so you must be extremely detailed and precise in your instructions.
 
 Below is the issue analysis and proposed changes that you will need to use to create the plan. This will tell you the thinking behind the person who made the proposed changes and what they are aiming for.
@@ -149,8 +149,8 @@ Plan: Write all necessary code changes to resolve the issue, indicating which co
     - Remember that when you are creating your plan, the changes will be applied IN ORDER meaning that if you create a file in the first <modify> block, you must consider the file created in second <modify> block meaning that if you are modifying the newly created file, you must now include the correct <original_code> block.
 
 Respond with the following xml format for the plan:
-<plan>  
-<modify file="file_path"> 
+<plan>
+<modify file="file_path">
 Describe ALL changes to be made. Implement all the changes FULLY. This means that under no circumstances should you leave any placeholder comments like "# rest of code" or "# rest of test cases". If you find yourself doing this you MUST rewrite the plan so that this doesn't happen.
 
 1. If you are creating a file, you may skip this step. Otherwise, copy the original code into <original_code></original_code> tags, copying them VERBATIM from the file. Do NOT paraphrase or abbreviate the source code. Placeholder comments like "# existing code" are not permitted. The referenced original code span should be just enough to cover the change, with 5 extra lines above and below for context. Start from the last header like a function or class definition and include the entire block of code that needs to be modified.

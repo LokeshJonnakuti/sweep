@@ -35,7 +35,9 @@ class PosthogClient:
             "timestamp": datetime.utcnow().isoformat()
             + "Z",  # Adding 'Z' to indicate UTC time
         }
-        response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
+        response = requests.post(
+            url, headers=headers, data=json.dumps(payload), timeout=60
+        )
         return response
 
 
@@ -80,7 +82,8 @@ def loki_sink(message):
             LOKI_URL,
             data=json.dumps(log_data),
             headers={"Content-Type": "application/json"},
-        timeout=60)
+            timeout=60,
+        )
         if response.status_code not in (200, 204):
             print("Error sending log to Loki:", response.text)
     except Exception as e:

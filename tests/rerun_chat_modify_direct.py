@@ -5,9 +5,11 @@ from sweepai.agents.modify import modify
 from sweepai.config.server import GITHUB_APP_ID, GITHUB_APP_PEM
 from sweepai.core.entities import FileChangeRequest
 from sweepai.dataclasses.code_suggestions import CodeSuggestion
-from sweepai.utils.github_utils import ClonedRepo, get_installation_id
-from sweepai.utils.github_utils import get_github_client
-
+from sweepai.utils.github_utils import (
+    ClonedRepo,
+    get_github_client,
+    get_installation_id,
+)
 
 repo_full_name = os.environ["REPO_FULL_NAME"]
 branch = os.environ["BRANCH"]
@@ -17,10 +19,7 @@ org_name, repo = repo_full_name.split("/")
 installation_id = get_installation_id(org_name, GITHUB_APP_PEM, GITHUB_APP_ID)
 user_token, g = get_github_client(installation_id=installation_id)
 cloned_repo = ClonedRepo(
-    repo_full_name,
-    installation_id=installation_id,
-    token=user_token,
-    branch=branch
+    repo_full_name, installation_id=installation_id, token=user_token, branch=branch
 )
 
 file_change_requests = []
@@ -41,7 +40,7 @@ for code_suggestion in code_suggestions:
             filename=code_suggestion.file_path,
             change_type=change_type,
             instructions=f"<original_code>\n{code_suggestion.original_code}\n</original_code>\n\n<new_code>\n{code_suggestion.new_code}\n</new_code>",
-        ) 
+        )
     )
 
 try:
@@ -49,7 +48,9 @@ try:
         fcrs=file_change_requests,
         request="",
         cloned_repo=cloned_repo,
-        relevant_filepaths=[code_suggestion.file_path for code_suggestion in code_suggestions],
+        relevant_filepaths=[
+            code_suggestion.file_path for code_suggestion in code_suggestions
+        ],
     ):
         pass
 except Exception as e:

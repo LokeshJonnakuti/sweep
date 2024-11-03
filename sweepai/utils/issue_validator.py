@@ -1,6 +1,6 @@
 import re
-from sweepai.core.chat import ChatGPT
 
+from sweepai.core.chat import ChatGPT
 
 issue_validator_instructions_prompt = """# Instructions
 
@@ -31,13 +31,20 @@ If False, respond to the user:
 Response to user with justification on why the issue is unclear.
 </response_to_user>"""
 
-issue_validator_system_prompt = """You are an AI assistant tasked with determining whether an issue reported by customer support should be passed on to be resolved by Sweep, an AI-powered software engineer.
+issue_validator_system_prompt = (
+    """You are an AI assistant tasked with determining whether an issue reported by customer support should be passed on to be resolved by Sweep, an AI-powered software engineer.
 
-""" + issue_validator_instructions_prompt
+"""
+    + issue_validator_instructions_prompt
+)
 
-issue_validator_user_prompt = """<issue>
+issue_validator_user_prompt = (
+    """<issue>
 {issue}
-</issue>\n\n""" + issue_validator_instructions_prompt
+</issue>\n\n"""
+    + issue_validator_instructions_prompt
+)
+
 
 def validate_issue(issue: str) -> str:
     """
@@ -48,17 +55,16 @@ def validate_issue(issue: str) -> str:
     )
 
     response = chat_gpt.chat_anthropic(
-        issue_validator_user_prompt.format(
-            issue=issue
-        ),
+        issue_validator_user_prompt.format(issue=issue),
         model="claude-3-opus-20240229",
         temperature=0.0,
     )
-    
+
     if "<pass>False</pass>" in response:
         pattern = "<response_to_user>(.*)</response_to_user>"
         return re.search(pattern, response, re.DOTALL).group(1).strip()
     return ""
+
 
 if __name__ == "__main__":
     print(validate_issue("The app is slow."))
