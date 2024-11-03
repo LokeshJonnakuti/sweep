@@ -50,7 +50,7 @@ def download_html(url: str) -> str:
     # loader = SimpleWebPageReader()
     # document, *_ = loader.load_data(urls=[url])
     # return document.text
-    return requests.get(url).text
+    return requests.get(url, timeout=60).text
 
 
 def extract_info(url):

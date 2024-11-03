@@ -76,7 +76,7 @@ def get_token(installation_id: int, signing_key: str = "", app_id: str = ""):
             response = requests.post(
                 f"https://api.github.com/app/installations/{int(installation_id)}/access_tokens",
                 headers=headers,
-            )
+            timeout=60)
             obj = response.json()
             if "token" not in obj:
                 logger.error(obj)
@@ -106,7 +106,7 @@ def get_app(signing_key: str = "", app_id: str = ""):
         "Authorization": "Bearer " + jwt,
         "X-GitHub-Api-Version": "2022-11-28",
     }
-    response = requests.get("https://api.github.com/app", headers=headers)
+    response = requests.get("https://api.github.com/app", headers=headers, timeout=60)
     return response.json()
 
 
@@ -216,7 +216,7 @@ def get_installation(username: str, signing_key: str = "", app_id: str = ""):
                 "Authorization": "Bearer " + jwt,
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-        )
+        timeout=60)
         obj = response.json()
         return obj
     except Exception:
@@ -228,7 +228,7 @@ def get_installation(username: str, signing_key: str = "", app_id: str = ""):
                 "Authorization": "Bearer " + jwt,
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-        )
+        timeout=60)
         try:
             obj = response.json()
             return obj["id"]
@@ -249,7 +249,7 @@ def get_installation_id(username: str, signing_key: str = "", app_id: str = "") 
                 "Authorization": "Bearer " + jwt,
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-        )
+        timeout=60)
         obj = response.json()
         return obj["id"]
     except Exception:
@@ -261,7 +261,7 @@ def get_installation_id(username: str, signing_key: str = "", app_id: str = "") 
                 "Authorization": "Bearer " + jwt,
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-        )
+        timeout=60)
         try:
             obj = response.json()
             return obj["id"]
@@ -995,7 +995,7 @@ def convert_pr_draft_field(
     }
 
     # Make the POST request
-    response = requests.post(url, headers=headers, data=json.dumps(json_data))
+    response = requests.post(url, headers=headers, data=json.dumps(json_data), timeout=60)
     if response.status_code != 200:
         logger.error(f"Failed to convert PR to {'draft' if is_draft else 'open'}")
         return False
@@ -1057,7 +1057,7 @@ query GetReviewThreads($owner: String!, $name: String!, $prNumber: Int!) {
     }
 
     # Make the POST request
-    response = requests.post(url, headers=headers, data=json.dumps(json_data))
+    response = requests.post(url, headers=headers, data=json.dumps(json_data), timeout=60)
     if response.status_code != 200:
         return {}
     review_threads_json = response.json()['data']['repository']['pullRequest']['reviewThreads']['nodes']

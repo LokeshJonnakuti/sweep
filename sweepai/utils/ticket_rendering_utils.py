@@ -173,7 +173,7 @@ def get_failing_gha_logs(runs, installation_id) -> str:
                 "Authorization": f"Bearer {token}",
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-        )
+        timeout=60)
         if jobs_response.status_code == 200:
             failed_jobs = []
             jobs = jobs_response.json()["jobs"]
@@ -210,7 +210,7 @@ def get_failing_gha_logs(runs, installation_id) -> str:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
             allow_redirects=True,
-        )
+        timeout=60)
         # Check if the request was successful
         if logs_response.status_code == 200:
             zip_data = io.BytesIO(logs_response.content)

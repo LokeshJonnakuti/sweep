@@ -12,7 +12,7 @@ def validate_license():
             "Accept": "application/vnd.api+json",
         },
         json={"meta": {"key": LICENSE_KEY}},
-    )
+    timeout=60)
     if response.status_code != 200:
         raise ValueError("License key is invalid or expired. Please contact us at team@sweep.dev to upgrade to an enterprise license.")
     obj = response.json()

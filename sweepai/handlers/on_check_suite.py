@@ -59,7 +59,7 @@ def download_logs(repo_full_name: str, run_id: int, installation_id: int, get_er
     response = requests.get(
         f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs",
         headers=headers,
-    )
+    timeout=60)
 
     logs_str = ""
     if response.status_code == 200:
@@ -302,7 +302,7 @@ def get_circleci_job_details(job_number, project_slug, vcs_type='github'):
     # project_slug is the repo full name
     headers = {'Circle-Token': CIRCLE_CI_PAT}
     url = f"https://circleci.com/api/v1.1/project/{vcs_type}/{project_slug}/{job_number}"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=60)
     return response.json()
 
 # take a commit and return all failing logs as a list
@@ -326,7 +326,7 @@ def get_failing_circleci_log_from_url(circleci_run_url: str, repo_full_name: str
                 continue
             if 'output_url' in action:
                 log_url = action['output_url']
-                log_response = requests.get(log_url, headers=headers)
+                log_response = requests.get(log_url, headers=headers, timeout=60)
                 log_response = log_response.json()
                 # these might return in a different order; watch out
                 log_message = log_response[0]["message"] if len(log_response) > 0 else ""

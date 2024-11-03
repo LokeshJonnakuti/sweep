@@ -19,7 +19,7 @@ def get_image_urls_from_issue(num: int, repo_full_name: str, installation_id: in
     }
     urls = {}
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=60)
         body_html = response.json()['body_html']
         if not body_html:
             return urls
@@ -46,7 +46,7 @@ def get_image_urls_from_issue(num: int, repo_full_name: str, installation_id: in
 def get_image_contents_from_urls(urls: dict[str, str]):
     image_contents = {}
     for url, image_type in urls.items():
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         if response.status_code == 200:
             image_contents[url] = {
                 "content": base64.b64encode(response.content).decode('utf-8'),
