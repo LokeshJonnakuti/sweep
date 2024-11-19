@@ -8,6 +8,7 @@ from loguru import logger
 from redis import Redis
 
 from sweepai.config.server import CACHE_DIRECTORY, FILE_CACHE_DISABLED, REDIS_URL
+import fickling
 
 TEST_BOT_NAME = "sweep-nightly[bot]"
 MAX_DEPTH = 6
@@ -105,7 +106,7 @@ def file_cache(ignore_params=[], ignore_contents=False, verbose=False, redis=Fal
                         if verbose:
                             print("Used cache for function: " + func.__name__)
                         with open(cache_file, "rb") as f:
-                            result = pickle.load(f)
+                            result = fickling.load(f)
                 except Exception:
                     logger.info("Unpickling failed")
             # Otherwise, call the function and save its result to the cache

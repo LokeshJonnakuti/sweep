@@ -4,6 +4,7 @@ import os
 import pickle
 
 from loguru import logger
+import fickling
 
 DISABLE_CACHE = False
 
@@ -89,7 +90,7 @@ def file_cache(ignore_params=[], verbose=False):
                     if verbose:
                         print("Used cache for function: " + func.__name__)
                     with open(cache_file, "rb") as f:
-                        return pickle.load(f)
+                        return fickling.load(f)
             except Exception:
                 logger.info("Unpickling failed")
 
