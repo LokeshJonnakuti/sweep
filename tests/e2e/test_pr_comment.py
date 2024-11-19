@@ -78,7 +78,7 @@ def test_e2e_pr_comment():
                     print(f"Failed to find files to change: {pr.title}")
                     print(f"PR object is: {pr}")
                     raise AssertionError("Failed to find files to change")
-                    
+
             time.sleep(60)
         raise AssertionError("PR was not updated!")
     except AssertionError as e:

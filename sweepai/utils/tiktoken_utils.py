@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-
 import tiktoken
-
-
 
 TIKTOKEN_CACHE_DIR = "/tmp/cache/tiktoken"
 
@@ -29,5 +26,5 @@ class Tiktoken:
     def truncate_string(
         self, text: str, model: str = "gpt-4", max_tokens: int = 8192
     ) -> str:
-        tokens = self.openai_models[model].encode(text)[:max_tokens - 1]
+        tokens = self.openai_models[model].encode(text)[: max_tokens - 1]
         return self.openai_models[model].decode(tokens)

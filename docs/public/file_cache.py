@@ -3,8 +3,8 @@ import inspect
 import os
 import pickle
 
-from loguru import logger
 import fickling
+from loguru import logger
 
 DISABLE_CACHE = False
 

@@ -1,6 +1,7 @@
 import re
 
 from loguru import logger
+
 from sweepai.core.chat import ChatGPT
 from sweepai.core.entities import Message
 
@@ -15,13 +16,13 @@ Summarize the key points of the issue concisely, but also list out any unfamilia
 2. Solution
 
 Describe thoroughly in extreme detail what the ideal code fix would look like:
-- Dive deep into the low-level implementation details of how you would change each file. Explain the logic, algorithms, data structures, etc. 
+- Dive deep into the low-level implementation details of how you would change each file. Explain the logic, algorithms, data structures, etc.
 - Explicitly call out any helper functions, utility modules, libraries or APIs you would leverage.
 - Carefully consider ALL parts of the codebase that could be relevant, including (in decreasing relevance):
   - Database schemas, models
   - Type definitions, interfaces, enums, constants
   - Shared utility code for common operations like date formatting, string manipulation, etc.
-  - Database mutators and query logic 
+  - Database mutators and query logic
   - User-facing messages, error messages, localization, i18n
   - Exception handling, error recovery, retries, fallbacks
   - API routes, request/response handling, serialization
@@ -37,7 +38,7 @@ Describe thoroughly in extreme detail what the ideal code fix would look like:
 
 Generate a list of 10 DIVERSE, highly specific, focused "where" queries to use as vector database search queries to find the most relevant code sections to directly resolve the GitHub issue.
 - Reference very specific functions, variables, classes, endpoints, etc. using exact names.
-- Describe the purpose and behavior of the code in detail to differentiate it. 
+- Describe the purpose and behavior of the code in detail to differentiate it.
 - Ask about granular logic within individual functions/methods.
 - Mention adjacent code like schemas, configs, and helpers to establish context.
 - Use verbose natural language that mirrors the terminology in the codebase.
@@ -53,7 +54,7 @@ Format your response like this:
 [detailed sentences describing what an ideal fix would change in the code and how
 
 Exhaustive list of relevant parts of the codebase that could be used in the solution include:
-- [Module, service, function or endpoint 1] 
+- [Module, service, function or endpoint 1]
 - [Module, service, function or endpoint 2]
 - [etc.]
 </solution>
@@ -75,6 +76,7 @@ Examples of good queries:
 - Where are the Elasticsearch queries that power the autocomplete suggestions for the site's search bar, and what specific fields are being searched and returned?
 - Where is the logic for automatically provisioning and scaling EC2 instances based on CPU and memory usage metrics from CloudWatch in the DevOps scripts?"""
 
+
 def generate_multi_queries(input_query: str):
     chatgpt = ChatGPT(
         messages=[
@@ -84,11 +86,11 @@ def generate_multi_queries(input_query: str):
             )
         ],
     )
-    stripped_input = input_query.strip('\n')
+    stripped_input = input_query.strip("\n")
     response = chatgpt.chat_anthropic(
         content=f"<github_issue>\n{stripped_input}\n</github_issue>",
         model="gpt-4o",
-        temperature=0.7, # I bumped this and it improved the benchmarks
+        temperature=0.7,  # I bumped this and it improved the benchmarks
         use_openai=True,
     )
     pattern = re.compile(r"<query>(?P<query>.*?)</query>", re.DOTALL)
@@ -99,6 +101,7 @@ def generate_multi_queries(input_query: str):
             queries.append(query)
     logger.debug(f"Generated {len(queries)} queries from the input query.")
     return queries
+
 
 if __name__ == "__main__":
     input_query = "I am trying to set up payment processing in my app using Stripe, but I keep getting a 400 error when I try to create a payment intent. I have checked the API key and the request body, but I can't figure out what's wrong. Here is the error message I'm getting: 'Invalid request: request parameters are invalid'. I have attached the relevant code snippets below. Can you help me find the part of the code that is causing this error?"

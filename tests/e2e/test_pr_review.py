@@ -14,7 +14,7 @@ def test_e2e_pr_review():
         _, g = get_github_client(installation_id)
         repo = g.get_repo(repo_name)
         pr = repo.get_pull(pr_number)
-        
+
         review_pr(
             "E2E-test-user",
             pr,

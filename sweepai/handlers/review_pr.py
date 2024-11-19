@@ -1,10 +1,11 @@
 import os
-from time import sleep, time
 import traceback
+from time import sleep, time
+
 import backoff
 from git import GitCommandError
-from github.Repository import Repository
 from github.PullRequest import PullRequest
+from github.Repository import Repository
 from loguru import logger
 
 from sweepai.chat.api import posthog_trace
@@ -20,12 +21,13 @@ from sweepai.core.review_utils import (
     group_vote_review_pr,
 )
 from sweepai.dataclasses.codereview import GroupedFilesForReview, PRReviewCommentThread
+from sweepai.utils.chat_logger import ChatLogger
 from sweepai.utils.concurrency_utils import fire_and_forget_wrapper
+from sweepai.utils.event_logger import posthog
 from sweepai.utils.github_utils import ClonedRepo, get_github_client, refresh_token
 from sweepai.utils.ticket_rendering_utils import create_update_review_pr_comment
 from sweepai.utils.validate_license import validate_license
-from sweepai.utils.chat_logger import ChatLogger
-from sweepai.utils.event_logger import posthog
+
 
 @backoff.on_exception(
     backoff.expo,
@@ -38,7 +40,7 @@ def review_pr(
     pr: PullRequest,
     repository: Repository,
     installation_id: int,
-    pr_labelled: bool, # if the PR was labelled let's review it no matter what
+    pr_labelled: bool,  # if the PR was labelled let's review it no matter what
     tracking_id: str | None = None,
     metadata: dict = {},
 ):
@@ -85,7 +87,9 @@ def review_pr(
                         "Sweep does not support reviewing PRs from forked repositories."
                     )
                     raise error
-                sleep(10) # sleep for 10 seconds to prevent race conditions with github uploading remote branch
+                sleep(
+                    10
+                )  # sleep for 10 seconds to prevent race conditions with github uploading remote branch
                 try:
                     cloned_repo: ClonedRepo = ClonedRepo(
                         repository.full_name,
@@ -120,10 +124,12 @@ def review_pr(
             pr_issue = repository.get_issue(number=pr.number)
             reaction_eyes = pr_issue.create_reaction("eyes")
             # get all comments on the pr
-            comment_threads: dict[str, list[PRReviewCommentThread]] = get_all_comments_for_review(
-                repository.full_name, pr, installation_id
+            comment_threads: dict[
+                str, list[PRReviewCommentThread]
+            ] = get_all_comments_for_review(repository.full_name, pr, installation_id)
+            formatted_comment_threads: dict[str, str] = format_comment_threads(
+                comment_threads
             )
-            formatted_comment_threads: dict[str, str] = format_comment_threads(comment_threads)
             # handle creating comments on the pr to tell the user we are going to begin reviewing the pr
             pr_changes, dropped_files, unsuitable_files = get_pr_changes(
                 repository, pr, cloned_repo
@@ -133,13 +139,13 @@ def review_pr(
             # build another dict so that all files are in their own group
             single_files = {file_name: [file_name] for file_name in pr_changes.keys()}
             # render all groups of files
-            formatted_pr_changes_by_group: dict[str, GroupedFilesForReview] = format_all_pr_changes_by_groups(
-                grouped_files, pr_changes
-            )
+            formatted_pr_changes_by_group: dict[
+                str, GroupedFilesForReview
+            ] = format_all_pr_changes_by_groups(grouped_files, pr_changes)
             # also render them individually
-            formatted_pr_changes_by_file: dict[str, GroupedFilesForReview] = format_all_pr_changes_by_groups(
-                single_files, pr_changes
-            )
+            formatted_pr_changes_by_file: dict[
+                str, GroupedFilesForReview
+            ] = format_all_pr_changes_by_groups(single_files, pr_changes)
             # formatted_pr_changes_by_file = format_pr_changes_by_file(pr_changes)
             pull_request_info = format_pr_info(pr)
             # only get sweep to generate a summary if the pr doesnt have a description
@@ -148,7 +154,7 @@ def review_pr(
                 pull_request_summary = get_pr_summary_from_patches(
                     pr_changes, chat_logger=chat_logger
                 )
-            
+
             # get initial code review by group vote
             code_review_by_group = group_vote_review_pr(
                 username,
@@ -175,7 +181,7 @@ def review_pr(
             # )
             # after 50 minutes have passed refresh token to re get pr
             if time() - review_pr_start_time > 50 * 60:
-                _, _ , repository = refresh_token(repository.full_name, installation_id)
+                _, _, repository = refresh_token(repository.full_name, installation_id)
                 pr = repository.get_pull(pr.number)
             _comment_id = create_update_review_pr_comment(
                 username,

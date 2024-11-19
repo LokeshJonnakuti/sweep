@@ -1,4 +1,5 @@
 import re
+
 from github import Github
 
 from sweepai.core.chat import ChatGPT
@@ -40,19 +41,14 @@ Sections of the markdown file copied verbose.
 issue_suffix = "\n\n**The recommended fixes may not be complete. There may be missing details such as relevant files or additional steps required to resolve the issue.**\n\n<!-- DISTILLED_SUMMARY -->"
 DISTILLED_SUMMARY_MARKER = "<!-- DISTILLED_SUMMARY -->"
 
+
 def distill_issue(text: str):
     if DISTILLED_SUMMARY_MARKER in text:
         return text
     chatgpt = ChatGPT(
         messages=[
-            Message(
-                role="system",
-                content=system_prompt
-            ),
-            Message(
-                role="user",
-                content=text
-            ),
+            Message(role="system", content=system_prompt),
+            Message(role="user", content=text),
         ]
     )
     response = chatgpt.chat(user_prompt)
@@ -63,8 +59,10 @@ def distill_issue(text: str):
     distilled_text = matches.group(1)
     return distilled_text + issue_suffix
 
+
 if __name__ == "__main__":
     import os
+
     issue_url = "https://github.com/sweepai/e2e/issues/32"
 
     *_, org_name, repo_name, _, issue_number = issue_url.split("/")

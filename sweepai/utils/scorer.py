@@ -48,7 +48,9 @@ def get_scores(score_factors):
     days_since_last_modified_scores = convert_to_percentiles(
         days_since_last_modified_scores, 1
     )
-    days_since_last_modified_scores = [1 - score for score in days_since_last_modified_scores]
+    days_since_last_modified_scores = [
+        1 - score for score in days_since_last_modified_scores
+    ]
     scores = [
         sum(x)
         for x in zip(

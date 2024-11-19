@@ -1,7 +1,6 @@
-
-from github import Github
 import typer
 from fastapi.testclient import TestClient
+from github import Github
 
 from sweepai.api import app
 from sweepai.handlers.on_comment import on_comment
@@ -21,7 +20,6 @@ def pull_request_url(
     better_stack_prefix: str = "https://logs.betterstack.com/team/199101/tail?rf=now-30m&q=metadata.issue_url%3A",
     debug: bool = True,
 ):
-    
     print("Fetching issue metadata...")
     is_review_comment = False
     if "issuecomment" in comment_url:
@@ -47,7 +45,9 @@ def pull_request_url(
             pr_number,
             files_and_comment_id,
         ) = comment_url.split("/")
-        comment_id = files_and_comment_id.split("#")[1][1:] # Remove "r" from the comment ID
+        comment_id = files_and_comment_id.split("#")[1][
+            1:
+        ]  # Remove "r" from the comment ID
 
     installation_id = get_installation_id(org_name)
     print("Fetching access token...")
@@ -73,7 +73,7 @@ def pull_request_url(
             installation_id=installation_id,
             pr_number=pr_number,
             comment_id=int(comment_id),
-            chat_logger=None
+            chat_logger=None,
         )
     else:
         for comment in pr.get_issue_comments():
@@ -90,7 +90,7 @@ def pull_request_url(
             installation_id=installation_id,
             pr_number=pr_number,
             comment_id=int(comment_id),
-            chat_logger=None
+            chat_logger=None,
         )
 
 

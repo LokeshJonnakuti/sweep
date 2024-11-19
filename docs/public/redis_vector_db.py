@@ -20,17 +20,23 @@ DIMENSIONS_TO_KEEP = 512
 openai_client = OpenAI()
 redis_client: Redis = Redis.from_url(REDIS_URL)
 
+
 def count_tiktoken(text: str, model: str = "gpt-4") -> int:
     tiktoken_encoding = encoding_for_model(model)
     return len(tiktoken_encoding.encode(text, disallowed_special=()))
 
-def truncate_string_tiktoken(text: str, model: str = "gpt-4", max_tokens: int = 8192) -> str:
+
+def truncate_string_tiktoken(
+    text: str, model: str = "gpt-4", max_tokens: int = 8192
+) -> str:
     tiktoken_encoding = encoding_for_model(model)
     tokens = tiktoken_encoding.encode(text)[:max_tokens]
     return tiktoken_encoding.decode(tokens)
 
+
 def hash_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
 
 def normalize_l2(x):
     x = np.array(x)
@@ -43,6 +49,7 @@ def normalize_l2(x):
         norm = np.linalg.norm(x, 2, axis=1, keepdims=True)
         return np.where(norm == 0, x, x / norm)
 
+
 def embed_text_array(texts: tuple[str]) -> list[np.ndarray]:
     embeddings = []
     texts = [text if text else " " for text in texts]
@@ -51,13 +58,17 @@ def embed_text_array(texts: tuple[str]) -> list[np.ndarray]:
         embeddings = pool.map(openai_with_expo_backoff, batches)
     return embeddings
 
+
 def openai_call_embedding(batch):
     response = openai_client.embeddings.create(
         input=batch, model="text-embedding-3-small", encoding_format="float"
     )
-    cut_dim = np.array([data.embedding for data in response.data])[:, :DIMENSIONS_TO_KEEP]
+    cut_dim = np.array([data.embedding for data in response.data])[
+        :, :DIMENSIONS_TO_KEEP
+    ]
     normalized_dim = normalize_l2(cut_dim)
     return normalized_dim
+
 
 @backoff.on_exception(
     backoff.expo,
@@ -78,7 +89,11 @@ def openai_with_expo_backoff(batch: tuple[str]):
     except Exception as e:
         logger.exception(f"Failure in openai_with_expo_backoff: {e}")
     # 2. If we have all the embeddings, return them
-    batch = [text for idx, text in enumerate(batch) if isinstance(embeddings[idx], type(None))]
+    batch = [
+        text
+        for idx, text in enumerate(batch)
+        if isinstance(embeddings[idx], type(None))
+    ]
     if len(batch) == 0:
         embeddings = np.array(embeddings)
         return embeddings
@@ -90,7 +105,9 @@ def openai_with_expo_backoff(batch: tuple[str]):
     except BadRequestError as e:
         try:
             # 4. If we get a BadRequestError, truncate the text and try again
-            batch = [truncate_string_tiktoken(text) for text in batch] # truncation is slow, so we only do it if we have to
+            batch = [
+                truncate_string_tiktoken(text) for text in batch
+            ]  # truncation is slow, so we only do it if we have to
             new_embeddings = openai_call_embedding(batch)
         except Exception as e:
             logger.exception(f"Failure calling openai_call_embedding: {e}")
@@ -107,6 +124,7 @@ def openai_with_expo_backoff(batch: tuple[str]):
     )
     return np.array(embeddings)
 
+
 def get_query_text_similarity(query: str, texts: str) -> float:
     embeddings = embed_text_array(texts)
     embeddings = np.concatenate(embeddings)
@@ -115,13 +133,16 @@ def get_query_text_similarity(query: str, texts: str) -> float:
     similarity = similarity.tolist()
     return similarity
 
+
 def get_most_similar_texts(query: str, texts: list[str], top_n: int = 5) -> list[str]:
     similarity = get_query_text_similarity(query, texts)
     indices = np.argsort(similarity)[::-1]
     return [texts[i] for i in indices[:top_n]]
 
+
 if __name__ == "__main__":
     import time
+
     start = time.time()
     n = 30000
     query = "example_query"

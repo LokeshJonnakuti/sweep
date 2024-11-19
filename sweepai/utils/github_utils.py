@@ -18,14 +18,13 @@ from typing import Any
 
 import git
 import requests
-from github import Github
+from github import Github, GithubException, InputGitTreeElement, PullRequest
 from github.Auth import Token
+from github.GithubException import BadCredentialsException, UnknownObjectException
+from github.Repository import Repository
 
 # get default_base_url from github
 from github.Requester import Requester
-from github.Repository import Repository
-from github.GithubException import BadCredentialsException, UnknownObjectException
-from github import PullRequest, InputGitTreeElement, GithubException
 from jwt import encode
 from loguru import logger
 from urllib3 import Retry
@@ -162,12 +161,12 @@ class CustomRequester(Requester):
 
 class CustomGithub(Github):
     def __init__(
-        self, 
+        self,
         installation_id: int,
         signing_key: str = "",
         app_id: str = "",
-        *args, 
-        **kwargs
+        *args,
+        **kwargs,
     ) -> "CustomGithub":
         self.installation_id = installation_id
         self.token = self._get_token(signing_key=signing_key, app_id=app_id)
@@ -175,10 +174,10 @@ class CustomGithub(Github):
         self.app_id = app_id
         super().__init__(self.token, *args, **kwargs)
         self._Github__requester = CustomRequester(
-            self.token, 
-            installation_id=self.installation_id, 
-            signing_key=self.signing_key, 
-            app_id=self.app_id
+            self.token,
+            installation_id=self.installation_id,
+            signing_key=self.signing_key,
+            app_id=self.app_id,
         )
 
     def _get_token(self, signing_key: str = "", app_id: str = "") -> str:
@@ -188,18 +187,14 @@ class CustomGithub(Github):
 
 
 def get_github_client(
-    installation_id: int, 
-    signing_key: str = "", 
-    app_id: str = ""
+    installation_id: int, signing_key: str = "", app_id: str = ""
 ) -> tuple[str, CustomGithub]:
     github_instance = None
     if not installation_id:
         github_instance = Github(os.environ["GITHUB_PAT"])
     else:
         github_instance = CustomGithub(
-            installation_id,
-            signing_key=signing_key,
-            app_id=app_id
+            installation_id, signing_key=signing_key, app_id=app_id
         )
     return github_instance.token, github_instance
 
@@ -504,7 +499,7 @@ class ClonedRepo:
                 # Try to open existing repo
                 repo = git.Repo(self.cached_dir)
                 repo.git.remote("set-url", "origin", self.clone_url)
-                repo.git.clean('-fd')
+                repo.git.clean("-fd")
                 repo.git.pull()
                 logger.info("Pull repo succeeded")
             except Exception as e:
@@ -543,7 +538,7 @@ class ClonedRepo:
             self.git_repo.git.checkout(self.branch)
         except Exception as e:
             self.handle_checkout_failures()
-            os.environ['GIT_LFS_SKIP_SMUDGE'] = '1'
+            os.environ["GIT_LFS_SKIP_SMUDGE"] = "1"
             self.git_repo.git.checkout(self.branch)
 
     def handle_checkout_failures(self):
@@ -562,8 +557,7 @@ class ClonedRepo:
             logger.info("No untracked files found")
 
         logger.info("Cleaning untracked files")
-        self.git_repo.git.clean('-fd')
-
+        self.git_repo.git.clean("-fd")
 
     def __del__(self):
         try:
@@ -1001,12 +995,9 @@ def convert_pr_draft_field(
         return False
     return True
 
+
 # get the review threads obejct for a pr, required to tell if a comment is resolved or not
-def get_review_threads(
-    repo_full_name: str,
-    pr_number: int,
-    installation_id: int
-):
+def get_review_threads(repo_full_name: str, pr_number: int, installation_id: int):
     token = get_token(installation_id)
     query = """
 query GetReviewThreads($owner: String!, $name: String!, $prNumber: Int!) {
@@ -1047,20 +1038,16 @@ query GetReviewThreads($owner: String!, $name: String!, $prNumber: Int!) {
     }
     owner, name = repo_full_name.split("/")
     # Prepare the JSON payload
-    variables = {
-        'owner': owner,
-        'name': name,
-        'prNumber': pr_number
-    }
-    json_data = {
-        'query': query, 'variables': variables
-    }
+    variables = {"owner": owner, "name": name, "prNumber": pr_number}
+    json_data = {"query": query, "variables": variables}
 
     # Make the POST request
     response = requests.post(url, headers=headers, data=json.dumps(json_data))
     if response.status_code != 200:
         return {}
-    review_threads_json = response.json()['data']['repository']['pullRequest']['reviewThreads']['nodes']
+    review_threads_json = response.json()["data"]["repository"]["pullRequest"][
+        "reviewThreads"
+    ]["nodes"]
     return review_threads_json
 
 

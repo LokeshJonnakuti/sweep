@@ -52,7 +52,11 @@ class Message(BaseModel):
 
     def __repr__(self):
         # take the first 100 and last 100 characters of the message if it's too long
-        truncated_message_content = self.content[:100] + "..." + self.content[-100:] if len(self.content) > 200 else self.content
+        truncated_message_content = (
+            self.content[:100] + "..." + self.content[-100:]
+            if len(self.content) > 200
+            else self.content
+        )
         return f"\nSTART OF MESSAGE\n\n{truncated_message_content}\n\nROLE: {self.role} FUNCTION_CALL: {self.function_call} NAME: {self.name} ANNOTATIONS: {self.annotations if self.annotations else ''} KEY: {self.key}\n\nEND OF MESSAGE\n\n"
 
 
@@ -289,6 +293,7 @@ SNIPPET_FORMAT = """<snippet>
 </source>
 </snippet>"""
 
+
 class Snippet(BaseModel):
     """
     Start and end refer to line numbers
@@ -298,7 +303,7 @@ class Snippet(BaseModel):
     start: int
     end: int
     file_path: str
-    score: float = 0.0 # TODO: migrate all usages to use this
+    score: float = 0.0  # TODO: migrate all usages to use this
     type_name: Literal["source", "tests", "dependencies", "tools", "docs"] = "source"
 
     def __eq__(self, other):
@@ -359,8 +364,7 @@ class Snippet(BaseModel):
     @property
     def xml(self):
         return SNIPPET_FORMAT.format(
-            denotation=self.file_denotation,
-            contents=self.get_snippet()
+            denotation=self.file_denotation, contents=self.get_snippet()
         )
 
     def get_xml(self, add_lines: bool = True):
@@ -405,20 +409,15 @@ class Snippet(BaseModel):
     @property
     def denotation(self):
         return f"{self.file_path}:{self.start}-{self.end}"
-    
+
     @property
     def file_denotation(self):
         if self.start <= 0 and self.end >= self.content.count("\n") + 1:
             return f"{self.file_path}"
-        return f"{self.file_path}:{self.start}-{self.end}" 
+        return f"{self.file_path}:{self.start}-{self.end}"
 
     @classmethod
-    def from_file(
-        cls,
-        file_path: str,
-        file_contents: str,
-        **kwargs
-    ):
+    def from_file(cls, file_path: str, file_contents: str, **kwargs):
         return cls(
             content=file_contents,
             start=1,
@@ -426,6 +425,7 @@ class Snippet(BaseModel):
             file_path=file_path,
             **kwargs,
         )
+
 
 def fuse_snippets(snippets: list[Snippet]) -> list[Snippet]:
     new_snippets = []
@@ -442,12 +442,16 @@ def fuse_snippets(snippets: list[Snippet]) -> list[Snippet]:
             new_snippets.append(snippet)
     return new_snippets
 
+
 class NoFilesException(Exception):
     def __init__(self, message="Sweep could not find any files to modify"):
         super().__init__(message)
 
+
 class UnsuitableFileException(Exception):
-    def __init__(self, message="Sweep has determined this file is unsuitable to work with"):
+    def __init__(
+        self, message="Sweep has determined this file is unsuitable to work with"
+    ):
         super().__init__(message)
 
 
@@ -507,18 +511,32 @@ class EmptyRepository(Exception):
 def parse_fcr(fcr: "FileChangeRequest"):
     justification, *_ = fcr.instructions.split("<original_code>", 1)
     justification, *_ = justification.split("<new_code>", 1)
-    justification = justification.rstrip().removesuffix("1.").removesuffix("2.").rstrip() # sometimes Claude puts 1. <original_code> which is weird
+    justification = (
+        justification.rstrip().removesuffix("1.").removesuffix("2.").rstrip()
+    )  # sometimes Claude puts 1. <original_code> which is weird
     original_code_pattern = r"<original_code(?: file_path=\".*?\")?(?: index=\"\d+\")?>\s*\n(.*?)</original_code>"
-    new_code_pattern = r"<new_code(?: file_path=\".*?\")?(?: index=\"\d+\")?>\s*\n(.*?)</new_code>"
-    original_code_matches = list(re.finditer(original_code_pattern, fcr.instructions, re.DOTALL))
+    new_code_pattern = (
+        r"<new_code(?: file_path=\".*?\")?(?: index=\"\d+\")?>\s*\n(.*?)</new_code>"
+    )
+    original_code_matches = list(
+        re.finditer(original_code_pattern, fcr.instructions, re.DOTALL)
+    )
     new_code_matches = list(re.finditer(new_code_pattern, fcr.instructions, re.DOTALL))
     replace_all_pattern = r"<replace_all>true</replace_all>"
-    replace_all_matches = list(re.finditer(replace_all_pattern, fcr.instructions, re.DOTALL))
+    replace_all_matches = list(
+        re.finditer(replace_all_pattern, fcr.instructions, re.DOTALL)
+    )
     return {
         "justification": justification.strip(),
         "file_path": fcr.filename,
-        "original_code": [strip_triple_quotes(original_code_match.group(1)) for original_code_match in original_code_matches],
-        "new_code": [strip_triple_quotes(new_code_match.group(1)) for new_code_match in new_code_matches],
+        "original_code": [
+            strip_triple_quotes(original_code_match.group(1))
+            for original_code_match in original_code_matches
+        ],
+        "new_code": [
+            strip_triple_quotes(new_code_match.group(1))
+            for new_code_match in new_code_matches
+        ],
         "replace_all": bool(replace_all_matches),
     }
 

@@ -2,6 +2,7 @@ import difflib
 import re
 
 from loguru import logger
+
 from sweepai.dataclasses.comments import CommentDiffSpan
 from sweepai.utils.search_and_replace import Match, find_best_match
 
@@ -28,7 +29,7 @@ def generate_diff(old_code, new_code, **kwargs):
     diff = difflib.unified_diff(
         stripped_old_code.splitlines(keepends=True),
         stripped_new_code.splitlines(keepends=True),
-        **kwargs
+        **kwargs,
     )
 
     diff_result = ""
@@ -40,6 +41,7 @@ def generate_diff(old_code, new_code, **kwargs):
 
     return diff_result
 
+
 def generate_ndiff(old_code, new_code, **kwargs):
     if old_code == new_code:
         return ""
@@ -49,7 +51,7 @@ def generate_ndiff(old_code, new_code, **kwargs):
     diff = difflib.ndiff(
         stripped_old_code.splitlines(keepends=True),
         stripped_new_code.splitlines(keepends=True),
-        **kwargs
+        **kwargs,
     )
 
     diff_text = "".join(diff)
@@ -243,6 +245,7 @@ def get_matches(modify_file_response):
     )
     return matches
 
+
 def is_markdown(filename):
     return (
         filename.endswith(".md")
@@ -250,7 +253,10 @@ def is_markdown(filename):
         or filename.endswith(".txt")
     )
 
-def get_diff_spans(old_content: str, new_content: str, file_name: str) -> list[CommentDiffSpan]:
+
+def get_diff_spans(
+    old_content: str, new_content: str, file_name: str
+) -> list[CommentDiffSpan]:
     # Split the contents into lines
     old_lines = old_content.splitlines()
     new_lines = new_content.splitlines()
@@ -279,12 +285,12 @@ def get_diff_spans(old_content: str, new_content: str, file_name: str) -> list[C
                 # End of a diff span
                 diff_spans.append(
                     CommentDiffSpan(
-                        old_start_line=old_start_line, 
+                        old_start_line=old_start_line,
                         old_end_line=old_end_line,
                         new_start_line=new_start_line,
                         new_end_line=new_end_line,
                         new_code="\n".join(new_code),
-                        file_name=file_name
+                        file_name=file_name,
                     )
                 )
                 old_start_line = None
@@ -308,16 +314,17 @@ def get_diff_spans(old_content: str, new_content: str, file_name: str) -> list[C
     if old_start_line is not None:
         diff_spans.append(
             CommentDiffSpan(
-                old_start_line=old_start_line, 
+                old_start_line=old_start_line,
                 old_end_line=old_end_line,
                 new_start_line=new_start_line,
                 new_end_line=new_end_line,
                 new_code="\n".join(new_code),
-                file_name=file_name
+                file_name=file_name,
             )
         )
 
     return diff_spans
+
 
 if __name__ == "__main__":
     old_file = """\

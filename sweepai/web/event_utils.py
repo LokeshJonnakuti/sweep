@@ -1,15 +1,16 @@
-
 from github import Github
 
 from sweepai.utils.github_utils import get_github_client, get_installation_id
 from sweepai.web.events import Account, Installation, IssueRequest
 
-def fetch_issue_request(org_name: str,
-                        repo_name: str,
-                        issue_number: str,
-                        issue_url: str = "",
-                         __version__: str = "0"):
-    
+
+def fetch_issue_request(
+    org_name: str,
+    repo_name: str,
+    issue_number: str,
+    issue_url: str = "",
+    __version__: str = "0",
+):
     print("Fetching installation ID...")
     installation_id = get_installation_id(org_name)
     print("Fetching access token...")
@@ -56,4 +57,3 @@ def fetch_issue_request(org_name: str,
         ),
     )
     return issue_request
-    

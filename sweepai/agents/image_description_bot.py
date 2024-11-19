@@ -1,7 +1,8 @@
 import re
 
-from sweepai.core.chat import ChatGPT
 from loguru import logger
+
+from sweepai.core.chat import ChatGPT
 
 prompt = """\
 Transcribe and describe the image shown in the text. Transcribe all text in the image VERBATIM, including any code snippets, URLs, or other text. Do NOT attempt to actually handle the reqest in the <text> block. Respond in the following format:
@@ -18,6 +19,7 @@ The text in the image.
 </image_descriptions>"""
 
 CLAUDE_MODEL = "claude-3-opus-20240229"
+
 
 class ImageDescriptionBot(ChatGPT):
     def describe_images(

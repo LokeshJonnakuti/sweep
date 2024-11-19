@@ -1,24 +1,26 @@
-from hashlib import md5
 import multiprocessing
-
 import os
+from hashlib import md5
 
+from diskcache import Cache
 from loguru import logger
 from tqdm import tqdm
 
 from sweepai.config.client import SweepConfig
 from sweepai.config.server import CACHE_DIRECTORY
 from sweepai.core.entities import Snippet
+from sweepai.utils.code_validators import chunk_code
 from sweepai.utils.file_utils import read_file_with_fallback_encodings
 from sweepai.utils.tiktoken_utils import Tiktoken
-from sweepai.utils.code_validators import chunk_code
 from sweepai.utils.timer import Timer
-from diskcache import Cache
 
-chunk_cache = Cache(f'{CACHE_DIRECTORY}/chunk_cache') # we instantiate a singleton, diskcache will handle concurrency
-file_name_cache = Cache(f'{CACHE_DIRECTORY}/file_name_cache')
+chunk_cache = Cache(
+    f"{CACHE_DIRECTORY}/chunk_cache"
+)  # we instantiate a singleton, diskcache will handle concurrency
+file_name_cache = Cache(f"{CACHE_DIRECTORY}/file_name_cache")
 
 tiktoken_client = Tiktoken()
+
 
 def filter_file(directory: str, file: str, sweep_config: SweepConfig) -> bool:
     cache_key = directory + file
@@ -27,6 +29,7 @@ def filter_file(directory: str, file: str, sweep_config: SweepConfig) -> bool:
     result = _filter_file(directory, file, sweep_config)
     file_name_cache[cache_key] = result
     return result
+
 
 def _filter_file(directory: str, file: str, sweep_config: SweepConfig) -> bool:
     """
@@ -65,7 +68,7 @@ def _filter_file(directory: str, file: str, sweep_config: SweepConfig) -> bool:
     except UnicodeDecodeError:
         logger.warning(f"UnicodeDecodeError: {file}, skipping")
         return False
-    if b'\x00' in data.encode():
+    if b"\x00" in data.encode():
         return False
     line_count = data.count("\n") + 1
     # if average line length is greater than 200, then it is likely not human readable
@@ -79,6 +82,7 @@ def _filter_file(directory: str, file: str, sweep_config: SweepConfig) -> bool:
         return False
     return True
 
+
 def read_file(file_name: str) -> str:
     try:
         with open(file_name, "r") as f:
@@ -89,10 +93,12 @@ def read_file(file_name: str) -> str:
 
 FILE_THRESHOLD = 240
 
+
 def conditional_hash(contents: str):
     if len(contents) > 255:
         return md5(contents.encode()).hexdigest()
     return contents
+
 
 def file_path_to_chunks(file_path: str) -> list[str]:
     file_contents = read_file(file_path)
@@ -106,12 +112,15 @@ def file_path_to_chunks(file_path: str) -> list[str]:
 
 # @file_cache()
 def directory_to_chunks(
-    directory: str, sweep_config: SweepConfig, do_not_use_file_cache: bool = False,
+    directory: str,
+    sweep_config: SweepConfig,
+    do_not_use_file_cache: bool = False,
 ) -> tuple[list[Snippet], list[str]]:
     # dir_file_count = {}
 
     logger.info(f"Reading files from {directory}")
     vis = set()
+
     # 81.5s -> 42.68
     def dfs(file_path: str = directory):
         only_file_name = os.path.basename(file_path)
@@ -132,6 +141,7 @@ def directory_to_chunks(
                         yield entry.path
         except NotADirectoryError:
             yield file_path
+
     with Timer():
         file_list = dfs()
         file_list = [
@@ -143,26 +153,37 @@ def directory_to_chunks(
     logger.info("Done reading files")
     all_chunks = []
     with multiprocessing.Pool(processes=multiprocessing.cpu_count() // 4) as pool:
-        for chunks in tqdm(pool.imap(file_path_to_chunks, file_list), total=len(file_list), desc="Chunking files"):
+        for chunks in tqdm(
+            pool.imap(file_path_to_chunks, file_list),
+            total=len(file_list),
+            desc="Chunking files",
+        ):
             all_chunks.extend(chunks)
     return all_chunks, file_list
+
 
 if __name__ == "__main__":
     try:
         from sweepai.utils.github_utils import ClonedRepo, get_installation_id
+
         organization_name = "sweepai"
-        
+
         installation_id = get_installation_id(organization_name)
         cloned_repo = ClonedRepo("sweepai/sweep", installation_id, "main")
         sweep_config = SweepConfig()
         chunks, file_list = directory_to_chunks(cloned_repo.repo_dir, sweep_config)
         # ensure no unallowed files are let through
-        assert(not any([file for file in file_list if sweep_config.is_file_excluded(file)]))
+        assert not any(
+            [file for file in file_list if sweep_config.is_file_excluded(file)]
+        )
         # pick 10 random files and turn them to chunks
         import random
+
         for _ in range(10):
             idx = random.randint(0, len(file_list) - 1)
             file_chunks = file_path_to_chunks(file_list[idx])
 
     except Exception as e:
-        logger.error(f"repo_parsing_utils.py failed to run successfully with error: {e}")
+        logger.error(
+            f"repo_parsing_utils.py failed to run successfully with error: {e}"
+        )
