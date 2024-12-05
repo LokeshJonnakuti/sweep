@@ -22,6 +22,7 @@ from sweepai.logn.cache import file_cache
 from sweepai.utils.github_utils import ClonedRepo, get_token
 from sweepai.utils.streamable_functions import streamable
 from sweepai.utils.timer import Timer
+from security import safe_command
 
 MAX_LINES = 500
 LINES_TO_KEEP = 100
@@ -140,7 +141,7 @@ def get_failing_docker_logs(cloned_repo: ClonedRepo):
                     build_command = f"{disable_buildkit_prefix} {build_command}"
                     status["message"] = "Building Docker image..."
                     yield status
-                    subprocess.run(build_command, shell=True, check=True, capture_output=True, text=True)
+                    safe_command.run(subprocess.run, build_command, shell=True, check=True, capture_output=True, text=True)
                     logger.info(f"Built Docker image {image_name}")
                     # Run the Docker container and remove it after it exits
                     if env_exists:
@@ -153,7 +154,7 @@ def get_failing_docker_logs(cloned_repo: ClonedRepo):
                     with Timer():
                         # Use Popen to stream output
                         stdout = ""
-                        with subprocess.Popen(run_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True) as proc:
+                        with safe_command.run(subprocess.Popen, run_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True) as proc:
                             for line in proc.stdout:
                                 print(line, end='', flush=True)
                                 stdout += line
@@ -168,7 +169,7 @@ def get_failing_docker_logs(cloned_repo: ClonedRepo):
                         remove_command = f"docker rm {container_name}"
                         status["message"] = "Removing Docker container..."
                         yield status
-                        subprocess.run(remove_command, shell=True, check=True, capture_output=True, text=True)
+                        safe_command.run(subprocess.run, remove_command, shell=True, check=True, capture_output=True, text=True)
                         if proc.returncode == 0:
                             logger.info(f"Docker container {container_name} exited successfully")
                             status["message"] = "Checks passed"
@@ -225,7 +226,7 @@ def delete_docker_images(docker_image_names: str):
     for image_name in docker_image_names:
         delete_command = f"docker rmi {image_name}"
         try:
-            subprocess.run(delete_command, shell=True, check=True)
+            safe_command.run(subprocess.run, delete_command, shell=True, check=True)
             logger.info(f"Deleted Docker image: {image_name}")
         except subprocess.CalledProcessError as e:
             logger.warning(f"Error deleting Docker image: {image_name}")

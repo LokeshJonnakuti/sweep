@@ -9,6 +9,7 @@ from sweepai.core.snippet_utils import merge_snippet_ranges
 from sweepai.utils.github_utils import ClonedRepo, MockClonedRepo
 from sweepai.utils.ticket_utils import prep_snippets
 from sweepai.core.entities import SNIPPET_FORMAT, Snippet
+from security import safe_command
 
 class QuestionAnswererException(Exception):
     def __init__(self, message):
@@ -267,8 +268,7 @@ def ripgrep(
     """
     Search for a keyword in the codebase.
     """
-    response = subprocess.run(
-        " ".join([
+    response = safe_command.run(subprocess.run, " ".join([
             "rg",
             "-n",
             # "-w",

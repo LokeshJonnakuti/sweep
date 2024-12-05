@@ -24,6 +24,7 @@ import tree_sitter_javascript
 from sweepai.core.entities import Snippet
 from sweepai.logn.cache import file_cache
 from sweepai.utils.fuzzy_diff import patience_fuzzy_additions
+from security import safe_command
 
 warnings.simplefilter("ignore", category=FutureWarning)
 
@@ -300,8 +301,7 @@ def check_valid_typescript(file_path: str, code: str) -> tuple[bool, str]:
     is_valid = True
     message = ""
     version_check = ["tsc", "--version"]
-    result = subprocess.run(
-        " ".join(version_check),
+    result = safe_command.run(subprocess.run, " ".join(version_check),
         capture_output=True,
         text=True,
         shell=True,
@@ -316,7 +316,7 @@ def check_valid_typescript(file_path: str, code: str) -> tuple[bool, str]:
         # Run `tsc` on the temporary file
         try:
             commands = ["tsc", "--pretty", "--noEmit", temp_file_path]
-            result = subprocess.run(" ".join(commands), shell=True, text=True, capture_output=True)
+            result = safe_command.run(subprocess.run, " ".join(commands), shell=True, text=True, capture_output=True)
 
             if result.returncode != 0:
                 message = strip_ansi_codes(result.stdout)
@@ -509,8 +509,7 @@ def get_check_results(file_path: str, code: str, last_fcr_for_file=False) -> Che
         # see if eslint is installed
         npx_commands = ["npx", "eslint", "--version"]
         try:
-            result = subprocess.run(
-                " ".join(npx_commands),
+            result = safe_command.run(subprocess.run, " ".join(npx_commands),
                 timeout=5,
                 capture_output=True,
                 text=True,
@@ -530,8 +529,7 @@ def get_check_results(file_path: str, code: str, last_fcr_for_file=False) -> Che
                     f.write(code)
                 try:
                     eslint_commands = ["npx", "eslint", new_file, "--config", config_file, "--no-ignore"]
-                    result = subprocess.run(
-                        " ".join(eslint_commands),
+                    result = safe_command.run(subprocess.run, " ".join(eslint_commands),
                         capture_output=True,
                         text=True,
                         shell=True,
@@ -582,8 +580,7 @@ def format_file(file_path: str, code: str, cwd: str | None = None) -> str:
                 f.write(prettier_config_contents)
             npx_commands = ["npx", "prettier", "--stdin-filepath", file_path]
             try:
-                result = subprocess.run(
-                    " ".join(npx_commands),
+                result = safe_command.run(subprocess.run, " ".join(npx_commands),
                     input=code,
                     capture_output=True,
                     text=True,

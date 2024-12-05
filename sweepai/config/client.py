@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from sweepai.core.entities import EmptyRepository
 from sweepai.utils.event_logger import posthog
 from sweepai.utils.file_utils import encode_file_with_fallback_encodings, read_file_with_fallback_encodings
+from security import safe_command
 
 
 class SweepConfig(BaseModel):
@@ -335,8 +336,7 @@ class SweepConfig(BaseModel):
         generated = False
         try:
             query = ["github-linguist", file_name, "-j"]
-            response = subprocess.run(
-                " ".join(query),
+            response = safe_command.run(subprocess.run, " ".join(query),
                 shell=True,
                 capture_output=True,
                 text=True,

@@ -8,6 +8,7 @@ from sweepai.core.snippet_utils import convert_lines_to_and_merge_ranges
 from sweepai.core.vector_db import cosine_similarity, embed_text_array
 from sweepai.utils.github_utils import ClonedRepo
 from sweepai.utils.ripgrep_utils import cleaned_rg_output, parse_ripgrep_line
+from security import safe_command
 
 
 # implements a variety of ways to get more context from the code base
@@ -41,8 +42,7 @@ class DynamicContextBot(ChatGPT):
             if not case_sensitive:
                 rg_command += ["-i"]
             try:
-                result = subprocess.run(
-                    " ".join(rg_command), text=True, shell=True, capture_output=True
+                result = safe_command.run(subprocess.run, " ".join(rg_command), text=True, shell=True, capture_output=True
                 )
                 results = result.stdout
                 files_to_results: dict[str, str] = cleaned_rg_output(directory, sweep_config, results)

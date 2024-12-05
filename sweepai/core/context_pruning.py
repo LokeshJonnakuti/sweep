@@ -21,6 +21,7 @@ from sweepai.utils.ripgrep_utils import post_process_rg_output
 from sweepai.utils.openai_listwise_reranker import listwise_rerank_snippets
 from sweepai.utils.progress import AssistantConversation, TicketProgress
 from sweepai.utils.tree_utils import DirectoryTree
+from security import safe_command
 
 ASSISTANT_MAX_CHARS = 4096 * 4 * 0.95  # ~95% of 4k tokens
 NUM_SNIPPETS_TO_SHOW_AT_START = 15
@@ -183,8 +184,7 @@ def run_ripgrep_command(code_entity, repo_dir, *args):
         code_entity,
         repo_dir,
     ]
-    result = subprocess.run(
-        " ".join(rg_command), text=True, shell=True, capture_output=True
+    result = safe_command.run(subprocess.run, " ".join(rg_command), text=True, shell=True, capture_output=True
     )
     return result.stdout
 
