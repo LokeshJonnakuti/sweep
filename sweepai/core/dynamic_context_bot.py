@@ -1,6 +1,8 @@
 import subprocess
 
 from loguru import logger
+from security import safe_command
+
 from sweepai.config.client import SweepConfig
 from sweepai.core.chat import ChatGPT
 from sweepai.core.entities import Snippet
@@ -8,7 +10,6 @@ from sweepai.core.snippet_utils import convert_lines_to_and_merge_ranges
 from sweepai.core.vector_db import cosine_similarity, embed_text_array
 from sweepai.utils.github_utils import ClonedRepo
 from sweepai.utils.ripgrep_utils import cleaned_rg_output, parse_ripgrep_line
-from security import safe_command
 
 
 # implements a variety of ways to get more context from the code base
@@ -42,10 +43,17 @@ class DynamicContextBot(ChatGPT):
             if not case_sensitive:
                 rg_command += ["-i"]
             try:
-                result = safe_command.run(subprocess.run, " ".join(rg_command), text=True, shell=True, capture_output=True
+                result = safe_command.run(
+                    subprocess.run,
+                    " ".join(rg_command),
+                    text=True,
+                    shell=True,
+                    capture_output=True,
                 )
                 results = result.stdout
-                files_to_results: dict[str, str] = cleaned_rg_output(directory, sweep_config, results)
+                files_to_results: dict[str, str] = cleaned_rg_output(
+                    directory, sweep_config, results
+                )
                 # list of line numbers for each file used to get snippets for that file
                 files_to_line_numbers: dict[str, list[int]] = {}
                 # break each line into line number and line content
@@ -63,13 +71,15 @@ class DynamicContextBot(ChatGPT):
                 files_to_ranges: dict[str, list[tuple[int, int]]] = {}
                 for file_path, line_numbers in files_to_line_numbers.items():
                     try:
-                        file_upper_bound = len(cloned_repo.get_file_contents(file_path).split("\n"))
+                        file_upper_bound = len(
+                            cloned_repo.get_file_contents(file_path).split("\n")
+                        )
                         ranges = convert_lines_to_and_merge_ranges(
-                            line_numbers, 
-                            range_size=20, 
-                            lower_bound=0, 
-                            upper_bound=file_upper_bound - 1, 
-                            offset = -1 # rip grep start counting at 1
+                            line_numbers,
+                            range_size=20,
+                            lower_bound=0,
+                            upper_bound=file_upper_bound - 1,
+                            offset=-1,  # rip grep start counting at 1
                         )
                         files_to_ranges[file_path] = ranges
                     except Exception as e:
@@ -92,11 +102,15 @@ class DynamicContextBot(ChatGPT):
                         logger.warning(f"Error getting snippets: {e}")
                         continue
                 # now we have all the snippets, we can filter them based on the target
-                snippet_contents = [snippet.get_snippet(add_lines=False) for snippet in snippets]
+                snippet_contents = [
+                    snippet.get_snippet(add_lines=False) for snippet in snippets
+                ]
                 # embed and them compare with the target
                 embedded_snippet_contents = embed_text_array(snippet_contents)[0]
                 embedded_query = embed_text_array([target])[0]
-                similarity_scores = cosine_similarity(embedded_query, embedded_snippet_contents).tolist()[0]
+                similarity_scores = cosine_similarity(
+                    embedded_query, embedded_snippet_contents
+                ).tolist()[0]
                 # update scores for each snippet
                 for i, snippet in enumerate(snippets):
                     snippet.score = similarity_scores[i]
@@ -105,7 +119,8 @@ class DynamicContextBot(ChatGPT):
                 logger.warning(f"Error running ripgrep: {e}")
                 continue
         return sorted_snippets[:k]
-    
+
+
 if __name__ == "__main__":
     pass
     # context_bot = DynamicContextBot()

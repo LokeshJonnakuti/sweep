@@ -1,13 +1,15 @@
 import re
+
 from jira import JIRA
 
+from sweepai.config.server import JIRA_API_TOKEN, JIRA_URL, JIRA_USER_NAME
 from sweepai.handlers.on_ticket import on_ticket
 from sweepai.utils.github_utils import get_github_client, get_installation_id
-from sweepai.config.server import JIRA_API_TOKEN, JIRA_URL, JIRA_USER_NAME
+
 
 def extract_repo_name_from_description(description):
     repo_full_name = None
-    pattern = r'repo:\s*(\S+/\S+)'
+    pattern = r"repo:\s*(\S+/\S+)"
     match = re.search(pattern, description)
     if match:
         repo_full_name = match.group(1)
@@ -16,13 +18,14 @@ def extract_repo_name_from_description(description):
 
 def comment_on_jira_webhook(webhook_data: dict, comment_text: str):
     # Extract relevant information from the webhook payload
-    issue_key = webhook_data['issue']['key']
+    issue_key = webhook_data["issue"]["key"]
 
     # Create a JIRA client instance
     jira = JIRA(server=JIRA_URL, basic_auth=(JIRA_USER_NAME, JIRA_API_TOKEN))
 
     # Add the comment to the Jira issue
     jira.add_comment(issue_key, comment_text)
+
 
 def handle_jira_ticket(event):
     # Do something with the JIRA ticket
@@ -44,7 +47,7 @@ def handle_jira_ticket(event):
     _, g = get_github_client(installation_id)
     repo = g.get_repo(repo_full_name)
     github_issue = repo.create_issue(title=title, body=description)
-    
+
     # wait for this
     on_ticket(
         username=github_issue.user.login,
@@ -78,9 +81,9 @@ def handle_jira_ticket(event):
             resolution_pr = pr
             break
     if not resolution_pr:
-        comment_text = "I have created a corresponding GitHub Issue:\n {github_issue.html_url}"
+        comment_text = (
+            "I have created a corresponding GitHub Issue:\n {github_issue.html_url}"
+        )
     else:
         comment_text = f"I have created a corresponding GitHub Issue and GitHub PR:\n{github_issue.html_url}\n{resolution_pr.html_url}"
     comment_on_jira_webhook(webhook_data=event, comment_text=comment_text)
-
-

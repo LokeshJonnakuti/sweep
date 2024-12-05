@@ -24,7 +24,9 @@ ENV = os.environ.get("ENV", "dev")
 
 BOT_TOKEN_NAME = "bot-token"
 
-GITHUB_BASE_URL = os.environ.get("GITHUB_BASE_URL", "https://api.github.com") # configure for enterprise
+GITHUB_BASE_URL = os.environ.get(
+    "GITHUB_BASE_URL", "https://api.github.com"
+)  # configure for enterprise
 
 SWEEP_HEALTH_URL = os.environ.get("SWEEP_HEALTH_URL")
 DISCORD_STATUS_WEBHOOK_URL = os.environ.get("DISCORD_STATUS_WEBHOOK_URL")
@@ -113,7 +115,9 @@ WHITELISTED_REPOS = os.environ.get("WHITELISTED_REPOS", "").split(",")
 BLACKLISTED_USERS = os.environ.get("BLACKLISTED_USERS", "").split(",")
 
 # Default OpenAI
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", None) # this may be none, and it will use azure
+OPENAI_API_KEY = os.environ.get(
+    "OPENAI_API_KEY", None
+)  # this may be none, and it will use azure
 
 OPENAI_API_TYPE = os.environ.get("OPENAI_API_TYPE", "anthropic")
 assert OPENAI_API_TYPE in ["anthropic", "azure", "openai"], "Invalid OPENAI_API_TYPE"
@@ -165,9 +169,9 @@ GHA_AUTOFIX_ENABLED: bool = os.environ.get("GHA_AUTOFIX_ENABLED", False)
 MERGE_CONFLICT_ENABLED: bool = os.environ.get("MERGE_CONFLICT_ENABLED", False)
 INSTALLATION_ID = os.environ.get("INSTALLATION_ID", None)
 
-AWS_ACCESS_KEY=os.environ.get("AWS_ACCESS_KEY")
-AWS_SECRET_KEY=os.environ.get("AWS_SECRET_KEY")
-AWS_REGION=os.environ.get("AWS_REGION")
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
+AWS_SECRET_KEY = os.environ.get("AWS_SECRET_KEY")
+AWS_REGION = os.environ.get("AWS_REGION")
 ANTHROPIC_AVAILABLE = AWS_ACCESS_KEY and AWS_SECRET_KEY and AWS_REGION
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", None)
@@ -176,21 +180,29 @@ COHERE_API_KEY = os.environ.get("COHERE_API_KEY", None)
 
 VOYAGE_API_KEY = os.environ.get("VOYAGE_API_KEY", None)
 
-VOYAGE_API_AWS_ACCESS_KEY=os.environ.get("VOYAGE_API_AWS_ACCESS_KEY_ID")
-VOYAGE_API_AWS_SECRET_KEY=os.environ.get("VOYAGE_API_AWS_SECRET_KEY")
-VOYAGE_API_AWS_REGION=os.environ.get("VOYAGE_API_AWS_REGION")
-VOYAGE_API_AWS_ENDPOINT_NAME=os.environ.get("VOYAGE_API_AWS_ENDPOINT_NAME", "voyage-code-2")
+VOYAGE_API_AWS_ACCESS_KEY = os.environ.get("VOYAGE_API_AWS_ACCESS_KEY_ID")
+VOYAGE_API_AWS_SECRET_KEY = os.environ.get("VOYAGE_API_AWS_SECRET_KEY")
+VOYAGE_API_AWS_REGION = os.environ.get("VOYAGE_API_AWS_REGION")
+VOYAGE_API_AWS_ENDPOINT_NAME = os.environ.get(
+    "VOYAGE_API_AWS_ENDPOINT_NAME", "voyage-code-2"
+)
 
-VOYAGE_API_USE_AWS = VOYAGE_API_AWS_ACCESS_KEY and VOYAGE_API_AWS_SECRET_KEY and VOYAGE_API_AWS_REGION
+VOYAGE_API_USE_AWS = (
+    VOYAGE_API_AWS_ACCESS_KEY and VOYAGE_API_AWS_SECRET_KEY and VOYAGE_API_AWS_REGION
+)
 
 PAREA_API_KEY = os.environ.get("PAREA_API_KEY", None)
 
 # TODO: we need to make this dynamic + backoff
 BATCH_SIZE = int(
-    os.environ.get("BATCH_SIZE", 64 if VOYAGE_API_KEY else 256) # Voyage only allows 128 items per batch and 120000 tokens per batch
+    os.environ.get(
+        "BATCH_SIZE", 64 if VOYAGE_API_KEY else 256
+    )  # Voyage only allows 128 items per batch and 120000 tokens per batch
 )
 
-DEPLOYMENT_GHA_ENABLED = os.environ.get("DEPLOYMENT_GHA_ENABLED", "true").lower() == "true"
+DEPLOYMENT_GHA_ENABLED = (
+    os.environ.get("DEPLOYMENT_GHA_ENABLED", "true").lower() == "true"
+)
 
 JIRA_USER_NAME = os.environ.get("JIRA_USER_NAME", None)
 JIRA_API_TOKEN = os.environ.get("JIRA_API_TOKEN", None)
@@ -210,7 +222,11 @@ CACHE_DIRECTORY = os.environ.get("CACHE_DIRECTORY", "/mnt/caches")
 assert OPENAI_API_KEY, "OPENAI_API_KEY is required."
 assert COHERE_API_KEY, "COHERE_API_KEY is required."
 
-CIRCLE_CI_PAT = os.environ.get("CIRCLE_CI_PAT", None) # if this is present, we will poll from and get logs from circleci
+CIRCLE_CI_PAT = os.environ.get(
+    "CIRCLE_CI_PAT", None
+)  # if this is present, we will poll from and get logs from circleci
 
 DOCKER_ENABLED = os.environ.get("DOCKER_ENABLED", "false").lower() == "true"
-DOCKERFILE_CONFIG_LOCATION = os.environ.get("DOCKERFILE_CONFIG_LOCATION", None) # location of the 
+DOCKERFILE_CONFIG_LOCATION = os.environ.get(
+    "DOCKERFILE_CONFIG_LOCATION", None
+)  # location of the

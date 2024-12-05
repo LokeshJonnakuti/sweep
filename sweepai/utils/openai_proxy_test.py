@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, PropertyMock, patch
 
-
 from sweepai.config.server import OPENAI_API_ENGINE_GPT35
 from sweepai.utils.openai_proxy import OpenAIProxy
 
@@ -107,4 +106,4 @@ class TestOpenAIProxyDetermineOpenaiEngine(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main() # these tests are broken
+    unittest.main()  # these tests are broken

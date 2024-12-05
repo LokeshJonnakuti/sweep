@@ -180,10 +180,12 @@ class PRRequest(BaseModel):
 
     installation: Installation
 
+
 class PRLabeledRequest(BaseModel):
     class PullRequest(BaseModel):
         class User(BaseModel):
             login: str
+
         class Label(BaseModel):
             name: str
 

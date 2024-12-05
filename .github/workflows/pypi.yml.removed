@@ -1,6 +1,6 @@
 name: Pypi Test Deploy
 
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -61,7 +61,7 @@ jobs:
       - run: |
           export TWINE_USERNAME=__token__
           export TWINE_PASSWORD=${{ secrets.TEST_PYPI_TOKEN }}
-          python -m twine upload dist/* --repository testpypi --non-interactive 
+          python -m twine upload dist/* --repository testpypi --non-interactive
 
   install:
     runs-on: ubuntu-latest

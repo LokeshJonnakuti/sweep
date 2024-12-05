@@ -12,11 +12,14 @@ import yaml
 from github.Repository import Repository
 from loguru import logger
 from pydantic import BaseModel
+from security import safe_command
 
 from sweepai.core.entities import EmptyRepository
 from sweepai.utils.event_logger import posthog
-from sweepai.utils.file_utils import encode_file_with_fallback_encodings, read_file_with_fallback_encodings
-from security import safe_command
+from sweepai.utils.file_utils import (
+    encode_file_with_fallback_encodings,
+    read_file_with_fallback_encodings,
+)
 
 
 class SweepConfig(BaseModel):
@@ -33,18 +36,21 @@ class SweepConfig(BaseModel):
         "oa3gen",
     ]
     exclude_path_dirs: list[str] = [
-        "node_modules", 
-        "build", 
-        ".venv", 
-        "venv", 
-        ".git", 
-        "dist"]
-    exclude_substrings_aggressive: list[str] = [ # aggressively filter out file paths, may drop some relevant files
+        "node_modules",
+        "build",
+        ".venv",
+        "venv",
+        ".git",
+        "dist",
+    ]
+    exclude_substrings_aggressive: list[
+        str
+    ] = [  # aggressively filter out file paths, may drop some relevant files
         "integration",
         ".spec",
         ".test",
         ".json",
-        "test"
+        "test",
     ]
     include_exts: list[str] = [
         ".cs",
@@ -120,19 +126,19 @@ class SweepConfig(BaseModel):
         "sweep.yaml",
         "pnpm-lock.yaml",
         "LICENSE",
-        'package-lock.json',
-        'package.json',
-        'pyproject.toml',
-        'requirements.txt',
-        'yarn.lock',
-        '.lockb',
-        '.gitignore',
-        '.lock'
+        "package-lock.json",
+        "package.json",
+        "pyproject.toml",
+        "requirements.txt",
+        "yarn.lock",
+        ".lockb",
+        ".gitignore",
+        ".lock",
     ]
     excluded_languages: list[str] = [
-        'TOML',
-        'Git Attributes',
-        'XML Property List',
+        "TOML",
+        "Git Attributes",
+        "XML Property List",
     ]
     # cutoff for when we output truncated versions of strings, this is an arbitrary number and can be changed
     truncation_cutoff: int = 20000
@@ -141,12 +147,7 @@ class SweepConfig(BaseModel):
     # github comments
     max_github_comment_body_length: int = 65535
     # allowed image types for vision
-    allowed_image_types: list[str] = [
-        "jpg",
-        "jpeg",
-        "webp",
-        "png"
-    ]
+    allowed_image_types: list[str] = ["jpg", "jpeg", "webp", "png"]
 
     def to_yaml(self) -> str:
         return yaml.safe_dump(self.dict())
@@ -194,9 +195,7 @@ class SweepConfig(BaseModel):
         try:
             sweep_yaml_dict = {}
             contents = repo.get_contents("sweep.yaml")
-            sweep_yaml_dict = yaml.safe_load(
-                contents.decoded_content.decode("utf-8")
-            )
+            sweep_yaml_dict = yaml.safe_load(contents.decoded_content.decode("utf-8"))
             if "branch" not in sweep_yaml_dict:
                 return default_branch
             branch_name = sweep_yaml_dict["branch"]
@@ -236,7 +235,7 @@ class SweepConfig(BaseModel):
         except Exception as e:
             logger.warning(f"Error when getting draft: {e}, returning False")
             return False
-    
+
     # returns if file is excluded or not
     def is_file_excluded(self, file_path: str) -> bool:
         parts = file_path.split(os.path.sep)
@@ -252,17 +251,19 @@ class SweepConfig(BaseModel):
                 if "." not in part:
                     return True
         return False
-    
+
     # returns if file is excluded or not, this version may drop actual relevant files
     def is_file_excluded_aggressive(self, dir: str, file_path: str) -> bool:
         # tiktoken_client = Tiktoken()
         # must exist
-        if not os.path.exists(os.path.join(dir, file_path)) and not os.path.exists(file_path):
+        if not os.path.exists(os.path.join(dir, file_path)) and not os.path.exists(
+            file_path
+        ):
             return True
         full_path = os.path.join(dir, file_path)
         if os.stat(full_path).st_size > 240000 or os.stat(full_path).st_size < 5:
             return True
-        # exclude binary 
+        # exclude binary
         with open(full_path, "rb") as f:
             is_binary = False
             for block in iter(lambda: f.read(1024), b""):
@@ -276,20 +277,22 @@ class SweepConfig(BaseModel):
             data = read_file_with_fallback_encodings(full_path)
             lines = data.split("\n")
         except UnicodeDecodeError:
-            logger.warning(f"UnicodeDecodeError in is_file_excluded_aggressive: {full_path}, skipping")
+            logger.warning(
+                f"UnicodeDecodeError in is_file_excluded_aggressive: {full_path}, skipping"
+            )
             return True
         line_count = len(lines)
         # if average line length is greater than 200, then it is likely not human readable
-        if len(data)/line_count > 200:
+        if len(data) / line_count > 200:
             return True
-    
+
         # check token density, if it is greater than 2, then it is likely not human readable
         # token_count = tiktoken_client.count(data)
         # if token_count == 0:
         #     return True
         # if len(data)/token_count < 2:
         #     return True
-        
+
         # now check the file name
         parts = file_path.split(os.path.sep)
         for part in parts:
@@ -298,19 +301,22 @@ class SweepConfig(BaseModel):
         for part in self.exclude_substrings_aggressive:
             if part in file_path:
                 return True
-            
+
         # check if file is autogenerated
         auto_generated, _ = self.is_file_auto_generated(file_path)
         if auto_generated:
             return True
         return False
-    
+
     # checks the actual context of a file to see if it is suitable for sweep or not
     # for example checks for size and composition of the file_contents
     # returns False if the file is bad
     def is_file_suitable(self, file_contents: str) -> tuple[bool, str]:
         if file_contents is None:
-            return False, "The file contents were a None Type object, this is most likely an issue on our end."
+            return (
+                False,
+                "The file contents were a None Type object, this is most likely an issue on our end.",
+            )
         try:
             encoded_file = encode_file_with_fallback_encodings(file_contents)
         except UnicodeEncodeError as e:
@@ -325,10 +331,13 @@ class SweepConfig(BaseModel):
         # if average line length is greater than 200, then it is likely not human readable
         if line_count == 0:
             return False, "Line count for this file was 0!"
-        if len(file_contents)/line_count > 200:
-            return False, "This file was determined to be non human readable due to the average line length."
+        if len(file_contents) / line_count > 200:
+            return (
+                False,
+                "This file was determined to be non human readable due to the average line length.",
+            )
         return True, ""
-    
+
     def is_file_bad(self, file_name: str, repo_dir: str) -> tuple[bool, str]:
         """
         Uses github-linguist to determine if a file is "good" or not
@@ -336,7 +345,9 @@ class SweepConfig(BaseModel):
         generated = False
         try:
             query = ["github-linguist", file_name, "-j"]
-            response = safe_command.run(subprocess.run, " ".join(query),
+            response = safe_command.run(
+                subprocess.run,
+                " ".join(query),
                 shell=True,
                 capture_output=True,
                 text=True,
@@ -344,7 +355,7 @@ class SweepConfig(BaseModel):
             )
             result = json.loads(response.stdout)
             type = result[file_name]["type"]
-            generated = result[file_name]['generated']
+            generated = result[file_name]["generated"]
             language = result[file_name]["language"]
             # if there is a string of numbers in the file name that is more than 4 characters long, it is likely autogenerated
             if generated:
@@ -352,22 +363,32 @@ class SweepConfig(BaseModel):
             if type != "Text":
                 return True, "This file is likely not a code file."
             if language in self.excluded_languages:
-                return True, f"This language for this file: {language} is usually not associated with coding."
+                return (
+                    True,
+                    f"This language for this file: {language} is usually not associated with coding.",
+                )
             if language is None:
-                return True, "A valid programming language could not be determined for this file."
-            pattern = r'\d{5,}'
+                return (
+                    True,
+                    "A valid programming language could not be determined for this file.",
+                )
+            pattern = r"\d{5,}"
             match = re.search(pattern, file_name)
             if bool(match):
-                return True, "The filename means that this file is likely auto generated."
+                return (
+                    True,
+                    "The filename means that this file is likely auto generated.",
+                )
         except Exception as e:
-            logger.error(f"Error when checking if file {file_name} is autogenerated: {e}, run `sudo apt-get install cmake pkg-config libicu-dev zlib1g-dev libcurl4-openssl-dev libssl-dev ruby-dev && gem install github-linguist`")
+            logger.error(
+                f"Error when checking if file {file_name} is autogenerated: {e}, run `sudo apt-get install cmake pkg-config libicu-dev zlib1g-dev libcurl4-openssl-dev libssl-dev ruby-dev && gem install github-linguist`"
+            )
             posthog.capture(
-                "is_file_auto_generated_or_vendored", 
-                "is_file_auto_generated_or_vendored error", 
-                properties={"error": str(e), "file_name": file_name}
+                "is_file_auto_generated_or_vendored",
+                "is_file_auto_generated_or_vendored error",
+                properties={"error": str(e), "file_name": file_name},
             )
         return False, ""
-        
 
 
 @lru_cache(maxsize=None)
@@ -375,9 +396,7 @@ def get_gha_enabled(repo: Repository) -> bool:
     try:
         contents = repo.get_contents("sweep.yaml")
     except Exception:
-        logger.info(
-            "No sweep.yaml found, falling back to True"
-        )
+        logger.info("No sweep.yaml found, falling back to True")
         return True
     try:
         gha_enabled = yaml.safe_load(contents.decoded_content.decode("utf-8")).get(
@@ -385,19 +404,16 @@ def get_gha_enabled(repo: Repository) -> bool:
         )
         return gha_enabled
     except Exception:
-        logger.info(
-            "Error when getting gha enabled, falling back to True"
-        )
+        logger.info("Error when getting gha enabled, falling back to True")
         return True
+
 
 @lru_cache(maxsize=None)
 def get_config_key_value(repo: Repository, key_name: str) -> bool:
     try:
         contents = repo.get_contents("sweep.yaml")
     except Exception:
-        logger.info(
-            "No sweep.yaml found, falling back to True"
-        )
+        logger.info("No sweep.yaml found, falling back to True")
         return None
     try:
         key_value = yaml.safe_load(contents.decoded_content.decode("utf-8")).get(
@@ -405,10 +421,9 @@ def get_config_key_value(repo: Repository, key_name: str) -> bool:
         )
         return key_value
     except Exception:
-        logger.info(
-            "Error when getting gha enabled, falling back to True"
-        )
+        logger.info("Error when getting gha enabled, falling back to True")
         return None
+
 
 @lru_cache(maxsize=None)
 def get_description(repo: Repository) -> dict:
@@ -472,6 +487,7 @@ def get_blocked_dirs(repo: Repository):
     except Exception:
         return []
 
+
 @lru_cache(maxsize=None)
 def get_rules(repo: Repository):
     try:
@@ -482,7 +498,8 @@ def get_rules(repo: Repository):
         rules = sweep_yaml.get("rules", [])
         return rules
     except Exception:
-        return []    
+        return []
+
 
 # optional, can leave env var blank
 GITHUB_APP_CLIENT_ID = os.environ.get("GITHUB_APP_CLIENT_ID", "Iv1.91fd31586a926a9f")

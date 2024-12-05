@@ -9,6 +9,7 @@ from openai.types.chat.chat_completion_message_tool_call import (
 )
 from pydantic import BaseModel
 
+
 def openai_retry_with_timeout(call, *args, num_retries=3, timeout=5, **kwargs):
     """
     Pass any OpenAI client call and retry it num_retries times, incorporating timeout into the call.

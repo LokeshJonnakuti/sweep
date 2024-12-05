@@ -1,15 +1,17 @@
-from copy import deepcopy
 import re
 import subprocess
+from copy import deepcopy
 
 from loguru import logger
+from security import safe_command
+
 from sweepai.agents.agent_utils import Parameter, get_function_call, tool
 from sweepai.core.chat import ChatGPT
+from sweepai.core.entities import SNIPPET_FORMAT, Snippet
 from sweepai.core.snippet_utils import merge_snippet_ranges
 from sweepai.utils.github_utils import ClonedRepo, MockClonedRepo
 from sweepai.utils.ticket_utils import prep_snippets
-from sweepai.core.entities import SNIPPET_FORMAT, Snippet
-from security import safe_command
+
 
 class QuestionAnswererException(Exception):
     def __init__(self, message):
@@ -18,10 +20,10 @@ class QuestionAnswererException(Exception):
 
 file_search_agent_dependency_tree_initialisation = """
 You must also build and maintain a dependency tree of all code entities that you are working with.
-Begin by identifying the main entity that you are working with when resolving the user's request. 
+Begin by identifying the main entity that you are working with when resolving the user's request.
 Now you must identify all relevant dependencies that this entity relies on and all entities that rely on this entity. For example, if the code entity is a function you must find out all files where this function is called. You must also examine the contents of this function to determine if it calls any functions or has uses any variables that are defined in other files.
-If at any point you discover an entity that is not located in the current code files that you have access to, you are to use the vector search tool or rip grep tool to search for the file where the unknown entity is located. 
-You must also indicate the types for each code entity in the dependency tree you are working with. 
+If at any point you discover an entity that is not located in the current code files that you have access to, you are to use the vector search tool or rip grep tool to search for the file where the unknown entity is located.
+You must also indicate the types for each code entity in the dependency tree you are working with.
 Include it with the entity you are referencing, if not, you must find the relevant file that has the type definition for the code entity.
 Any file within this dependency tree that you build must be added to the context using the `add_files_to_context` tool.
 Respond in the following format:
@@ -45,7 +47,7 @@ The whole point of this dependency tree is to aid you in figuring out when you c
 """
 
 file_search_agent_dependency_tree_update = """
-You must also update the dependency tree with the new code entity that you have discovered. 
+You must also update the dependency tree with the new code entity that you have discovered.
 Then check if there are still any missing types or files that you need to find.
 
 Remember to respond in the following format:
@@ -90,7 +92,8 @@ If you have exhausted all search options and still have not found the answer, yo
 
 Remember to use the valid function call format for either options."""
 
-SEARCH_RESULT_INSTRUCTIONS_FILE_SEARCHER = """
+SEARCH_RESULT_INSTRUCTIONS_FILE_SEARCHER = (
+    """
 
 First, think step-by-step in a scratchpad to analyze the search results and determine whether the answers provided here are sufficient or if there are additional relevant code files that we may need, such as referenced utility files, docs or tests.
 
@@ -114,10 +117,13 @@ Alternatively, if you have found a file that seems relevant but you would like t
 
 Option B: Submit the relevant files
 
-Otherwise, if you have found all the relevant information to answer the user's request, submit the files using `add_files_to_context`. 
+Otherwise, if you have found all the relevant information to answer the user's request, submit the files using `add_files_to_context`.
 
 If you have exhausted all search options and still have not found the answer, submit all the relevant files that you have found using `add_files_to_context` and then call `done_file_search` to indicate that you are finished.
-""" + file_search_agent_dependency_tree_update
+"""
+    + file_search_agent_dependency_tree_update
+)
+
 
 def search_codebase(
     question: str,
@@ -133,13 +139,16 @@ def search_codebase(
         NUM_SNIPPETS_TO_KEEP=0,
         skip_analyze_agent=True,
         *args,
-        **kwargs
+        **kwargs,
     )
     return snippets[:k]
 
+
 @tool()
 def semantic_search(
-    question: Parameter("A single, detailed, specific natural language search question to search the codebase for relevant snippets."),
+    question: Parameter(
+        "A single, detailed, specific natural language search question to search the codebase for relevant snippets."
+    ),
     cloned_repo: ClonedRepo,
     llm_state: dict,
 ):
@@ -158,29 +167,51 @@ def semantic_search(
     for snippet in retrieved_snippets[::-1]:
         if snippet.denotation not in llm_state["visited_snippets"]:
             expand_size = 100
-            snippets.append(SNIPPET_FORMAT.format(
-                denotation=snippet.expand(expand_size).denotation,
-                contents=snippet.expand(expand_size).get_snippet(add_lines=False),
-            ))
+            snippets.append(
+                SNIPPET_FORMAT.format(
+                    denotation=snippet.expand(expand_size).denotation,
+                    contents=snippet.expand(expand_size).get_snippet(add_lines=False),
+                )
+            )
             llm_state["visited_snippets"].add(snippet.denotation)
         else:
-            snippets.append(f"Snippet already retrieved previously: {snippet.denotation}")
+            snippets.append(
+                f"Snippet already retrieved previously: {snippet.denotation}"
+            )
     snippets_string = "\n\n".join(snippets)
-    snippets_string += f"\n\nYour last search query was \"{question}\". Here is a list of all the files retrieved in this search query:\n" + "\n".join([f"- {snippet.denotation}" for snippet in retrieved_snippets])
+    snippets_string += (
+        f'\n\nYour last search query was "{question}". Here is a list of all the files retrieved in this search query:\n'
+        + "\n".join([f"- {snippet.denotation}" for snippet in retrieved_snippets])
+    )
     if prev_visited_snippets:
-        snippets_string += "\n\nHere is a list of all the files retrieved previously:\n" + "\n".join([f"- {snippet}" for snippet in sorted(list(prev_visited_snippets))])
-    snippets_string += f"\n\nThe above are the snippets that are found in decreasing order of relevance to the search query \"{question}\"."
+        snippets_string += (
+            "\n\nHere is a list of all the files retrieved previously:\n"
+            + "\n".join(
+                [f"- {snippet}" for snippet in sorted(list(prev_visited_snippets))]
+            )
+        )
+    snippets_string += f'\n\nThe above are the snippets that are found in decreasing order of relevance to the search query "{question}".'
     if previously_asked_question:
-        snippets_string += "\n\nYou have already asked the following questions so do not ask them again:\n" + "\n".join([f"- {question}" for question in previously_asked_question])
+        snippets_string += (
+            "\n\nYou have already asked the following questions so do not ask them again:\n"
+            + "\n".join([f"- {question}" for question in previously_asked_question])
+        )
     warning_messages = ""
-    return snippets_string + SEARCH_RESULT_INSTRUCTIONS.format(
-        request=llm_state["request"],
-        visited_questions="\n".join(sorted(list(llm_state["visited_questions"])))
-    ) + warning_messages
+    return (
+        snippets_string
+        + SEARCH_RESULT_INSTRUCTIONS.format(
+            request=llm_state["request"],
+            visited_questions="\n".join(sorted(list(llm_state["visited_questions"]))),
+        )
+        + warning_messages
+    )
+
 
 @tool()
 def vector_search(
-    question: Parameter("A single, detailed, specific natural language search question to search the codebase for relevant code snippets."),
+    question: Parameter(
+        "A single, detailed, specific natural language search question to search the codebase for relevant code snippets."
+    ),
     cloned_repo: ClonedRepo,
     llm_state: dict,
 ):
@@ -199,25 +230,45 @@ def vector_search(
     for snippet in retrieved_snippets[::-1]:
         if snippet.denotation not in llm_state["visited_snippets"]:
             expand_size = 100
-            snippets.append(SNIPPET_FORMAT.format(
-                denotation=snippet.expand(expand_size).denotation,
-                contents=snippet.expand(expand_size).get_snippet(add_lines=False),
-            ))
+            snippets.append(
+                SNIPPET_FORMAT.format(
+                    denotation=snippet.expand(expand_size).denotation,
+                    contents=snippet.expand(expand_size).get_snippet(add_lines=False),
+                )
+            )
             llm_state["visited_snippets"].add(snippet.denotation)
         else:
-            snippets.append(f"Snippet already retrieved previously: {snippet.denotation}")
+            snippets.append(
+                f"Snippet already retrieved previously: {snippet.denotation}"
+            )
     snippets_string = "\n\n".join(snippets)
-    snippets_string += f"\n\nYour last search query was \"{question}\". Here is a list of all the files retrieved in this search query:\n" + "\n".join([f"- {snippet.denotation}" for snippet in retrieved_snippets])
+    snippets_string += (
+        f'\n\nYour last search query was "{question}". Here is a list of all the files retrieved in this search query:\n'
+        + "\n".join([f"- {snippet.denotation}" for snippet in retrieved_snippets])
+    )
     if prev_visited_snippets:
-        snippets_string += "\n\nHere is a list of all the files retrieved previously:\n" + "\n".join([f"- {snippet}" for snippet in sorted(list(prev_visited_snippets))])
-    snippets_string += f"\n\nThe above are the snippets that are found in decreasing order of relevance to the search query \"{question}\"."
+        snippets_string += (
+            "\n\nHere is a list of all the files retrieved previously:\n"
+            + "\n".join(
+                [f"- {snippet}" for snippet in sorted(list(prev_visited_snippets))]
+            )
+        )
+    snippets_string += f'\n\nThe above are the snippets that are found in decreasing order of relevance to the search query "{question}".'
     if previously_asked_question:
-        snippets_string += "\n\nYou have already asked the following questions so do not ask them again:\n" + "\n".join([f"- {question}" for question in previously_asked_question])
+        snippets_string += (
+            "\n\nYou have already asked the following questions so do not ask them again:\n"
+            + "\n".join([f"- {question}" for question in previously_asked_question])
+        )
     warning_messages = ""
-    return snippets_string + SEARCH_RESULT_INSTRUCTIONS_FILE_SEARCHER.format(
-        request=llm_state["request"],
-        visited_questions="\n".join(sorted(list(llm_state["visited_questions"])))
-    ) + warning_messages
+    return (
+        snippets_string
+        + SEARCH_RESULT_INSTRUCTIONS_FILE_SEARCHER.format(
+            request=llm_state["request"],
+            visited_questions="\n".join(sorted(list(llm_state["visited_questions"]))),
+        )
+        + warning_messages
+    )
+
 
 RIPGREP_SEARCH_RESULT_INSTRUCTIONS = """
 
@@ -247,6 +298,7 @@ Otherwise, if you have found all the relevant information to answer the user's r
 
 Remember to use the valid function call format for either options."""
 
+
 def post_filter_ripgrep_results(
     results: str,
     max_line_length: int = 300,
@@ -259,6 +311,7 @@ def post_filter_ripgrep_results(
             output += line[:300] + f"... (omitted {len(line) - 300} characters)\n"
     return output.strip("\n")
 
+
 @tool()
 def ripgrep(
     query: Parameter("The keyword to search for in the codebase."),
@@ -268,16 +321,20 @@ def ripgrep(
     """
     Search for a keyword in the codebase.
     """
-    response = safe_command.run(subprocess.run, " ".join([
-            "rg",
-            "-n",
-            # "-w",
-            "-i",
-            "-C=5",
-            "--heading",
-            "--sort-files",
-            query,
-        ]),
+    response = safe_command.run(
+        subprocess.run,
+        " ".join(
+            [
+                "rg",
+                "-n",
+                # "-w",
+                "-i",
+                "-C=5",
+                "--heading",
+                "--sort-files",
+                query,
+            ]
+        ),
         shell=True,
         capture_output=True,
         text=True,
@@ -289,10 +346,14 @@ def ripgrep(
         else:
             return f"Error running ripgrep:\n\n{response.stderr}"
     results = post_filter_ripgrep_results(response.stdout)
-    return f"Here are ALL occurrences of '{query}' in the codebase:\n\n```{results}```\n" + RIPGREP_SEARCH_RESULT_INSTRUCTIONS.format(
-        request=llm_state["request"],
-        visited_questions="\n".join(sorted(list(llm_state["visited_questions"])))
+    return (
+        f"Here are ALL occurrences of '{query}' in the codebase:\n\n```{results}```\n"
+        + RIPGREP_SEARCH_RESULT_INSTRUCTIONS.format(
+            request=llm_state["request"],
+            visited_questions="\n".join(sorted(list(llm_state["visited_questions"]))),
+        )
     )
+
 
 @tool()
 def view_file(
@@ -310,6 +371,7 @@ def view_file(
         raise e
     num_lines = len(file_contents.splitlines())
     return f"Here are the contents:\n\n```\n{file_contents}\n```\n\nHere is how you can denote this snippet for listing it in the sources: {file_path}:0-{num_lines-1}"
+
 
 CORRECTED_SUBMIT_SOURCES_FORMAT = """ERROR
 
@@ -346,7 +408,10 @@ YOU WILL USE THE XML TAGS. Otherwise, the assistant will not be able to parse th
 
 
 def parse_sources(sources: str, cloned_repo: ClonedRepo):
-    source_pattern = re.compile(r"<source>\s+<file_path>(?P<file_path>.*?)</file_path>\s+<start_line>(?P<start_line>\d+?)</start_line>\s+<end_line>(?P<end_line>\d+?)</end_line>\s+(<justification>(?P<justification>.*?)</justification>\s+)?</source>", re.DOTALL)
+    source_pattern = re.compile(
+        r"<source>\s+<file_path>(?P<file_path>.*?)</file_path>\s+<start_line>(?P<start_line>\d+?)</start_line>\s+<end_line>(?P<end_line>\d+?)</end_line>\s+(<justification>(?P<justification>.*?)</justification>\s+)?</source>",
+        re.DOTALL,
+    )
     source_matches = source_pattern.finditer(sources)
     snippets = []
     missing_files = []
@@ -358,24 +423,32 @@ def parse_sources(sources: str, cloned_repo: ClonedRepo):
             content = cloned_repo.get_file_contents(file_path)
         except FileNotFoundError:
             missing_files.append(file_path)
-        snippets.append(Snippet(
-            content=content,
-            start=int(start_line),
-            end=max(int(start_line) + 1, int(end_line)),
-            file_path=file_path,
-        ))
+        snippets.append(
+            Snippet(
+                content=content,
+                start=int(start_line),
+                end=max(int(start_line) + 1, int(end_line)),
+                file_path=file_path,
+            )
+        )
         if not file_path or not start_line or not end_line:
-            raise Exception(CORRECTED_SUBMIT_SOURCES_FORMAT + f"\n\nThe following source is missing one of the required fields:\n\n{source.group(0)}")
+            raise Exception(
+                CORRECTED_SUBMIT_SOURCES_FORMAT
+                + f"\n\nThe following source is missing one of the required fields:\n\n{source.group(0)}"
+            )
     if missing_files:
-        raise Exception(FILE_NOT_FOUND_ERROR.format(file_paths="\n".join(missing_files)))
+        raise Exception(
+            FILE_NOT_FOUND_ERROR.format(file_paths="\n".join(missing_files))
+        )
     return snippets
+
 
 @tool()
 def submit_task(
     answer: Parameter("The answer to the user's question."),
     sources: Parameter("The sources of the answer."),
     cloned_repo: ClonedRepo,
-    justification: str = "", # breaks without this line
+    justification: str = "",  # breaks without this line
 ):
     """
     Once you have collected and analyzed the relevant snippets, use this tool to submit the final response to the user's question.
@@ -390,28 +463,31 @@ def submit_task(
     else:
         return "DONE"
 
+
 @tool()
 def add_files_to_context(
-    file_names: Parameter("The full paths of the files you want to add to context. Ensure correct spelling and capitalization. Separate multiple files with a comma."),
+    file_names: Parameter(
+        "The full paths of the files you want to add to context. Ensure correct spelling and capitalization. Separate multiple files with a comma."
+    ),
     cloned_repo: ClonedRepo,
     relevant_files: list[Snippet],
     llm_state: dict,
 ):
     """
-Use this tool to indicate the files that you believe are needed in order to fully resolve the user request. 
-You can add a portion of a file using the following format: file_path:start_line-end_line
-Not including a start_line and end_line will add the entire file to context.
-Files are indexed from 0.
+    Use this tool to indicate the files that you believe are needed in order to fully resolve the user request.
+    You can add a portion of a file using the following format: file_path:start_line-end_line
+    Not including a start_line and end_line will add the entire file to context.
+    Files are indexed from 0.
 
-Here is an example:
+    Here is an example:
 
-<function_call>
-<add_files_to_context>
-<file_names>
-path/to/filea.py:0-123, path/to/fileb.py, path/to/filec.py:34-345
-</file_names>
-</add_files_to_context>
-</function_call>
+    <function_call>
+    <add_files_to_context>
+    <file_names>
+    path/to/filea.py:0-123, path/to/fileb.py, path/to/filec.py:34-345
+    </file_names>
+    </add_files_to_context>
+    </function_call>
     """
     error_message = ""
 
@@ -432,7 +508,7 @@ path/to/filea.py:0-123, path/to/fileb.py, path/to/filec.py:34-345
         except FileNotFoundError:
             bad_files.append(file_name)
             continue
-            
+
         if file_contents:
             file_lines = file_contents.splitlines()
         else:
@@ -455,12 +531,14 @@ path/to/filea.py:0-123, path/to/fileb.py, path/to/filec.py:34-345
                 for i in snippet_indexes[::-1]:
                     relevant_files.pop(i)
                 for start, end in new_ranges:
-                    relevant_files.append(Snippet(
-                        content=file_contents,
-                        start=start,
-                        end=end,
-                        file_path=file_name,
-                    ))
+                    relevant_files.append(
+                        Snippet(
+                            content=file_contents,
+                            start=start,
+                            end=end,
+                            file_path=file_name,
+                        )
+                    )
             # adding whole file so we just overwrite the entire file
             else:
                 snippet_indexes = []
@@ -477,17 +555,19 @@ path/to/filea.py:0-123, path/to/fileb.py, path/to/filec.py:34-345
                 # iterate backwards through relevant files and pop the indexes
                 for i in snippet_indexes[::-1]:
                     relevant_files.pop(i)
-        else: # otherwise we add the snippet
+        else:  # otherwise we add the snippet
             start = 0
             end = file_length
             if file_range:
                 start, end = file_range
-            relevant_files.append(Snippet(
-                content=file_contents,
-                start=0,
-                end=file_length,
-                file_path=file_name,
-            ))
+            relevant_files.append(
+                Snippet(
+                    content=file_contents,
+                    start=0,
+                    end=file_length,
+                    file_path=file_name,
+                )
+            )
     relevant_snippets = f'{", ".join([f"{snippet.file_path}:{snippet.start}-{snippet.end}" for snippet in relevant_files])}'
     if bad_files:
         if len(bad_files) == 1:
@@ -496,23 +576,29 @@ path/to/filea.py:0-123, path/to/fileb.py, path/to/filec.py:34-345
             error_message += f"The following files do not exist in the codebase: {', '.join(bad_files)}. Please ensure the correct spelling and capitalization of the file names and call the `add_file_to_context` tool again."
         error_message += f" The current files in context are {relevant_snippets}."
         return error_message
-    return f'The current files you have identified as being relevant are {relevant_snippets}. You may move on to finding the next files that are relevant. If these were the final files you wanted to add, call the `done_file_search` tool to indicate that you are finished.'
+    return f"The current files you have identified as being relevant are {relevant_snippets}. You may move on to finding the next files that are relevant. If these were the final files you wanted to add, call the `done_file_search` tool to indicate that you are finished."
+
 
 @tool()
 def done_file_search(
-    reason: Parameter("Justification for why you are calling this tool and why you have found all relevant files."),
-    justification: str = "", # breaks without this line
+    reason: Parameter(
+        "Justification for why you are calling this tool and why you have found all relevant files."
+    ),
+    justification: str = "",  # breaks without this line
 ):
     """
     Once you are confident you have found and added ALL relevant files to context you may call this tool to indicate that you are finished.
     """
     return "DONE"
 
+
 tools = [semantic_search, ripgrep, view_file, submit_task]
 
 tools_available = """You have access to the following tools to assist in fulfilling the user request:
 
-""" + "\n\n".join(tool.get_xml() for tool in tools)
+""" + "\n\n".join(
+    tool.get_xml() for tool in tools
+)
 
 example_tool_calls = """Here are a list of illustrative examples of how to use the tools:
 
@@ -696,7 +782,8 @@ Now find the relevant code snippets in the codebase to answer the question. Use 
 Don't know why but few-shot examples confuse Haiku.
 """
 
-NO_TOOL_CALL_PROMPT = """FAILURE
+NO_TOOL_CALL_PROMPT = (
+    """FAILURE
 Your last function call was incorrectly formatted.
 
 Make sure you provide XML tags for function_call, tool_name and parameters for all function calls. Check the examples section for reference.
@@ -707,7 +794,10 @@ Resolve this error by following these steps:
 3. Describe why your last function call was incorrectly formatted.
 4. Finally, re-invoke your last function call with the corrected format, with the contents copied over.
 
-Here are the available tools: """ + " ".join([tool.name for tool in tools]) + '.'
+Here are the available tools: """
+    + " ".join([tool.name for tool in tools])
+    + "."
+)
 
 DEFAULT_FUNCTION_CALL = """<function_call>
 <semantic_search>
@@ -716,14 +806,13 @@ DEFAULT_FUNCTION_CALL = """<function_call>
 </function_call>"""
 
 
-def rag(
-    question: str,
-    cloned_repo: ClonedRepo,
-    model="claude-3-5-sonnet-20240620"
-):
+def rag(question: str, cloned_repo: ClonedRepo, model="claude-3-5-sonnet-20240620"):
     chat_gpt = ChatGPT.from_system_message_string(
-        prompt_string=search_agent_instructions + tools_available + "\n\n" + example_tool_calls,
-        model=model
+        prompt_string=search_agent_instructions
+        + tools_available
+        + "\n\n"
+        + example_tool_calls,
+        model=model,
     )
     user_message = search_agent_user_message.format(question=question)
     llm_state = {
@@ -746,18 +835,29 @@ def rag(
         )
 
         user_message = f"<function_call>\n{function_call_response}\n</function_call>"
-        
+
         if function_call_response == "DONE":
-            return function_call.function_parameters.get("answer"), function_call.function_parameters.get("sources")
-    raise QuestionAnswererException("Could not complete the task. The information may not exist in the codebase.")
+            return function_call.function_parameters.get(
+                "answer"
+            ), function_call.function_parameters.get("sources")
+    raise QuestionAnswererException(
+        "Could not complete the task. The information may not exist in the codebase."
+    )
 
 
-
-file_searcher_tools = [vector_search, ripgrep, view_file, add_files_to_context, done_file_search]
+file_searcher_tools = [
+    vector_search,
+    ripgrep,
+    view_file,
+    add_files_to_context,
+    done_file_search,
+]
 
 file_searcher_tools_available = """You have access to the following tools to assist in identifying relevant files:
 
-""" + "\n\n".join(tool.get_xml() for tool in file_searcher_tools)
+""" + "\n\n".join(
+    tool.get_xml() for tool in file_searcher_tools
+)
 
 existing_snippet_format = """
 <snippet>
@@ -770,15 +870,19 @@ existing_snippet_format = """
 </snippet>
 """
 
+
 def file_searcher(
     question: str,
     cloned_repo: ClonedRepo,
     existing_context: list[Snippet] = [],
-    model="claude-3-5-sonnet-20240620"
+    model="claude-3-5-sonnet-20240620",
 ):
     chat_gpt = ChatGPT.from_system_message_string(
-        prompt_string=file_search_agent_instructions + file_searcher_tools_available + "\n\n" + example_tool_calls_file_searcher,
-        model=model
+        prompt_string=file_search_agent_instructions
+        + file_searcher_tools_available
+        + "\n\n"
+        + example_tool_calls_file_searcher,
+        model=model,
     )
     # list of snippets
     relevant_files = []
@@ -789,11 +893,13 @@ def file_searcher(
         for snippet in existing_context:
             snippet_name = f"<{snippet.file_path}:{snippet.start}-{snippet.end}>\n"
             snippet_content = snippet.get_snippet(add_lines=False)
-            existing_snippet = existing_snippet_format.format(file_name=snippet_name, source=snippet_content)
+            existing_snippet = existing_snippet_format.format(
+                file_name=snippet_name, source=snippet_content
+            )
             existing_context_string += f"\n{existing_snippet}\n"
         existing_context_string += "</existing_context>"
         user_message += existing_context_string
-    
+
     user_message += file_search_agent_dependency_tree_initialisation
     llm_state = {
         "visited_snippets": set(),
@@ -815,23 +921,26 @@ def file_searcher(
         )
 
         user_message = f"<function_call>\n{function_call_response}\n</function_call>"
-        
+
         if function_call_response == "DONE":
             return relevant_files
-    raise QuestionAnswererException("Could not complete the task. The information may not exist in the codebase.")
+    raise QuestionAnswererException(
+        "Could not complete the task. The information may not exist in the codebase."
+    )
+
 
 if __name__ == "__main__":
-#     cloned_repo = MockClonedRepo(
-#         _repo_dir = "/tmp/sweep",
-#         repo_full_name="sweepai/sweep",
-#     )
-#     result = file_searcher(
-#         question="""In the vector search logic, how would I migrate the KNN to use HNSW instead?
-# """,
-#         cloned_repo=cloned_repo,
-#     )
+    #     cloned_repo = MockClonedRepo(
+    #         _repo_dir = "/tmp/sweep",
+    #         repo_full_name="sweepai/sweep",
+    #     )
+    #     result = file_searcher(
+    #         question="""In the vector search logic, how would I migrate the KNN to use HNSW instead?
+    # """,
+    #         cloned_repo=cloned_repo,
+    #     )
     # result = rag(
     #     question="What version of django is used in this codebase?",
     #     cloned_repo=cloned_repo,
     # )
-    breakpoint() #noqa
+    breakpoint()  # noqa

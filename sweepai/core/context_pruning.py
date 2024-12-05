@@ -1,35 +1,40 @@
-from copy import deepcopy
-from math import log
 import subprocess
 import urllib
+from copy import deepcopy
 from dataclasses import dataclass, field
+from math import log
 
 import networkx as nx
 import openai
 from loguru import logger
 from openai.types.beta.thread import Thread
 from openai.types.beta.threads.run import Run
+from security import safe_command
 
 from sweepai.config.client import SweepConfig
 from sweepai.core.chat import ChatGPT
 from sweepai.core.entities import Message, Snippet
 from sweepai.logn.cache import file_cache
 from sweepai.utils.chat_logger import ChatLogger
-from sweepai.utils.convert_openai_anthropic import AnthropicFunctionCall, mock_function_calls_to_string
+from sweepai.utils.convert_openai_anthropic import (
+    AnthropicFunctionCall,
+    mock_function_calls_to_string,
+)
 from sweepai.utils.github_utils import ClonedRepo
-from sweepai.utils.ripgrep_utils import post_process_rg_output
 from sweepai.utils.openai_listwise_reranker import listwise_rerank_snippets
 from sweepai.utils.progress import AssistantConversation, TicketProgress
+from sweepai.utils.ripgrep_utils import post_process_rg_output
 from sweepai.utils.tree_utils import DirectoryTree
-from security import safe_command
 
 ASSISTANT_MAX_CHARS = 4096 * 4 * 0.95  # ~95% of 4k tokens
 NUM_SNIPPETS_TO_SHOW_AT_START = 15
 MAX_REFLECTIONS = 1
 MAX_ITERATIONS = 25
-NUM_ROLLOUTS = 1 # dev speed
-SCORE_THRESHOLD = 8 # good score
-STOP_AFTER_SCORE_THRESHOLD_IDX = 0 # stop after the first good score and past this index
+NUM_ROLLOUTS = 1  # dev speed
+SCORE_THRESHOLD = 8  # good score
+STOP_AFTER_SCORE_THRESHOLD_IDX = (
+    0  # stop after the first good score and past this index
+)
 MAX_PARALLEL_FUNCTION_CALLS = 1
 NUM_BAD_FUNCTION_CALLS = 5
 
@@ -133,22 +138,25 @@ Here is an example illustrating a complex code search to discover new relevant i
 
 Remember, your goal is to discover and store ALL files that are relevant to solving the issue. Perform targeted searches to uncover new information, view new files to understand the codebase, and avoid re-analyzing already stored files."""
 
-sys_prompt = """You are a brilliant engineer assigned to solve the following GitHub issue. Your task is to search through the codebase and locate ALL files that are RELEVANT to resolving the issue. A file is considered RELEVANT if it provides important context or may need to be modified as part of the solution.
+sys_prompt = (
+    """You are a brilliant engineer assigned to solve the following GitHub issue. Your task is to search through the codebase and locate ALL files that are RELEVANT to resolving the issue. A file is considered RELEVANT if it provides important context or may need to be modified as part of the solution.
 
 You will begin with a small set of stored relevant files. However, it is critical that you identify every additional relevant file by exhaustively searching the codebase. Your goal is to generate an extremely comprehensive list of files for an intern engineer who is completely unfamiliar with the codebase. Prioritize finding all relevant files over perfect precision - it's better to include a few extra files than to miss a key one.
 
 To accomplish this, you will iteratively search for and view new files to gather all the necessary information. Follow these steps:
 
-1. Perform targeted code searches to find definitions, usages, and references for ALL unknown variables, classes, attributes, functions and other entities that may be relevant based on the currently stored files and issue description. Be creative and think critically about what to search for to get to the root of the issue. 
+1. Perform targeted code searches to find definitions, usages, and references for ALL unknown variables, classes, attributes, functions and other entities that may be relevant based on the currently stored files and issue description. Be creative and think critically about what to search for to get to the root of the issue.
 
 2. View new files from the search results that seem relevant. Avoid viewing files that are already stored, and instead focus on discovering new information.
 
-3. Store additional files that provide important context or may need changes based on the search results, viewed files, and issue description. 
+3. Store additional files that provide important context or may need changes based on the search results, viewed files, and issue description.
 
 Repeat steps 1-3, searching and exploring the codebase exhaustively until you are confident you have found all relevant files. Prioritize discovering new information over re-analyzing what is already known.
 
 Here are the tools at your disposal:
-""" + anthropic_function_calls
+"""
+    + anthropic_function_calls
+)
 
 unformatted_user_prompt = """\
 ## Stored Files
@@ -165,12 +173,14 @@ DO NOT CALL THE STORE OR VIEW TOOLS ON THEM AGAIN AS THEY HAVE ALREADY BEEN STOR
 
 PLAN_SUBMITTED_MESSAGE = "SUCCESS: Report and plan submitted."
 
+
 def escape_ripgrep(text):
     # Special characters to escape
     special_chars = ["(", "{"]
     for s in special_chars:
         text = text.replace(s, "\\" + s)
     return text
+
 
 def run_ripgrep_command(code_entity, repo_dir, *args):
     # Updated for the new context
@@ -184,9 +194,11 @@ def run_ripgrep_command(code_entity, repo_dir, *args):
         code_entity,
         repo_dir,
     ]
-    result = safe_command.run(subprocess.run, " ".join(rg_command), text=True, shell=True, capture_output=True
+    result = safe_command.run(
+        subprocess.run, " ".join(rg_command), text=True, shell=True, capture_output=True
     )
     return result.stdout
+
 
 @staticmethod
 def can_add_snippet(snippet: Snippet, current_snippets: list[Snippet]):
@@ -208,7 +220,9 @@ class RepoContextManager:
         default_factory=list
     )  # a list of file paths that appear in the user query
     # UNUSED:
-    snippets: list[Snippet] = field(default_factory=list) # This is actually used in benchmarks
+    snippets: list[Snippet] = field(
+        default_factory=list
+    )  # This is actually used in benchmarks
     snippet_scores: dict[str, float] = field(default_factory=dict)
     current_top_tree: str | None = None
     dir_obj: DirectoryTree | None = None
@@ -236,19 +250,22 @@ class RepoContextManager:
     ):
         files_in_repo_str = ""
         stored_files = set()
-        for idx, snippet in enumerate(list(dict.fromkeys(self.current_top_snippets))[:NUM_SNIPPETS_TO_SHOW_AT_START]):
+        for idx, snippet in enumerate(
+            list(dict.fromkeys(self.current_top_snippets))[
+                :NUM_SNIPPETS_TO_SHOW_AT_START
+            ]
+        ):
             if snippet.file_path in stored_files:
                 continue
             stored_files.add(snippet.file_path)
-            snippet_str = \
-f'''
+            snippet_str = f"""
 <stored_file index="{idx + 1}">
 <file_path>{snippet.file_path}</file_path>
 <source>
 {snippet.content}
 </source>
 </stored_file>
-'''
+"""
             files_in_repo_str += snippet_str
         repo_tree = str(self.dir_obj)
         import_tree_prompt = """
@@ -298,14 +315,26 @@ f'''
         for snippet in snippets_to_add:
             self.current_top_snippets.append(snippet)
 
-    def boost_snippets_to_top(self, snippets_to_boost: list[Snippet], code_files_in_query: list[str]):
+    def boost_snippets_to_top(
+        self, snippets_to_boost: list[Snippet], code_files_in_query: list[str]
+    ):
         # self.dir_obj.add_file_paths([snippet.file_path for snippet in snippets_to_boost])
         for snippet in snippets_to_boost:
             # get first positions of all snippets that are in the code_files_in_query
-            all_first_in_query_positions = [self.top_snippet_paths.index(file_path) for file_path in code_files_in_query if file_path in self.top_snippet_paths]
-            last_mentioned_result_index = (max(all_first_in_query_positions, default=-1) + 1) if all_first_in_query_positions else 0
+            all_first_in_query_positions = [
+                self.top_snippet_paths.index(file_path)
+                for file_path in code_files_in_query
+                if file_path in self.top_snippet_paths
+            ]
+            last_mentioned_result_index = (
+                (max(all_first_in_query_positions, default=-1) + 1)
+                if all_first_in_query_positions
+                else 0
+            )
             # insert after the last mentioned result
-            self.current_top_snippets.insert(max(0, last_mentioned_result_index), snippet)
+            self.current_top_snippets.insert(
+                max(0, last_mentioned_result_index), snippet
+            )
 
     def add_import_trees(self, import_trees: str):
         self.import_trees += "\n" + import_trees
@@ -330,6 +359,7 @@ main.py
 └── utils.py
     └── models.py
 """
+
 
 def build_full_hierarchy(
     graph: nx.DiGraph, start_node: str, k: int, prefix="", is_last=True, level=0
@@ -399,8 +429,11 @@ def load_graph_from_file(filename):
                     G.add_node(current_node)
     return G
 
+
 # @file_cache(ignore_params=["rcm", "G"])
-def graph_retrieval(formatted_query: str, top_k_paths: list[str], rcm: RepoContextManager, G: nx.DiGraph):
+def graph_retrieval(
+    formatted_query: str, top_k_paths: list[str], rcm: RepoContextManager, G: nx.DiGraph
+):
     # TODO: tune these params
     top_paths_cutoff = 25
     num_rerank = 30
@@ -417,26 +450,41 @@ def graph_retrieval(formatted_query: str, top_k_paths: list[str], rcm: RepoConte
     for snippet in selected_paths:
         personalization[snippet] = 1
     try:
+
         @file_cache()
         def get_distilled_file_paths(formatted_query, top_k_paths):
-            personalized_pagerank_scores = nx.pagerank(G, personalization=personalization, alpha=0.85)
+            personalized_pagerank_scores = nx.pagerank(
+                G, personalization=personalization, alpha=0.85
+            )
             unpersonalized_pagerank_scores = nx.pagerank(G, alpha=0.85)
 
             # tfidf style
-            normalized_pagerank_scores = {path: score * log(1 / (1e-6 + unpersonalized_pagerank_scores[path])) for path, score in personalized_pagerank_scores.items()}
+            normalized_pagerank_scores = {
+                path: score * log(1 / (1e-6 + unpersonalized_pagerank_scores[path]))
+                for path, score in personalized_pagerank_scores.items()
+            }
 
-            top_pagerank_scores = sorted(normalized_pagerank_scores.items(), key=lambda x: x[1], reverse=True)
-            
+            top_pagerank_scores = sorted(
+                normalized_pagerank_scores.items(), key=lambda x: x[1], reverse=True
+            )
+
             top_pagerank_paths = [path for path, _score in top_pagerank_scores]
 
             distilled_file_path_list = []
 
             for file_path, score in top_pagerank_scores:
-                if file_path.endswith(".js") and file_path.replace(".js", ".ts") in top_pagerank_paths:
+                if (
+                    file_path.endswith(".js")
+                    and file_path.replace(".js", ".ts") in top_pagerank_paths
+                ):
                     continue
                 if file_path in top_k_paths:
                     continue
-                if "generated" in file_path or "mock" in file_path or "test" in file_path:
+                if (
+                    "generated" in file_path
+                    or "mock" in file_path
+                    or "test" in file_path
+                ):
                     continue
                 try:
                     rcm.cloned_repo.get_file_contents(file_path)
@@ -444,28 +492,44 @@ def graph_retrieval(formatted_query: str, top_k_paths: list[str], rcm: RepoConte
                     continue
                 distilled_file_path_list.append(file_path)
             return distilled_file_path_list
-        distilled_file_path_list = get_distilled_file_paths(formatted_query, top_k_paths)
+
+        distilled_file_path_list = get_distilled_file_paths(
+            formatted_query, top_k_paths
+        )
         # Rerank once
         reranked_snippets = []
         for file_path in distilled_file_path_list[:num_rerank]:
             contents = rcm.cloned_repo.get_file_contents(file_path)
-            reranked_snippets.append(Snippet(
-                content=contents,
-                start=0,
-                end=contents.count("\n") + 1,
-                file_path=file_path,
-            ))
-        reranked_snippets = listwise_rerank_snippets(formatted_query, reranked_snippets, prompt_type="graph")
-        distilled_file_path_list[:num_rerank] = [snippet.file_path for snippet in reranked_snippets]
+            reranked_snippets.append(
+                Snippet(
+                    content=contents,
+                    start=0,
+                    end=contents.count("\n") + 1,
+                    file_path=file_path,
+                )
+            )
+        reranked_snippets = listwise_rerank_snippets(
+            formatted_query, reranked_snippets, prompt_type="graph"
+        )
+        distilled_file_path_list[:num_rerank] = [
+            snippet.file_path for snippet in reranked_snippets
+        ]
 
         return distilled_file_path_list
     except Exception as e:
         logger.error(e)
         return []
 
+
 # @file_cache(ignore_params=["repo_context_manager", "override_import_graph"]) # can't cache this because rcm is stateful
-def integrate_graph_retrieval(formatted_query: str, repo_context_manager: RepoContextManager, override_import_graph: nx.DiGraph = None):
-    repo_context_manager, import_graph = parse_query_for_files(formatted_query, repo_context_manager)
+def integrate_graph_retrieval(
+    formatted_query: str,
+    repo_context_manager: RepoContextManager,
+    override_import_graph: nx.DiGraph = None,
+):
+    repo_context_manager, import_graph = parse_query_for_files(
+        formatted_query, repo_context_manager
+    )
     if override_import_graph:
         import_graph = override_import_graph
     # if import_graph:
@@ -489,6 +553,7 @@ def integrate_graph_retrieval(formatted_query: str, repo_context_manager: RepoCo
     #         repo_context_manager.current_top_snippets = repo_context_manager.current_top_snippets[:50 - num_graph_retrievals]
     return repo_context_manager, import_graph
 
+
 # add import trees for any relevant_file_paths (code files that appear in query)
 def build_import_trees(
     rcm: RepoContextManager,
@@ -511,7 +576,10 @@ def build_import_trees(
                 + build_full_hierarchy(import_graph, file, 2)
             )
             if graph_retrieved_files:
-                representation += "\n\nThe following modules may contain helpful services or utility functions:\n- " + "\n- ".join(graph_retrieved_files)
+                representation += (
+                    "\n\nThe following modules may contain helpful services or utility functions:\n- "
+                    + "\n- ".join(graph_retrieved_files)
+                )
             rcm.add_import_trees(representation)
     # if there are no code_files_in_query, we build import trees for the top 5 snippets
     else:
@@ -522,7 +590,10 @@ def build_import_trees(
                 + build_full_hierarchy(import_graph, file_path, 2)
             )
             if graph_retrieved_files:
-                representation += "\n\nThe following modules may contain helpful services or utility functions:\n- " + "\n-".join(graph_retrieved_files)
+                representation += (
+                    "\n\nThe following modules may contain helpful services or utility functions:\n- "
+                    + "\n-".join(graph_retrieved_files)
+                )
             rcm.add_import_trees(representation)
     return rcm
 
@@ -547,56 +618,56 @@ def add_relevant_files_to_top_snippets(rcm: RepoContextManager) -> RepoContextMa
                 )
     return rcm
 
+
 def generate_import_graph_text(graph):
-  # Create a dictionary to store the import relationships
-  import_dict = {}
+    # Create a dictionary to store the import relationships
+    import_dict = {}
 
-  # Iterate over each node (file) in the graph
-  for node in graph.nodes():
-    # Get the files imported by the current file
-    imported_files = list(graph.successors(node))
+    # Iterate over each node (file) in the graph
+    for node in graph.nodes():
+        # Get the files imported by the current file
+        imported_files = list(graph.successors(node))
 
-    # Add the import relationships to the dictionary
-    if imported_files:
-      import_dict[node] = imported_files
-    else:
-      import_dict[node] = []
+        # Add the import relationships to the dictionary
+        if imported_files:
+            import_dict[node] = imported_files
+        else:
+            import_dict[node] = []
 
-  # Generate the text-based representation
-  final_text = ""
-  visited_files = set()
-  for file, imported_files in sorted(import_dict.items(), key=lambda x: x[0]):
-    if file not in visited_files:
-      final_text += generate_file_imports(graph, file, visited_files, "")
-      final_text += "\n"
+    # Generate the text-based representation
+    final_text = ""
+    visited_files = set()
+    for file, imported_files in sorted(import_dict.items(), key=lambda x: x[0]):
+        if file not in visited_files:
+            final_text += generate_file_imports(graph, file, visited_files, "")
+            final_text += "\n"
 
-  # Add files that are not importing any other files
-  non_importing_files = [
-      file for file, imported_files in import_dict.items()
-      if not imported_files and file not in visited_files
-  ]
-  if non_importing_files:
-    final_text += "\n".join(non_importing_files)
+    # Add files that are not importing any other files
+    non_importing_files = [
+        file
+        for file, imported_files in import_dict.items()
+        if not imported_files and file not in visited_files
+    ]
+    if non_importing_files:
+        final_text += "\n".join(non_importing_files)
 
-  return final_text
+    return final_text
 
 
-def generate_file_imports(graph,
-                          file,
-                          visited_files,
-                          last_successor,
-                          indent_level=0):
-  # if you just added this file as a successor, you don't need to add it again
-  visited_files.add(file)
-  text = "  " * indent_level + f"{file}\n" if file != last_successor else ""
+def generate_file_imports(graph, file, visited_files, last_successor, indent_level=0):
+    # if you just added this file as a successor, you don't need to add it again
+    visited_files.add(file)
+    text = "  " * indent_level + f"{file}\n" if file != last_successor else ""
 
-  for imported_file in graph.successors(file):
-    text += "  " * (indent_level + 1) + f"──> {imported_file}\n"
-    if imported_file not in visited_files:
-      text += generate_file_imports(graph, imported_file, visited_files,
-                                    imported_file, indent_level + 2)
+    for imported_file in graph.successors(file):
+        text += "  " * (indent_level + 1) + f"──> {imported_file}\n"
+        if imported_file not in visited_files:
+            text += generate_file_imports(
+                graph, imported_file, visited_files, imported_file, indent_level + 2
+            )
 
-  return text
+    return text
+
 
 # fetch all files mentioned in the user query
 def parse_query_for_files(
@@ -613,15 +684,21 @@ def parse_query_for_files(
         if file in query or file_uri_encoded in query:
             code_files_to_add.append((file, file))
         # check this separately to match a/b/c.py with b/c.py
-        elif len(file.split('/')) >= 2:
-            last_two_parts = '/'.join(file.split('/')[-2:])
-            if (last_two_parts in query or urllib.parse.quote(last_two_parts) in query) and len(last_two_parts) > 5:
+        elif len(file.split("/")) >= 2:
+            last_two_parts = "/".join(file.split("/")[-2:])
+            if (
+                last_two_parts in query or urllib.parse.quote(last_two_parts) in query
+            ) and len(last_two_parts) > 5:
                 # this can be improved by bumping out other matches if it's a "better" match (e.g. more specific)
                 code_files_to_add.append((file, last_two_parts))
     # sort by where the match was found in the query
     code_files_to_add = sorted(
         code_files_to_add,
-        key=lambda x: query.index(x[1]) if x[1] in query else urllib.parse.unquote(query).index(x[1]), # must exist in query because we matched something
+        key=lambda x: query.index(x[1])
+        if x[1] in query
+        else urllib.parse.unquote(query).index(
+            x[1]
+        ),  # must exist in query because we matched something
     )
     # convert to a deduplicated list of file paths
     code_files_to_add = list(dict.fromkeys([file for file, _ in code_files_to_add]))
@@ -638,8 +715,8 @@ def get_relevant_context(
     seed: int = None,
     import_graph: nx.DiGraph = None,
     num_rollouts: int = NUM_ROLLOUTS,
-    ticket_progress = None,
-    chat_logger = None,
+    ticket_progress=None,
+    chat_logger=None,
 ) -> RepoContextManager:
     logger.info("Seed: " + str(seed))
     try:
@@ -659,7 +736,7 @@ def get_relevant_context(
             unformatted_user_prompt=unformatted_user_prompt,
             query=query,
         )
-        return repo_context_manager # Temporarily disabled context
+        return repo_context_manager  # Temporarily disabled context
         chat_gpt = ChatGPT()
         chat_gpt.messages = [Message(role="system", content=sys_prompt)]
         old_relevant_snippets = deepcopy(repo_context_manager.current_top_snippets)
@@ -744,7 +821,9 @@ def validate_and_parse_function_calls(
 
 
 def handle_function_call(
-    repo_context_manager: RepoContextManager, function_call: AnthropicFunctionCall, llm_state: dict[str, str]
+    repo_context_manager: RepoContextManager,
+    function_call: AnthropicFunctionCall,
+    llm_state: dict[str, str],
 ):
     function_name = function_call.function_name
     function_input = function_call.function_parameters
@@ -754,36 +833,64 @@ def handle_function_call(
     output_prefix = f"Output for {function_name}:\n"
     output = ""
     current_top_snippets_string = "\n".join(
-        list(dict.fromkeys([snippet.file_path for snippet in repo_context_manager.current_top_snippets]))
+        list(
+            dict.fromkeys(
+                [
+                    snippet.file_path
+                    for snippet in repo_context_manager.current_top_snippets
+                ]
+            )
+        )
     )
     if function_name == "code_search":
-        code_entity = f'"{function_input["code_entity"]}"'  # handles cases with two words
-        code_entity = escape_ripgrep(code_entity) # escape special characters
+        code_entity = (
+            f'"{function_input["code_entity"]}"'  # handles cases with two words
+        )
+        code_entity = escape_ripgrep(code_entity)  # escape special characters
         try:
-            rg_output = run_ripgrep_command(code_entity, repo_context_manager.cloned_repo.repo_dir)
+            rg_output = run_ripgrep_command(
+                code_entity, repo_context_manager.cloned_repo.repo_dir
+            )
             if rg_output:
                 # post process rip grep output to be more condensed
-                rg_output_pretty, file_output_dict, file_to_num_occurrences = post_process_rg_output(
+                (
+                    rg_output_pretty,
+                    file_output_dict,
+                    file_to_num_occurrences,
+                ) = post_process_rg_output(
                     repo_context_manager.cloned_repo.repo_dir, SweepConfig(), rg_output
                 )
                 # return results first by occurrences then by alphabetical order
-                non_stored_files = sorted([
-                    file_path
-                    for file_path in file_output_dict
-                    if file_path not in repo_context_manager.top_snippet_paths
-                ], key=lambda x: (-file_to_num_occurrences[x], x))
-                non_stored_files = [file_path + f" ({file_to_num_occurrences[file_path]} occurrences)" for file_path in non_stored_files]
-                non_stored_files_string = "These search results have not been stored:\n<non_stored_search_results>\n" + "\n".join(non_stored_files) + "\n</non_stored_search_results>\n" if non_stored_files else "All of the files above have already been stored. Search for a new term.\n"
+                non_stored_files = sorted(
+                    [
+                        file_path
+                        for file_path in file_output_dict
+                        if file_path not in repo_context_manager.top_snippet_paths
+                    ],
+                    key=lambda x: (-file_to_num_occurrences[x], x),
+                )
+                non_stored_files = [
+                    file_path + f" ({file_to_num_occurrences[file_path]} occurrences)"
+                    for file_path in non_stored_files
+                ]
+                non_stored_files_string = (
+                    "These search results have not been stored:\n<non_stored_search_results>\n"
+                    + "\n".join(non_stored_files)
+                    + "\n</non_stored_search_results>\n"
+                    if non_stored_files
+                    else "All of the files above have already been stored. Search for a new term.\n"
+                )
                 if len(file_output_dict) <= 10:
                     output = (
-                        f"SUCCESS: Here are the code_search results:\n<code_search_results>\n{rg_output_pretty}<code_search_results>\n" +
-                        non_stored_files_string + 
-                        "Use the `view_files` tool to read the most relevant non-stored files. Use `store_file` to add any important non-stored files to the context. DO NOT VIEW FILES THAT HAVE BEEN STORED."
+                        f"SUCCESS: Here are the code_search results:\n<code_search_results>\n{rg_output_pretty}<code_search_results>\n"
+                        + non_stored_files_string
+                        + "Use the `view_files` tool to read the most relevant non-stored files. Use `store_file` to add any important non-stored files to the context. DO NOT VIEW FILES THAT HAVE BEEN STORED."
                     )
                 else:
                     output = (
-                        f"SUCCESS: Here are the code_search results:\n<code_search_results>\n{rg_output_pretty}<code_search_results>\n" +
-                        non_stored_files_string + "Prioritize viewing the non-stored files with the most occurrences. Use the `view_files` tool to read the most relevant non-stored files. Use `store_file` to add any important non-stored files to the context. DO NOT VIEW FILES THAT HAVE BEEN STORED."
+                        f"SUCCESS: Here are the code_search results:\n<code_search_results>\n{rg_output_pretty}<code_search_results>\n"
+                        + non_stored_files_string
+                        + "Prioritize viewing the non-stored files with the most occurrences. Use the `view_files` tool to read the most relevant non-stored files. Use `store_file` to add any important non-stored files to the context. DO NOT VIEW FILES THAT HAVE BEEN STORED."
                     )
                 # too many prompt it to search more specific
             else:
@@ -795,7 +902,11 @@ def handle_function_call(
             output = f"FAILURE: No results found for code_entity: {code_entity} in the entire codebase. Please try a new code_entity. Consider trying different whitespace or a truncated version of this code_entity."
     elif function_name == "view_files":
         output = ""
-        all_viewed_files = [function_input.get("first_file_path", ""), function_input.get("second_file_path", ""), function_input.get("file_path", "")]
+        all_viewed_files = [
+            function_input.get("first_file_path", ""),
+            function_input.get("second_file_path", ""),
+            function_input.get("file_path", ""),
+        ]
         all_viewed_files = [file_path for file_path in all_viewed_files if file_path]
         for file_path in all_viewed_files:
             try:
@@ -812,8 +923,11 @@ def handle_function_call(
                 # if file_path in previously_viewed_files:
                 #     previously_viewed_files_str = "\n".join(previously_viewed_files)
                 #     output = f"WARNING: `{file_path}` has already been viewed. Please refer to the file in your previous function call. These files have already been viewed:\n{previously_viewed_files_str}"
-                if file_path not in [snippet.file_path for snippet in repo_context_manager.current_top_snippets]:
-                    output += f'SUCCESS: Here are the contents of `{file_path}`:\n<source>\n{file_contents}\n</source>\nYou can use the `store_file` tool to add this file to the context.'
+                if file_path not in [
+                    snippet.file_path
+                    for snippet in repo_context_manager.current_top_snippets
+                ]:
+                    output += f"SUCCESS: Here are the contents of `{file_path}`:\n<source>\n{file_contents}\n</source>\nYou can use the `store_file` tool to add this file to the context."
                 else:
                     output += f"FAILURE: {file_path} has already been stored. Please view a new file."
             except FileNotFoundError:
@@ -856,7 +970,14 @@ def handle_function_call(
             else:
                 repo_context_manager.add_snippets([snippet])
                 current_top_snippets_string = "\n".join(
-                    list(dict.fromkeys([snippet.file_path for snippet in repo_context_manager.current_top_snippets]))
+                    list(
+                        dict.fromkeys(
+                            [
+                                snippet.file_path
+                                for snippet in repo_context_manager.current_top_snippets
+                            ]
+                        )
+                    )
                 )
                 output = (
                     f"SUCCESS: {file_path} was added to the stored_files. It will be used as a reference or modified to resolve the issue."
@@ -865,17 +986,15 @@ def handle_function_call(
                 )
     elif function_name == "submit":
         plan = function_input.get("plan")
-        repo_context_manager.update_issue_report_and_plan(f"# Highly Suggested Plan:\n\n{plan}\n\n")
+        repo_context_manager.update_issue_report_and_plan(
+            f"# Highly Suggested Plan:\n\n{plan}\n\n"
+        )
         output = PLAN_SUBMITTED_MESSAGE
     else:
         output = f"FAILURE: Invalid tool name {function_name}"
-    analysis = (
-        function_input["analysis"] if "analysis" in function_input else ""
-    )
-    logger.info(
-        f"Tool Call: {function_name}\n{analysis}\n{output}"
-    )
-    return (output_prefix + output)
+    analysis = function_input["analysis"] if "analysis" in function_input else ""
+    logger.info(f"Tool Call: {function_name}\n{analysis}\n{output}")
+    return output_prefix + output
 
 
 reflections_prompt_prefix = """
@@ -899,14 +1018,19 @@ Reviewer feedback on previous attempt:
 </feedback>
 </attempt_and_feedback_{idx}>"""
 
-def format_reflections(reflections_to_gathered_files: dict[str, tuple[list[str], int]]) -> str:
+
+def format_reflections(
+    reflections_to_gathered_files: dict[str, tuple[list[str], int]]
+) -> str:
     formatted_reflections_prompt = ""
     if not reflections_to_gathered_files:
         return formatted_reflections_prompt
     all_reflections_string = "\n"
     # take only the MAX_REFLECTIONS sorted by score
     top_reflections = sorted(
-        reflections_to_gathered_files.items(), key=lambda x: x[1][1] * 100 + len(x[1][0]), reverse=True # break ties by number of files stored
+        reflections_to_gathered_files.items(),
+        key=lambda x: x[1][1] * 100 + len(x[1][0]),
+        reverse=True,  # break ties by number of files stored
     )[:MAX_REFLECTIONS]
     for idx, (reflection, (gathered_files, score)) in enumerate(top_reflections):
         formatted_reflection = reflection_prompt.format(
@@ -921,53 +1045,99 @@ def format_reflections(reflections_to_gathered_files: dict[str, tuple[list[str],
     )
     return formatted_reflections_prompt
 
-def render_all_attempts(function_call_histories: list[list[list[AnthropicFunctionCall]]]) -> str:
+
+def render_all_attempts(
+    function_call_histories: list[list[list[AnthropicFunctionCall]]],
+) -> str:
     formatted_attempts = ""
     for idx, function_call_history in enumerate(function_call_histories):
-        formatted_function_calls = render_function_calls_for_attempt(function_call_history)
-        formatted_attempts += f"<attempt_{idx}>\n{formatted_function_calls}\n</attempt_{idx}>"
+        formatted_function_calls = render_function_calls_for_attempt(
+            function_call_history
+        )
+        formatted_attempts += (
+            f"<attempt_{idx}>\n{formatted_function_calls}\n</attempt_{idx}>"
+        )
     return formatted_attempts
 
-def render_function_calls_for_attempt(function_call_history: list[list[AnthropicFunctionCall]]) -> str:
+
+def render_function_calls_for_attempt(
+    function_call_history: list[list[AnthropicFunctionCall]],
+) -> str:
     formatted_function_calls = ""
     idx = 0
     for function_calls in function_call_history:
         for function_call in function_calls:
-            function_call.function_parameters.pop("analysis", None) # remove analysis
-            function_call_cleaned_string = function_call.function_name + " | " + "\n".join([str(k) + " | " + str(v) for k, v in function_call.function_parameters.items()])
+            function_call.function_parameters.pop("analysis", None)  # remove analysis
+            function_call_cleaned_string = (
+                function_call.function_name
+                + " | "
+                + "\n".join(
+                    [
+                        str(k) + " | " + str(v)
+                        for k, v in function_call.function_parameters.items()
+                    ]
+                )
+            )
             formatted_function_calls += f"- {function_call_cleaned_string}\n"
         if function_calls:
             idx += 1
     return formatted_function_calls
 
+
 def get_stored_files(repo_context_manager: RepoContextManager) -> str:
-    fetched_files_that_are_stored = list(dict.fromkeys([snippet.file_path for snippet in repo_context_manager.current_top_snippets]))
+    fetched_files_that_are_stored = list(
+        dict.fromkeys(
+            [snippet.file_path for snippet in repo_context_manager.current_top_snippets]
+        )
+    )
     joined_files_string = "\n".join(fetched_files_that_are_stored)
-    stored_files_string = f'The following files have been stored already. DO NOT CALL THE STORE OR VIEW TOOLS ON THEM AGAIN. \n<stored_files>\n{joined_files_string}\n</stored_files>\n' if fetched_files_that_are_stored else ""
+    stored_files_string = (
+        f"The following files have been stored already. DO NOT CALL THE STORE OR VIEW TOOLS ON THEM AGAIN. \n<stored_files>\n{joined_files_string}\n</stored_files>\n"
+        if fetched_files_that_are_stored
+        else ""
+    )
     return stored_files_string
 
-def search_for_context_with_reflection(repo_context_manager: RepoContextManager, reflections_to_read_files: dict[str, tuple[list[str], int]], user_prompt: str, rollout_function_call_histories: list[list[list[AnthropicFunctionCall]]], problem_statement: str) -> tuple[list[Message], list[list[AnthropicFunctionCall]]]:
+
+def search_for_context_with_reflection(
+    repo_context_manager: RepoContextManager,
+    reflections_to_read_files: dict[str, tuple[list[str], int]],
+    user_prompt: str,
+    rollout_function_call_histories: list[list[list[AnthropicFunctionCall]]],
+    problem_statement: str,
+) -> tuple[list[Message], list[list[AnthropicFunctionCall]]]:
     try:
-        _, function_call_history = perform_rollout(repo_context_manager, reflections_to_read_files, user_prompt)
+        _, function_call_history = perform_rollout(
+            repo_context_manager, reflections_to_read_files, user_prompt
+        )
         rollout_function_call_histories.append(function_call_history)
     except Exception as e:
         logger.error(f"Error in perform_rollout: {e}")
-    rollout_stored_files = [snippet.file_path for snippet in repo_context_manager.current_top_snippets]
+    rollout_stored_files = [
+        snippet.file_path for snippet in repo_context_manager.current_top_snippets
+    ]
     # truncated_message_results = message_results[1:] # skip system prompt
     # joined_messages = "\n\n".join([message.content for message in truncated_message_results])
     # overall_score, message_to_contractor = EvaluatorAgent().evaluate_run(
-    #     problem_statement=problem_statement, 
+    #     problem_statement=problem_statement,
     #     run_text=joined_messages,
     #     stored_files=rollout_stored_files,
     # )
     return 0, "", repo_context_manager, rollout_stored_files
 
-def perform_rollout(repo_context_manager: RepoContextManager, reflections_to_gathered_files: dict[str, tuple[list[str], int]], user_prompt: str) -> list[Message]:
+
+def perform_rollout(
+    repo_context_manager: RepoContextManager,
+    reflections_to_gathered_files: dict[str, tuple[list[str], int]],
+    user_prompt: str,
+) -> list[Message]:
     function_call_history = []
     formatted_reflections_prompt = format_reflections(reflections_to_gathered_files)
     updated_user_prompt = user_prompt + formatted_reflections_prompt
     chat_gpt = ChatGPT()
-    chat_gpt.messages = [Message(role="system", content=sys_prompt + formatted_reflections_prompt)]
+    chat_gpt.messages = [
+        Message(role="system", content=sys_prompt + formatted_reflections_prompt)
+    ]
     function_calls_string = chat_gpt.chat_anthropic(
         content=updated_user_prompt,
         stop_sequences=["</function_call>"],
@@ -976,7 +1146,7 @@ def perform_rollout(repo_context_manager: RepoContextManager, reflections_to_gat
         assistant_message_content="<function_call>",
     )
     bad_call_count = 0
-    llm_state = {} # persisted across one rollout
+    llm_state = {}  # persisted across one rollout
     llm_state["function_call_history"] = {}
     for _ in range(MAX_ITERATIONS):
         function_calls = validate_and_parse_function_calls(
@@ -984,7 +1154,10 @@ def perform_rollout(repo_context_manager: RepoContextManager, reflections_to_gat
         )
         function_outputs = ""
         for function_call in function_calls[:MAX_PARALLEL_FUNCTION_CALLS]:
-            function_outputs += handle_function_call(repo_context_manager, function_call, llm_state) + "\n"
+            function_outputs += (
+                handle_function_call(repo_context_manager, function_call, llm_state)
+                + "\n"
+            )
             logger.info(f"Function outputs: {function_outputs}")
             logger.info("Function call: " + str(function_call))
             llm_state["function_call_history"] = function_call_history
@@ -992,8 +1165,12 @@ def perform_rollout(repo_context_manager: RepoContextManager, reflections_to_gat
                 return chat_gpt.messages, function_call_history
         function_call_history.append(function_calls)
         if len(function_calls) == 0:
-            function_outputs = "REMINDER: No function calls were made or your last function call was incorrectly formatted. The correct syntax for function calling is this:\n" \
-                + "<function_call>\n<invoke>\n<tool_name>tool_name</tool_name>\n<parameters>\n<param_name>param_value</param_name>\n</parameters>\n</invoke>\n</function_call>" + "\nRemember to gather ALL relevant files. " + get_stored_files(repo_context_manager)
+            function_outputs = (
+                "REMINDER: No function calls were made or your last function call was incorrectly formatted. The correct syntax for function calling is this:\n"
+                + "<function_call>\n<invoke>\n<tool_name>tool_name</tool_name>\n<parameters>\n<param_name>param_value</param_name>\n</parameters>\n</invoke>\n</function_call>"
+                + "\nRemember to gather ALL relevant files. "
+                + get_stored_files(repo_context_manager)
+            )
             bad_call_count += 1
         if function_outputs.startswith("FAILURE"):
             bad_call_count += 1
@@ -1001,8 +1178,14 @@ def perform_rollout(repo_context_manager: RepoContextManager, reflections_to_gat
             return chat_gpt.messages, function_call_history
         if len(function_calls) > MAX_PARALLEL_FUNCTION_CALLS:
             remaining_function_calls = function_calls[MAX_PARALLEL_FUNCTION_CALLS:]
-            remaining_function_calls_string = mock_function_calls_to_string(remaining_function_calls)
-            function_outputs += "WARNING: You requested more than 1 function call at once. Only the first function call has been processed. The unprocessed function calls were:\n<unprocessed_function_call>\n" + remaining_function_calls_string + "\n</unprocessed_function_call>"
+            remaining_function_calls_string = mock_function_calls_to_string(
+                remaining_function_calls
+            )
+            function_outputs += (
+                "WARNING: You requested more than 1 function call at once. Only the first function call has been processed. The unprocessed function calls were:\n<unprocessed_function_call>\n"
+                + remaining_function_calls_string
+                + "\n</unprocessed_function_call>"
+            )
         try:
             function_calls_string = chat_gpt.chat_anthropic(
                 content=function_outputs,
@@ -1016,6 +1199,7 @@ def perform_rollout(repo_context_manager: RepoContextManager, reflections_to_gat
             return chat_gpt.messages[:-1], function_call_history
     return chat_gpt.messages, function_call_history
 
+
 def context_dfs(
     user_prompt: str,
     repo_context_manager: RepoContextManager,
@@ -1027,29 +1211,46 @@ def context_dfs(
     rollouts_to_scores_and_rcms = {}
     rollout_function_call_histories = []
     for rollout_idx in range(num_rollouts):
-        overall_score, message_to_contractor, repo_context_manager, rollout_stored_files = search_for_context_with_reflection(
+        (
+            overall_score,
+            message_to_contractor,
+            repo_context_manager,
+            rollout_stored_files,
+        ) = search_for_context_with_reflection(
             repo_context_manager=repo_context_manager,
             reflections_to_read_files=reflections_to_read_files,
             user_prompt=user_prompt,
             rollout_function_call_histories=rollout_function_call_histories,
-            problem_statement=problem_statement
+            problem_statement=problem_statement,
         )
-        logger.info(f"Completed run {rollout_idx} with score: {overall_score} and reflection: {message_to_contractor}")
+        logger.info(
+            f"Completed run {rollout_idx} with score: {overall_score} and reflection: {message_to_contractor}"
+        )
         if overall_score is None or message_to_contractor is None:
-            continue # can't get any reflections here
+            continue  # can't get any reflections here
         # reflections_to_read_files[message_to_contractor] = rollout_stored_files, overall_score
         rollouts_to_scores_and_rcms[rollout_idx] = (overall_score, repo_context_manager)
-        if overall_score >= SCORE_THRESHOLD and len(rollout_stored_files) > STOP_AFTER_SCORE_THRESHOLD_IDX:
+        if (
+            overall_score >= SCORE_THRESHOLD
+            and len(rollout_stored_files) > STOP_AFTER_SCORE_THRESHOLD_IDX
+        ):
             break
     # if we reach here, we have not found a good enough solution
     # select rcm from the best rollout
     logger.info(f"{render_all_attempts(rollout_function_call_histories)}")
     all_scores_and_rcms = list(rollouts_to_scores_and_rcms.values())
-    best_score, best_rcm = max(all_scores_and_rcms, key=lambda x: x[0] * 100 + len(x[1].current_top_snippets)) # sort first on the highest score, break ties with length of current_top_snippets
+    best_score, best_rcm = max(
+        all_scores_and_rcms, key=lambda x: x[0] * 100 + len(x[1].current_top_snippets)
+    )  # sort first on the highest score, break ties with length of current_top_snippets
     for score, rcm in all_scores_and_rcms:
-        logger.info(f"Rollout score: {score}, Rollout files: {[snippet.file_path for snippet in rcm.current_top_snippets]}")
-    logger.info(f"Best score: {best_score}, Best files: {[snippet.file_path for snippet in best_rcm.current_top_snippets]}")
+        logger.info(
+            f"Rollout score: {score}, Rollout files: {[snippet.file_path for snippet in rcm.current_top_snippets]}"
+        )
+    logger.info(
+        f"Best score: {best_score}, Best files: {[snippet.file_path for snippet in best_rcm.current_top_snippets]}"
+    )
     return best_rcm
+
 
 if __name__ == "__main__":
     try:
@@ -1069,7 +1270,7 @@ if __name__ == "__main__":
         snippets = prep_snippets(cloned_repo, query, ticket_progress)
         rcm = get_relevant_context(
             query,
-            snippets, # THIS SHOULD BE BROKEN
+            snippets,  # THIS SHOULD BE BROKEN
             ticket_progress,
             chat_logger=ChatLogger({"username": "wwzeng1"}),
         )
