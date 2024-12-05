@@ -1,11 +1,10 @@
-
-system_prompt = """You are a careful and smart tech lead that wants to avoid production issues. You will be analyzing a set of diffs representing a pull request made to a piece of source code. 
+system_prompt = """You are a careful and smart tech lead that wants to avoid production issues. You will be analyzing a set of diffs representing a pull request made to a piece of source code.
 You will also be given the pull request title and description which you will use to determine the intentions of the pull request. Be very concise."""
 
-system_prompt_review = """You are a busy tech manager who is responsible for reviewing prs and identifying any possible production issues. 
+system_prompt_review = """You are a busy tech manager who is responsible for reviewing prs and identifying any possible production issues.
 You will be analyzing a list of potential issues that have been identified by a previous engineer and determing which issues are severe enough to bring up to the original engineer."""
 
-system_prompt_special_rules = """You are a careful and smart tech lead that wants to avoid production issues. You will be analyzing a set of diffs representing a pull request made to a piece of source code. 
+system_prompt_special_rules = """You are a careful and smart tech lead that wants to avoid production issues. You will be analyzing a set of diffs representing a pull request made to a piece of source code.
 You will also be given the pull request title and description which you will use to determine the intentions of the pull request. Finally you will be given a set of rules to check the pull request changes against.
 It is your job to make sure that the pull request changes do not violate any of the given rules.
 """
@@ -27,7 +26,7 @@ You will be given a function definition that was just added to the codebase and 
 system_prompt_pr_summary = """You are a talented software engineer that excels at summarising pull requests for readability and brevity. You will be analysing a series of patches that represent all the changes made in a specific pull request.
 It is your job to write a short and concise but still descriptive summary that describes what the pull request accomplishes."""
 
-system_prompt_sort_issues = """You are a helpful and detail-oriented software engineer who is responsible for sorting a list of identified issues based on their severity and importance. 
+system_prompt_sort_issues = """You are a helpful and detail-oriented software engineer who is responsible for sorting a list of identified issues based on their severity and importance.
 You will be analyzing a list of issues that have been identified by a previous engineer and determing the severity of each issue.
 You will then rank the issues from most severe to least severe based on your analysis."""
 
@@ -61,7 +60,7 @@ Here are the changes in the pull request changes given in diff format:
     1d. Provide a final summary for the changes that should be a single sentence and formatted within a <change_summary> tag.
 Here is an example, make sure the summary sounds natural and keep it brief and easy to skim over:
 <example_change_summary>
-Added a new categorization system for snippets in `multi_prep_snippets` and updated the snippet score calculation in `get_pointwise_reranked_snippet_scores`. 
+Added a new categorization system for snippets in `multi_prep_snippets` and updated the snippet score calculation in `get_pointwise_reranked_snippet_scores`.
 </example_change_summary>
 <change_summary>
 {{Final summary of the major changes}}
@@ -104,7 +103,7 @@ Along with the rules provided, there may be examples given for each rule. These 
 Output the questions and answers for each rule in step 1 in the following format:
 <examples_analysis>
 {{Question and answers for each example in the special_rules section.}}
-</examples_analysis> 
+</examples_analysis>
 
 2. Analyze the code changes.
     For each rule provided, answer the following questions:
@@ -188,14 +187,14 @@ n. Question n repeated verbatim. Answer: Question n answer goes here...
 </questions_and_answers>
 
 3. Identify Issues
-Based on your answers to the questions above you are now to identify any potential issues that the code changes may introduce. 
-Read through each question and answer pair and determine if an issue needs to be raised. 
-If there was not enough information to answer a question IT IS NOT AN ISSUE! DO NOT INCLUDE IT AS AN ISSUE AND MOVE ON TO THE NEXT QUESTION. 
+Based on your answers to the questions above you are now to identify any potential issues that the code changes may introduce.
+Read through each question and answer pair and determine if an issue needs to be raised.
+If there was not enough information to answer a question IT IS NOT AN ISSUE! DO NOT INCLUDE IT AS AN ISSUE AND MOVE ON TO THE NEXT QUESTION.
 """
 
 user_prompt_issue_output_format = """
 [FORMAT]
-Finally, format the found issues and root causes using the following XML tags. Each issue description should be a single sentence. 
+Finally, format the found issues and root causes using the following XML tags. Each issue description should be a single sentence.
 Include a corresponding line number for the issue. The issue will be raised as a github comment on that exact line in the code file. DO NOT reference the patch or patch number in the description. Format these fields in an <issue> tag in the following manner:
 
 <issues>
@@ -259,7 +258,7 @@ Review each identified issue individually, formulate 3 questions to answer in or
     1a. First formulated question and answer. In order to accomplish this examine the referenced lines of code in the provided code files above.
     1b. Second formulated question and answer. In order to accomplish this examine the referenced lines of code in the provided code files above.
     1c. Third formulated question and answer. In order to accomplish this examine the referenced lines of code in the provided code files above.
-    1d. Is this reported issue accurate (double check that the previous reviewer was not mistaken, YOU MUST include the corresponding patch for proof). If the answer to this question is no, then the issue is not severe. 
+    1d. Is this reported issue accurate (double check that the previous reviewer was not mistaken, YOU MUST include the corresponding patch for proof). If the answer to this question is no, then the issue is not severe.
     1e. Is there accidentally removed or commented out lines of code that has functional utility. In this case double check if this change was intentional or accidental.
     1f. Take into account the intentions of the pull request when identifying issues. Are the code changes in line with the intentions of the pull request? If the answer is yes then this is not an issue.
     1g. Is this issue related to potential security vulnerabilities? If yes, then this issue is NOT severe and should not be included.
@@ -274,17 +273,17 @@ In addition to all the above questions you must answer in step 1, the following 
 {special_rules}
 </special_rules>
 
-For each rule defined in the special_rules section, ask if the issue is in violation of the rule. 
+For each rule defined in the special_rules section, ask if the issue is in violation of the rule.
 You may be given relevant context for a rule in which case extra attention is required to make sure that the change in the pull request does not violate the rule.
 If the issue is in violation of the rule, then it is severe and should be included in the final list of issues.
 """
 
-user_prompt_review_analysis_format = """    
+user_prompt_review_analysis_format = """
 Deliver your analysis including all questions and answers in the following format:
 <thoughts>
 <thinking>
 {{Analysis of the issue, include ALL the questions and answers.
-Answer in this format: 
+Answer in this format:
 1a. Answer for question 1a...
 1b. ...
 ...
@@ -408,10 +407,10 @@ user_prompt_pr_summary = """Below are all the patches associated with this pull 
     1c. Never provide "useless" summaries. "useless" summaries are the following: informing the user a variable or function was created without explaining how it contributes the the main goal of the pull request.
     1d. Instead summarize how the changes were accomplished like this: function `foo` implements feature bar and this had xyz effect of abc.
     1e. It is okay to not summarize minor changes that do not tie into the main goal of the pull request.
-    1f. Avoid using overly complex language. For example: instead of the word 'utilize' instead use the word 'use'. 
+    1f. Avoid using overly complex language. For example: instead of the word 'utilize' instead use the word 'use'.
     1g. Respond in the following xml format:
 <pr_summary>
-{{Provide a detailed summary here. Be sure to reference relevant entities and variables to make it very clear what you are referencing. Speak in past tense. 
+{{Provide a detailed summary here. Be sure to reference relevant entities and variables to make it very clear what you are referencing. Speak in past tense.
 This summary should be maximum 10 sentences. Make sure the summary is not a wall of text, use an adequate amount of new lines.}}
 </pr_summary>
 

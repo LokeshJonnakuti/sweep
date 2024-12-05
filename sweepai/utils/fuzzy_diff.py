@@ -8,15 +8,18 @@
 # log of the fuzziness scores and use that as the cost matrix.
 
 import re
+
 from rapidfuzz import fuzz
 
 THRESHOLD = 95
+
 
 def similar(a: str, b: str):
     # Replace all runs of over 3 spaces to 3 spaces using regex
     a = re.sub(r"\s{4,}", "   ", a)
     b = re.sub(r"\s{4,}", "   ", b)
     return fuzz.ratio(a, b) > THRESHOLD
+
 
 def lis(lst: list):
     # Longest increasing subsequence
@@ -26,7 +29,7 @@ def lis(lst: list):
 
     dag = {lst[0]: None}
     buckets = [[lst[0]]]
-    
+
     for i, x in enumerate(lst[1:]):
         # Should use binary search here for O(nlogn) but quadratic for now
         # Haven't seen performance issues yet
@@ -38,7 +41,7 @@ def lis(lst: list):
         else:
             buckets.append([x])
             dag[x] = buckets[-2][-1]
-        
+
     result = []
     k = buckets[-1][-1]
     while k is not None:
@@ -48,14 +51,12 @@ def lis(lst: list):
     back_map = {x: i for i, x in enumerate(lst)}
     return [back_map[x] for x in result[::-1]]
 
-def find_unique_matches(
-    old_lines: list,
-    new_lines: list
-):
+
+def find_unique_matches(old_lines: list, new_lines: list):
     matched_lines = set()
     matches = []
     for i, old_line in enumerate(old_lines):
-        if old_line in old_lines[:i] or old_line in old_lines[i + 1:]:
+        if old_line in old_lines[:i] or old_line in old_lines[i + 1 :]:
             continue
         max_index = -1
         max_fuzz = 0
@@ -72,17 +73,16 @@ def find_unique_matches(
     return matches
 
 
-def patience_fuzzy_diff_lines(
-    old_lines: list[str],
-    new_lines: list[str]
-) -> str:
+def patience_fuzzy_diff_lines(old_lines: list[str], new_lines: list[str]) -> str:
     # Assumes new string has a few lines added from old string.
     # There's probably a better implementation but we'll do this for now.
     if not old_lines:
         return [f"+ {line}" for line in new_lines]
     if not new_lines:
         return [f"- {line}" for line in old_lines]
-    if len(old_lines) == len(new_lines) and all(similar(old_line, new_line) for old_line, new_line in zip(old_lines, new_lines)):
+    if len(old_lines) == len(new_lines) and all(
+        similar(old_line, new_line) for old_line, new_line in zip(old_lines, new_lines)
+    ):
         return [f"  {line}" for line in new_lines]
     diff_lines = []
     matches = find_unique_matches(old_lines, new_lines)
@@ -94,12 +94,16 @@ def patience_fuzzy_diff_lines(
             current_left_lines = old_lines[last_left:left]
             current_right_lines = new_lines[last_right:right]
 
-            diff_lines.extend(patience_fuzzy_diff_lines(current_left_lines, current_right_lines))
+            diff_lines.extend(
+                patience_fuzzy_diff_lines(current_left_lines, current_right_lines)
+            )
             diff_lines.append(f"  {new_lines[right]}")
 
             last_left = left + 1
             last_right = right + 1
-        diff_lines.extend(patience_fuzzy_diff_lines(old_lines[last_left:], new_lines[last_right:]))
+        diff_lines.extend(
+            patience_fuzzy_diff_lines(old_lines[last_left:], new_lines[last_right:])
+        )
     else:
         if similar(old_lines[0], new_lines[0]):
             diff_lines.append(f"  {new_lines[0]}")
@@ -109,10 +113,8 @@ def patience_fuzzy_diff_lines(
         diff_lines.extend(patience_fuzzy_diff_lines(old_lines[1:], new_lines[1:]))
     return diff_lines
 
-def patience_fuzzy_diff(
-    old_string: str,
-    new_string: str
-):
+
+def patience_fuzzy_diff(old_string: str, new_string: str):
     if old_string == new_string:
         return ""
     old_lines = old_string.splitlines()
@@ -120,16 +122,15 @@ def patience_fuzzy_diff(
     diff_lines = patience_fuzzy_diff_lines(old_lines, new_lines)
     return "\n".join(diff_lines)
 
-def patience_fuzzy_additions(
-    old_string: str,
-    new_string: str
-):
+
+def patience_fuzzy_additions(old_string: str, new_string: str):
     if old_string == new_string:
         return ""
     old_lines = old_string.splitlines()
     new_lines = new_string.splitlines()
     diff_lines = patience_fuzzy_diff_lines(old_lines, new_lines)
     return "\n".join(line[2:] for line in diff_lines if line.startswith("+"))
+
 
 old_lint_results = """> pylint sweepai/handlers/on_ticket.py
 
@@ -213,13 +214,11 @@ stress_test_new = "AAGTCCGTAACCTGACATCTGAGGCTAATCACTGAGGCGTATGCGCGATATGCGTATGCGC
 
 if __name__ == "__main__":
     import time
+
     start = time.time()
     # print(patience_fuzzy_diff(
     #     old_lint_results,
     #     new_lint_results
     # ))
-    print(patience_fuzzy_additions(
-        old_lint_results,
-        new_lint_results
-    ))
+    print(patience_fuzzy_additions(old_lint_results, new_lint_results))
     print(f"Time taken: {time.time() - start} seconds.")

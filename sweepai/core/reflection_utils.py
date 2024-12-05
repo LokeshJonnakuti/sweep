@@ -21,14 +21,14 @@ Go through the contractor's process step-by-step. For anything they did even sli
 <overall_score>
 Evaluate the contractor from 1-10, erring on the low side:
 1 - Completely failed to identify relevant files, trace dependencies, or understand the issue
-2 - Identified a couple files from the issue description but missed many critical dependencies 
+2 - Identified a couple files from the issue description but missed many critical dependencies
 3 - Found some relevant files but had major gaps in dependency tracing and codebase understanding
 4 - Identified several key files but still missed important usages and lacked justification
 5 - Found many relevant files but missed a few critical dependencies
 6 - Identified most key files and dependencies but still had some gaps in usage tracing
 7 - Found nearly all relevant files but missed a couple edge case usages or minor dependencies
 8 - Exhaustively traced nearly all dependencies with robust justification, only minor omissions
-9 - Perfectly identified every single relevant file and usage with airtight justification 
+9 - Perfectly identified every single relevant file and usage with airtight justification
 10 - Flawless, absolutely exhaustive dependency tracing and codebase understanding
 </overall_score>
 
@@ -41,12 +41,14 @@ Provide a single sentence of extremely specific, targeted, and actionable critic
 
 Do not give any positive feedback unless the contractor literally achieved perfection. Be extremely harsh and critical in your evaluation. Assume incompetence until proven otherwise. Make the contractor work hard to get a high score."""
 
-state_eval_prompt = """You are helping contractors on a task that involves finding all of the relevant files needed to resolve a github issue. You are an expert at this task and have solved it hundreds of times. This task does not involve writing or modifying code. The contractors' goal is to identify all necessary files, not actually implement the solution. The contractor should not be coding at all. 
+state_eval_prompt = (
+    """You are helping contractors on a task that involves finding all of the relevant files needed to resolve a github issue. You are an expert at this task and have solved it hundreds of times. This task does not involve writing or modifying code. The contractors' goal is to identify all necessary files, not actually implement the solution. The contractor should not be coding at all.
 
 Your job is to review the contractor's work with an extremely critical eye. Leave no stone unturned in your evaluation. Read through every single step the contractor took and analyze it in depth.
 
-""" + response_format + \
 """
+    + response_format
+    + """
 Here are some examples of how you should evaluate the contractor's work:
 
 <examples>
@@ -67,9 +69,9 @@ No relevant files seem to have been missed. The contractor used a comprehensive 
 Excellent work identifying Payment.java, PaymentController.java, PaymentService.java, and all critical dependencies.
 </message_to_contractor>
 
-Example 2 (Score: 4): 
+Example 2 (Score: 4):
 <judgement_on_task>
-The contractor identified the UserAccount.java file where the login bug is occurring, but failed to use nearly enough code/function/class searches to find many other critical files. While they noted that LoginController.java calls UserAccount.authenticateUser(), they didn't search for the "authenticateUser" function to identify LoginService.java which orchestrates the login flow.  
+The contractor identified the UserAccount.java file where the login bug is occurring, but failed to use nearly enough code/function/class searches to find many other critical files. While they noted that LoginController.java calls UserAccount.authenticateUser(), they didn't search for the "authenticateUser" function to identify LoginService.java which orchestrates the login flow.
 
 They completely missed using searches for the "UserAccount" class, "credentials", "principal", "login", etc. to find the UserRepository.java file that loads user data from the database and many other files involved in authentication. Searching for "hash", "encrypt", "password", etc. should have revealed the critical PasswordEncryptor.java that handles password hashing.
 
@@ -77,7 +79,7 @@ The contractor claimed UserForgotPasswordController.java and UserCreateControlle
 
 In general, the contractor seemed to stumble upon a couple relevant files, but failed to systematically trace the login code path and its dependencies. They showed a superficial and incomplete understanding of the login architecture and process. Many critical files were completely missed and the scope was not properly focused on login.
 </judgement_on_task>
-<overall_score>4</overall_score>  
+<overall_score>4</overall_score>
 <message_to_contractor>
 Failed to search for "authenticateUser", "UserAccount", "login", "credentials". Missed LoginService.java, UserRepository.java, PasswordEncryptor.java.
 </message_to_contractor>
@@ -105,7 +107,7 @@ The contractor identified most of the key files involved in the user profile upd
 
 However, they missed a few critical dependencies. They did not search for "UserProfile" to find the UserProfileRepository.java DAO that loads and saves user profiles to the database. This is a significant omission in their understanding of the data persistence layer.
 
-The contractor also failed to look for configuration files related to user profiles. Searching for "profile" in YAML or properties files should have revealed application-profiles.yml which contains important profile settings. 
+The contractor also failed to look for configuration files related to user profiles. Searching for "profile" in YAML or properties files should have revealed application-profiles.yml which contains important profile settings.
 
 While the contractor had a decent high-level understanding of the user profile update process, they showed some gaps in their low-level understanding of the data flow and configuration. They needed to be more thorough in tracing code dependencies to uncover the complete set of relevant files.
 </judgement_on_task>
@@ -114,6 +116,7 @@ While the contractor had a decent high-level understanding of the user profile u
 Missed UserProfileRepository.java and application-profiles.yml dependencies. Search for "UserProfile" and "profile" to find remaining relevant files.
 </message_to_contractor>
 </examples>"""
+)
 
 modify_eval_response_format = """Please provide your critical evaluation of this submission using the following structured format:
 
@@ -203,25 +206,29 @@ I regret to inform you that your submission for the user authentication task is 
 I recommend reviewing the task requirements carefully, studying best practices for user authentication, and taking the time to implement a complete and secure solution. If you need further guidance or clarification, please don't hesitate to ask.
 </message_to_contractor>"""
 
-modify_eval_prompt = """You are an evaluator agent tasked with grading and providing critical feedback on code changes submitted by an outside contractor in response to a given coding task. You will be provided with the original task description as well as a series of file changes in unified diff format.
+modify_eval_prompt = (
+    """You are an evaluator agent tasked with grading and providing critical feedback on code changes submitted by an outside contractor in response to a given coding task. You will be provided with the original task description as well as a series of file changes in unified diff format.
 
 Your job is to carefully review the code changes and provide feedback focused on the following:
 
 1. Identify any missing import statements that would prevent the code from compiling. Call out the specific imports that are needed.
 
-2. Look for any variables or methods that are referenced but not defined in the provided code changes. These may indicate the contractor hallucinated or made invalid assumptions. 
+2. Look for any variables or methods that are referenced but not defined in the provided code changes. These may indicate the contractor hallucinated or made invalid assumptions.
 
 3. Analyze whether the code changes, as submitted, fully satisfy the requirements of the original coding task. Identify any gaps or ways in which the solution falls short.
 
 Remember, your goal is to be a harsh critic and really scrutinize the work to ensure only high-quality, complete code changes are accepted. Do not praise mediocre work.
 
-""" + modify_eval_response_format + modify_eval_examples
+"""
+    + modify_eval_response_format
+    + modify_eval_examples
+)
 
 modify_eval_patch_prompt = """\
 You are a meticulous code reviewer providing critical and specific feedback on a contractor's code changes to help resolve a GitHub issue.
 Inputs:
 - Task description
-- Code patch (diff) 
+- Code patch (diff)
 - Completed changes
 - Current plan
 - Current file
@@ -229,7 +236,7 @@ Steps:
 1. Review CURRENT TASK for requirements.
 2. Analyze code patch:
    - Purpose and impact of each change
-   - Check for LLM failures: 
+   - Check for LLM failures:
      - Logic errors
      - Unhandled edge cases
      - Missing imports
@@ -239,7 +246,7 @@ Steps:
      - Non-functional code
    - Alignment with plan and requirements
 3. Perform critical contextual analysis:
-   - Break down changes 
+   - Break down changes
    - Explain reasoning
    - Identify logic issues, edge cases, plan deviations
    - Consider all scenarios and pitfalls
@@ -251,14 +258,14 @@ Format:
 Provide a brief summary of the task requirements, the contractor's plan, and the current file changes.
 </task_summary>
 <patch_integration>
-Critically analyze patch fit, behavior changes, conflicts, issues, consequences. 
+Critically analyze patch fit, behavior changes, conflicts, issues, consequences.
 </patch_integration>
 <code_examination>
 Break down changes. Explain purpose. Call out logic errors and integration issues in detail:
 - Unhandled edge cases: [list]
 - Logic errors: [list]
 - Missing imports: [list]
-- Incomplete changes: [list] 
+- Incomplete changes: [list]
 - Undefined variables/functions: [list]
 - Non-functional code: [list]
 Require justification for plan deviations. Criticize behavior changes not handled. Overlook NOTHING.
@@ -278,7 +285,7 @@ modify_eval_suffix_prompt = """Again, you will critically review the code change
 
 Inputs:
 - Task description
-- Code patch (diff) 
+- Code patch (diff)
 - Completed changes
 - Current plan
 - Current file
@@ -286,7 +293,7 @@ Steps:
 1. Review CURRENT TASK for requirements.
 2. Analyze code patch:
    - Purpose and impact of each change
-   - Check for LLM failures: 
+   - Check for LLM failures:
      - Logic errors
      - Unhandled edge cases
      - Missing imports
@@ -296,7 +303,7 @@ Steps:
      - Non-functional code
    - Alignment with plan and requirements
 3. Perform critical contextual analysis:
-   - Break down changes 
+   - Break down changes
    - Explain reasoning
    - Identify logic issues, edge cases, plan deviations
    - Consider all scenarios and pitfalls
@@ -308,7 +315,7 @@ Steps:
 Format:
 
 <patch_integration>
-Critically analyze patch fit, behavior changes, conflicts, issues, consequences. 
+Critically analyze patch fit, behavior changes, conflicts, issues, consequences.
 </patch_integration>
 
 <code_examination>
@@ -316,7 +323,7 @@ Break down changes. Explain purpose. Call out logic errors and integration issue
 - Unhandled edge cases: [list]
 - Logic errors: [list]
 - Missing imports: [list]
-- Incomplete changes: [list] 
+- Incomplete changes: [list]
 - Undefined variables/functions: [list]
 - Non-functional code: [list]
 Require justification for plan deviations. Criticize behavior changes not handled. Overlook NOTHING.
@@ -345,30 +352,44 @@ Respond with your extremely critical analysis and feedback."""
 # 3. update the reflections section with the new reflections
 CLAUDE_MODEL = "claude-3-opus-20240229"
 
+
 class EvaluatorAgent(ChatGPT):
-    def evaluate_run(self, problem_statement: str, run_text: str, stored_files: list[str]):
+    def evaluate_run(
+        self, problem_statement: str, run_text: str, stored_files: list[str]
+    ):
         self.model = CLAUDE_MODEL
         self.messages = [Message(role="system", content=state_eval_prompt)]
         formatted_problem_statement = f"This is the task for the contractor to research:\n<task_to_research>\n{problem_statement}\n</task_to_research>"
         contractor_stored_files = "\n".join([file for file in stored_files])
         stored_files_section = f"""The contractor stored these files:\n<stored_files>\n{contractor_stored_files}\n</stored_files>"""
-        content = formatted_problem_statement + "\n\n" + f"<contractor_attempt>\n{run_text}\n</contractor_attempt>"\
-             + f"\n\n{stored_files_section}\n\n" + response_format
+        content = (
+            formatted_problem_statement
+            + "\n\n"
+            + f"<contractor_attempt>\n{run_text}\n</contractor_attempt>"
+            + f"\n\n{stored_files_section}\n\n"
+            + response_format
+        )
         evaluate_response = self.chat_anthropic(
             content=content,
             stop_sequences=["</message_to_contractor>"],
             model=CLAUDE_MODEL,
             message_key="user_request",
         )
-        evaluate_response += "</message_to_contractor>" # add the stop sequence back in, if it stopped for another reason we've crashed
+        evaluate_response += "</message_to_contractor>"  # add the stop sequence back in, if it stopped for another reason we've crashed
         overall_score = None
         message_to_contractor = None
         try:
             overall_score_pattern = r"<overall_score>(.*?)</overall_score>"
-            message_to_contractor_pattern = r"<message_to_contractor>(.*?)</message_to_contractor>"
+            message_to_contractor_pattern = (
+                r"<message_to_contractor>(.*?)</message_to_contractor>"
+            )
 
-            overall_score_match = re.search(overall_score_pattern, evaluate_response, re.DOTALL)
-            message_to_contractor_match = re.search(message_to_contractor_pattern, evaluate_response, re.DOTALL)
+            overall_score_match = re.search(
+                overall_score_pattern, evaluate_response, re.DOTALL
+            )
+            message_to_contractor_match = re.search(
+                message_to_contractor_pattern, evaluate_response, re.DOTALL
+            )
 
             if overall_score_match is None or message_to_contractor_match is None:
                 return overall_score, message_to_contractor
@@ -387,25 +408,29 @@ class EvaluatorAgent(ChatGPT):
             logger.info(f"Error evaluating response: {e}")
             return overall_score, message_to_contractor
 
+
 # Eval agent specific to modify step
 class ModifyEvaluatorAgent(ChatGPT):
     def evaluate_patch(
-        self, 
-        problem_statement: str, 
-        patch: str, 
-        changed_files: dict[str, dict[str, str]], 
+        self,
+        problem_statement: str,
+        patch: str,
+        changed_files: dict[str, dict[str, str]],
         new_file_contents: str,
-        current_plan: str, 
+        current_plan: str,
         current_task: str,
         file_name: str,
         warning_message: str = "",
         previous_attempt: str = "",
-        chat_logger_messages: list[dict[str, str]] | None = None
+        chat_logger_messages: list[dict[str, str]] | None = None,
     ):
         self.model = CLAUDE_MODEL
         self.messages = [Message(role="system", content=modify_eval_patch_prompt)]
         formatted_problem_statement = f"This is the task for the contractor to complete:\n<task_to_complete>\n{problem_statement}\n</task_to_complete>\n\n"
-        formatted_patch_and_contents = f"This is the CURRENT PATCH that the contractor has submitted for evaluation:\n<current_patch file_name={file_name}>\n{patch}\n</current_patch>\n\n" + f"This is the current file after modifications:\n<current_file>\n{new_file_contents}\n</current_file>\n\n"
+        formatted_patch_and_contents = (
+            f"This is the CURRENT PATCH that the contractor has submitted for evaluation:\n<current_patch file_name={file_name}>\n{patch}\n</current_patch>\n\n"
+            + f"This is the current file after modifications:\n<current_file>\n{new_file_contents}\n</current_file>\n\n"
+        )
         formatted_plan = f"This is the current plan that we must follow:\n<entire_plan>\n{current_plan}\n</entire_plan>\n\n"
         contractor_changes_made: dict[str, str] = {}
         for file_name, file_data in changed_files.items():
@@ -414,9 +439,19 @@ class ModifyEvaluatorAgent(ChatGPT):
             diff = generate_diff(file_data["original_contents"], file_data["contents"])
             if diff:
                 contractor_changes_made[file_name] = diff
-        contractor_changed_files = "\n".join([f"<completed_patch file_name={file_name}>\n{diff}\n</completed_patch>" for file_name, diff in contractor_changes_made.items()])
+        contractor_changed_files = "\n".join(
+            [
+                f"<completed_patch file_name={file_name}>\n{diff}\n</completed_patch>"
+                for file_name, diff in contractor_changes_made.items()
+            ]
+        )
         changed_files_section = f"""The contractor has already completed these changes as part of the completed tasks:\n<completed_changes>\n{contractor_changed_files}\n</completed_changes>\n\n"""
-        content = formatted_problem_statement + formatted_plan + changed_files_section + formatted_patch_and_contents
+        content = (
+            formatted_problem_statement
+            + formatted_plan
+            + changed_files_section
+            + formatted_patch_and_contents
+        )
         if warning_message:
             content += f"The changes also trigger the following warnings:\n<warnings>\n{warning_message}\n</warnings>\n\n"
         content += current_task
@@ -429,7 +464,7 @@ class ModifyEvaluatorAgent(ChatGPT):
             model=CLAUDE_MODEL,
             message_key="user_request",
         )
-        evaluate_response += "</message_to_contractor>" # add the stop sequence back in, if it stopped for another reason we've crashed
+        evaluate_response += "</message_to_contractor>"  # add the stop sequence back in, if it stopped for another reason we've crashed
         # update chat_logger_messages in place if they are passed in
         if chat_logger_messages:
             chat_logger_messages.append({"role": "assistant", "content": content})
@@ -441,14 +476,22 @@ class ModifyEvaluatorAgent(ChatGPT):
             message_to_contractor_pattern = r"<feedback>(.*?)</feedback>"
 
             next_step_match = re.search(next_step_pattern, evaluate_response, re.DOTALL)
-            message_to_contractor_match = re.search(message_to_contractor_pattern, evaluate_response, re.DOTALL)
+            message_to_contractor_match = re.search(
+                message_to_contractor_pattern, evaluate_response, re.DOTALL
+            )
 
             if next_step_match is None or message_to_contractor_match is None:
                 return next_step, feedback
 
             next_step = next_step_match.group(1).strip()
             # check if 1 through 10 are a match
-            if not any(["COMPLETE" in next_step, "CONTINUE" in next_step, "REJECT" in next_step]):
+            if not any(
+                [
+                    "COMPLETE" in next_step,
+                    "CONTINUE" in next_step,
+                    "REJECT" in next_step,
+                ]
+            ):
                 return None, ""
             else:
                 if "COMPLETE" in next_step:
@@ -463,8 +506,12 @@ class ModifyEvaluatorAgent(ChatGPT):
             logger.info(f"Error evaluating response: {e}")
             return next_step, feedback
 
-
-    def evaluate_run(self, problem_statement: str, run_text: str, changed_files: dict[str, dict[str, str]]):
+    def evaluate_run(
+        self,
+        problem_statement: str,
+        run_text: str,
+        changed_files: dict[str, dict[str, str]],
+    ):
         self.model = CLAUDE_MODEL
         self.messages = [Message(role="system", content=modify_eval_prompt)]
         formatted_problem_statement = f"This is the task for the contractor to complete:\n<task_to_complete>\n{problem_statement}\n</task_to_complete>"
@@ -473,25 +520,41 @@ class ModifyEvaluatorAgent(ChatGPT):
             diff = generate_diff(file_data["original_contents"], file_data["contents"])
             if diff:
                 contractor_changes_made[file_name] = diff
-        contractor_changed_files = "\n".join([f"Changes made to file {file_name}:\n\n{diff}\n\n" for file_name, diff in contractor_changes_made.items()])
+        contractor_changed_files = "\n".join(
+            [
+                f"Changes made to file {file_name}:\n\n{diff}\n\n"
+                for file_name, diff in contractor_changes_made.items()
+            ]
+        )
         changed_files_section = f"""The contractor made these changes to the following files:\n<changed_files>\n{contractor_changed_files}\n</changed_files>"""
-        content = formatted_problem_statement + "\n\n" + f"<contractor_attempt>\n{run_text}\n</contractor_attempt>"\
-             + f"\n\n{changed_files_section}\n\n" + modify_eval_response_format
+        content = (
+            formatted_problem_statement
+            + "\n\n"
+            + f"<contractor_attempt>\n{run_text}\n</contractor_attempt>"
+            + f"\n\n{changed_files_section}\n\n"
+            + modify_eval_response_format
+        )
         evaluate_response = self.chat_anthropic(
             content=content,
             stop_sequences=["</message_to_contractor>"],
             model=CLAUDE_MODEL,
             message_key="user_request",
         )
-        evaluate_response += "</message_to_contractor>" # add the stop sequence back in, if it stopped for another reason we've crashed
+        evaluate_response += "</message_to_contractor>"  # add the stop sequence back in, if it stopped for another reason we've crashed
         overall_score = None
         message_to_contractor = None
         try:
             overall_score_pattern = r"<overall_score>(.*?)</overall_score>"
-            message_to_contractor_pattern = r"<message_to_contractor>(.*?)</message_to_contractor>"
+            message_to_contractor_pattern = (
+                r"<message_to_contractor>(.*?)</message_to_contractor>"
+            )
 
-            overall_score_match = re.search(overall_score_pattern, evaluate_response, re.DOTALL)
-            message_to_contractor_match = re.search(message_to_contractor_pattern, evaluate_response, re.DOTALL)
+            overall_score_match = re.search(
+                overall_score_pattern, evaluate_response, re.DOTALL
+            )
+            message_to_contractor_match = re.search(
+                message_to_contractor_pattern, evaluate_response, re.DOTALL
+            )
 
             if overall_score_match is None or message_to_contractor_match is None:
                 return overall_score, message_to_contractor
@@ -510,13 +573,16 @@ class ModifyEvaluatorAgent(ChatGPT):
             logger.info(f"Error evaluating response: {e}")
             return overall_score, message_to_contractor
 
+
 if __name__ == "__main__":
     try:
         pass
     except Exception as e:
         import sys
+
         info = sys.exc_info()
-        import pdb # noqa
+        import pdb  # noqa
+
         # pylint: disable=no-member
         pdb.post_mortem(info[2])
         raise e

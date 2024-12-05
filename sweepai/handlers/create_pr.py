@@ -5,7 +5,7 @@ It is also responsible for handling Sweep config PR creation. test
 
 import copy
 
-import openai  
+import openai
 from github.Repository import Repository
 from loguru import logger
 
@@ -18,10 +18,7 @@ from sweepai.config.server import (
     GITHUB_DEFAULT_CONFIG,
     GITHUB_LABEL_NAME,
 )
-from sweepai.core.entities import (
-    FileChangeRequest,
-    MaxTokensExceeded,
-)
+from sweepai.core.entities import FileChangeRequest, MaxTokensExceeded
 from sweepai.utils.event_logger import posthog
 from sweepai.utils.github_utils import ClonedRepo
 
@@ -34,6 +31,7 @@ INSTRUCTIONS_FOR_REVIEW = """\
 > * Comment below, and Sweep can edit the entire PR
 > * Comment on a file, Sweep will only modify the commented file
 > * Edit the original issue to get Sweep to recreate the PR from scratch"""
+
 
 # this should be the only modification function
 def handle_file_change_requests(
@@ -78,15 +76,13 @@ def handle_file_change_requests(
         )
         # If no files were updated, log a warning and return
         if not modify_files_dict:
-            logger.warning(
-                "No changes made to any file!"
-            )
+            logger.warning("No changes made to any file!")
             return (
                 modify_files_dict,
                 False,
                 file_change_requests,
             )
-        
+
         # update previous_modify_files_dict
         if not previous_modify_files_dict:
             previous_modify_files_dict = {}
@@ -149,6 +145,7 @@ def handle_file_change_requests(
         )
         raise e
 
+
 def safe_delete_sweep_branch(
     pr,  # Github PullRequest
     repo: Repository,
@@ -175,9 +172,8 @@ def safe_delete_sweep_branch(
         # Failed to delete branch as it was edited by someone else
         return False
 
-def create_config_pr(
-    repo: Repository = None, cloned_repo: ClonedRepo = None
-):
+
+def create_config_pr(repo: Repository = None, cloned_repo: ClonedRepo = None):
     if repo is not None:
         # Check if file exists in repo
         try:
@@ -256,6 +252,7 @@ def create_config_pr(
     )
     pr.add_to_labels(GITHUB_LABEL_NAME)
     return pr
+
 
 def create_gha_pr(g, repo):
     # Create a new branch

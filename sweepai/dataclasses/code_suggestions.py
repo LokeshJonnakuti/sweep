@@ -9,8 +9,8 @@ class CodeSuggestion:
     new_code: str
     file_contents: str = ""
 
+
 @dataclass
 class StatefulCodeSuggestion(CodeSuggestion):
     state: Literal["pending", "processing", "done", "error"] = "pending"
     error: Optional[str] = None
-

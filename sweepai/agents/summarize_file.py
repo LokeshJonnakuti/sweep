@@ -4,9 +4,12 @@ from sweepai.utils.github_utils import MockClonedRepo
 
 instructions = "Explain in great detail what types of content this directory contains (code, documentation, configs, assets, tests etc.). Explain the purpose of the directory. Be concise and optimize for informational density. One paragraph."
 
-system_prompt = "Your job is to summarize the following file from the repository. " + instructions
+system_prompt = (
+    "Your job is to summarize the following file from the repository. " + instructions
+)
 
-user_prompt = """Summarize the following file from the repository.
+user_prompt = (
+    """Summarize the following file from the repository.
 
 <repo_name>
 {repo_name}
@@ -20,7 +23,10 @@ user_prompt = """Summarize the following file from the repository.
 {file_contents}
 </file_contents>
 
-""" + instructions
+"""
+    + instructions
+)
+
 
 @file_cache()
 def summarize_file(file_path: str, file_contents: str, repo_name: str):
@@ -36,6 +42,7 @@ def summarize_file(file_path: str, file_contents: str, repo_name: str):
     )
 
     return response
+
 
 if __name__ == "__main__":
     cloned_repo = MockClonedRepo("/tmp/sweep", "sweepai/sweep")

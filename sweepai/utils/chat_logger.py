@@ -6,10 +6,7 @@ from loguru import logger
 from pydantic import BaseModel, Field
 from pymongo import MongoClient
 
-from sweepai.config.server import (
-    IS_SELF_HOSTED,
-    MONGODB_URI,
-)
+from sweepai.config.server import IS_SELF_HOSTED, MONGODB_URI
 from sweepai.global_threads import global_threads
 
 global_mongo_client = None
@@ -184,6 +181,7 @@ class ChatLogger(BaseModel):
             (self.get_ticket_count() >= 5 or self.get_ticket_count(use_date=True) > 3)
             and purchased_tickets == 0
         ) or not self.active
+
 
 if __name__ == "__main__":
     chat_logger = ChatLogger(

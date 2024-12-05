@@ -23,6 +23,7 @@ Concise bulleted description of the pull request. Markdown format `variables`, `
 
 CLAUDE_MODEL = "claude-3-haiku-20240307"
 
+
 class PRDescriptionBot(ChatGPT):
     def describe_diffs(
         self,
@@ -46,10 +47,11 @@ class PRDescriptionBot(ChatGPT):
                     return ""
             else:
                 break
-                
+
         pr_desc = pr_desc_matches.group(1)
         pr_desc = pr_desc.strip()
         return pr_desc
+
 
 if __name__ == "__main__":
     bot = PRDescriptionBot()

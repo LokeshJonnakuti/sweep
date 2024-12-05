@@ -2,11 +2,11 @@ import re
 from dataclasses import dataclass
 from functools import lru_cache
 
+from loguru import logger
 from rapidfuzz import fuzz
 from tqdm import tqdm
 
 from sweepai.logn import file_cache
-from loguru import logger
 
 
 @lru_cache()

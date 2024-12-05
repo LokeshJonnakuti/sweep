@@ -3,7 +3,7 @@ def convert_lines_to_and_merge_ranges(
     range_size: int = 10,
     lower_bound: int = -1,
     upper_bound: int = -1,
-    offset: int = 0, # offset to apply to each line number
+    offset: int = 0,  # offset to apply to each line number
 ) -> list[tuple[int, int]]:
     """
     Converts a list of line numbers to a list of ranges, handles merging of ranges with custom range_size
@@ -12,7 +12,7 @@ def convert_lines_to_and_merge_ranges(
         return []
     ranges = []
     lines.sort()
-    range_size = max(0, range_size) # ensure at least one line is present
+    range_size = max(0, range_size)  # ensure at least one line is present
     for line in lines:
         if offset:
             line += offset

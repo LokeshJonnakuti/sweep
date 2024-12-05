@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Iterator, Tuple
+
 from sweepai.core.entities import Snippet
+
 
 @dataclass
 class SeparatedSnippets:
@@ -26,12 +28,14 @@ class SeparatedSnippets:
             self.source.append(snippet)
         else:
             raise ValueError(f"Unknown type_name: {type_name}")
-    
+
     def override_list(self, attribute_name: str, new_list: list[Snippet]):
         if hasattr(self, attribute_name):
             setattr(self, attribute_name, new_list)
         else:
-            raise AttributeError(f"List type '{attribute_name}' does not exist in SeparatedSnippets")
+            raise AttributeError(
+                f"List type '{attribute_name}' does not exist in SeparatedSnippets"
+            )
 
     def __iter__(self) -> Iterator[Tuple[str, list[Snippet]]]:
         yield "source", self.source

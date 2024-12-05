@@ -1,23 +1,22 @@
-from math import inf
 import os
 import re
 import sys
+from math import inf
 
-from rapidfuzz import fuzz, process
-import stringzilla as sz
-
-from loguru import logger
 import rapidfuzz
+import stringzilla as sz
+from loguru import logger
+from rapidfuzz import fuzz, process
 from tqdm import tqdm
+
 from sweepai.core.chat import ChatGPT, parse_function_calls, tool_call_parameters
-from sweepai.core.entities import FileChangeRequest
+from sweepai.core.entities import FileChangeRequest, parse_fcr
+from sweepai.utils.code_validators import get_check_results
 from sweepai.utils.convert_openai_anthropic import AnthropicFunctionCall
 from sweepai.utils.diff import generate_diff
 from sweepai.utils.github_utils import ClonedRepo
 from sweepai.utils.ripgrep_utils import manual_code_check
-from sweepai.utils.code_validators import get_check_results
 from sweepai.utils.str_utils import rstrip_lines, strip_triple_quotes
-from sweepai.core.entities import parse_fcr
 
 modify_tools = """
 # make_change - Make a SINGLE, TARGETED code change in a file. Preserve whitespace, comments, and style. Changes should be minimal, self-contained, and address only one specific modification. If a change affects multiple separate code sections, use multiple calls to this tool, one for each section.
@@ -60,7 +59,7 @@ Summarize the code changes made and explain how they fulfill the user's original
 </justification>
 </submit_task>"""
 
-instructions = """You are an expert software developer tasked with editing code to fulfill the user's request. Your goal is to make the necessary changes to the codebase while following best practices and respecting existing conventions. 
+instructions = """You are an expert software developer tasked with editing code to fulfill the user's request. Your goal is to make the necessary changes to the codebase while following best practices and respecting existing conventions.
 
 To complete the task, follow these steps:
 
@@ -73,7 +72,7 @@ To complete the task, follow these steps:
     - Ensure each change is complete and functional before moving on
         When providing code snippets, be extremely precise with indentation:
         - Count the exact number of spaces used for indentation
-        - If tabs are used, specify that explicitly 
+        - If tabs are used, specify that explicitly
         - Ensure the indentation of the code snippet matches the original file exactly
 3. After making all the changes, review the modified code to verify it fully satisfies the original request.
 4. Once you are confident the task is complete, submit the final solution.
@@ -140,7 +139,7 @@ a. Identify the code we are trying to append.
 b. List function headers in this file that are relevant to the code we are trying to append, and explain what they each do. For example, if our code is tests multiplication, focus on tests that test multiplication. Follow this format:
     - Function: [function_name] - [description]
     [additional functions]
-c. Identify the function you want to append the new_code block to, copying them completely and VERBATIM from the file. Do NOT paraphrase or abbreviate the source code, keeping all comments, docstrings, indentation, and whitespace. Placeholder comments like "# existing code" are not permitted. Be sure to copy the ENTIRE function or section of code. 
+c. Identify the function you want to append the new_code block to, copying them completely and VERBATIM from the file. Do NOT paraphrase or abbreviate the source code, keeping all comments, docstrings, indentation, and whitespace. Placeholder comments like "# existing code" are not permitted. Be sure to copy the ENTIRE function or section of code.
 ```
 The function or section of code you want to append to.
 ```
@@ -295,7 +294,7 @@ b. Analyze code patch:
     - Non-functional code
     - Misalignment with plan and requirements
 c. Perform critical contextual analysis:
-    - Break down changes 
+    - Break down changes
     - Explain reasoning
     - Identify logic issues, edge cases, plan deviations
     - Consider all scenarios and pitfalls
@@ -441,6 +440,7 @@ SUBMIT_TASK_MOCK_FUNCTION_CALL = """<function_call>
 </submit_task>
 </function_call>"""
 
+
 def english_join(items: list[str]) -> str:
     if len(items) == 0:
         return ""
@@ -450,18 +450,28 @@ def english_join(items: list[str]) -> str:
         return f"{items[0]} and {items[1]}"
     return ", ".join(items[:-1]) + f", and {items[-1]}"
 
+
 def indent(text: str, spaces: int) -> str:
-    return "\n".join([f"{' ' * spaces}{line}" if line.strip() else "" for line in text.split("\n")])
+    return "\n".join(
+        [f"{' ' * spaces}{line}" if line.strip() else "" for line in text.split("\n")]
+    )
+
 
 def tokenize_code(code: str):
     cleaned_code = ""
     for line in code.split("\n"):
         stripped_line = line.strip()
-        if stripped_line.startswith("#") or stripped_line.startswith("//") or len(stripped_line) == 0:
+        if (
+            stripped_line.startswith("#")
+            or stripped_line.startswith("//")
+            or len(stripped_line) == 0
+        ):
             continue
         cleaned_code += line + "\n"
     tokens = []
-    for token in sz.Str(cleaned_code).split_charset(separator=' \n\t\r()\{\}\[\]', maxsplit=sys.maxsize, keepseparator=True):
+    for token in sz.Str(cleaned_code).split_charset(
+        separator=" \n\t\r()\{\}\[\]", maxsplit=sys.maxsize, keepseparator=True
+    ):
         stringified_token = str(token)
         if stringified_token.strip():
             tokens.append(stringified_token)
@@ -470,6 +480,7 @@ def tokenize_code(code: str):
 
 def code_processor(code: str):
     return " ".join(tokenize_code(code))
+
 
 def check_valid_parentheses(code: str):
     stack = []
@@ -484,6 +495,7 @@ def check_valid_parentheses(code: str):
             if char in parentheses_mapping:
                 stack.append(char)
     return not stack
+
 
 def check_valid_parentheses_for_patch(original_code: str, new_code: str):
     for parentheses in ["()", "{}", "[]"]:
@@ -506,7 +518,7 @@ def find_best_matches(
     verbose=True,
     num_matches=5,
     tokenized=False,
-    **kwargs
+    **kwargs,
 ):
     best_matches = []
     file_contents_lines = haystack.split("\n")
@@ -515,7 +527,9 @@ def find_best_matches(
     max_char_diff = max(100, int(num_non_whitespace_chars * 0.03))
     tokenized_needle = tokenize_code(needle)
 
-    for start_line in tqdm(range(num_lines), total=num_lines) if verbose else range(num_lines):
+    for start_line in (
+        tqdm(range(num_lines), total=num_lines) if verbose else range(num_lines)
+    ):
         # if time.time() - absolute_start > 5:
         #     breakpoint()
         #     raise Exception("Took too long to find best matches")
@@ -524,9 +538,14 @@ def find_best_matches(
         end_line = start_line
         current_string = ""
         num_chars = 0
-        while num_chars < num_non_whitespace_chars + max_char_diff and end_line < num_lines:
+        while (
+            num_chars < num_non_whitespace_chars + max_char_diff
+            and end_line < num_lines
+        ):
             current_string += file_contents_lines[end_line] + "\n"
-            num_chars += sum(not char.isspace() for char in file_contents_lines[end_line])
+            num_chars += sum(
+                not char.isspace() for char in file_contents_lines[end_line]
+            )
             end_line += 1
             if num_chars > num_non_whitespace_chars - max_char_diff:
                 if not potential_choices and needle.count("\n") > 30:
@@ -539,7 +558,7 @@ def find_best_matches(
                         break
                 potential_choices.append(current_string)
                 end_lines.append(end_line)
-        
+
         if not potential_choices:
             continue
 
@@ -547,17 +566,21 @@ def find_best_matches(
         results = process.extract(
             needle,
             potential_choices,
-            scorer=fuzz.QRatio, 
-            score_cutoff=threshold, 
+            scorer=fuzz.QRatio,
+            score_cutoff=threshold,
             limit=num_matches,
             processor=tokenize_code if tokenized else None,
-            **kwargs
+            **kwargs,
         )
 
         for _choice, score, index in results:
             if score >= threshold:
-                best_matches.append((score, (potential_choices[index], start_line, end_lines[index])))
-        best_matches = sorted(best_matches, key=lambda x: x[0], reverse=True)[:num_matches]
+                best_matches.append(
+                    (score, (potential_choices[index], start_line, end_lines[index]))
+                )
+        best_matches = sorted(best_matches, key=lambda x: x[0], reverse=True)[
+            :num_matches
+        ]
 
     deduped_best_matches = []
     covered_spans = set()
@@ -568,9 +591,11 @@ def find_best_matches(
         deduped_best_matches.append((match.strip("\n"), score))
     return deduped_best_matches[:num_matches]
 
+
 def find_best_match(*args, **kwargs):
     results = find_best_matches(*args, **kwargs, num_matches=1)
     return results[0] if len(results) > 0 else ("", 0)
+
 
 def find_max_indentation(needle: str):
     max_indent = 0
@@ -579,6 +604,7 @@ def find_max_indentation(needle: str):
             continue
         max_indent = max(max_indent, len(line) - len(line.lstrip()))
     return max_indent
+
 
 def find_smallest_valid_superspan(needle: str, haystack: str):
     # assumption: needle is a contiguous block of code in the haystack
@@ -603,8 +629,9 @@ def find_smallest_valid_superspan(needle: str, haystack: str):
             else:
                 stack.append(char)
         if not stack:
-            return haystack[starting_index:ending_index + i + 1]
+            return haystack[starting_index : ending_index + i + 1]
     return ""
+
 
 def contains_ignoring_whitespace(needle: str, haystack: str):
     needle = "\n".join([line.rstrip() for line in needle.splitlines()])
@@ -619,8 +646,10 @@ def contains_ignoring_whitespace(needle: str, haystack: str):
             return start_line, end_line
     return False
 
+
 MODEL = "claude-3-5-sonnet-20240620"
 SLOW_MODEL = "claude-3-5-sonnet-20240620"
+
 
 def validate_and_parse_function_call(
     function_calls_string: str, chat_gpt: ChatGPT
@@ -630,8 +659,8 @@ def validate_and_parse_function_call(
     )
     if len(function_calls) > 0:
         function_calls[0] = AnthropicFunctionCall(
-            function_name=function_calls[0]['tool'],
-            function_parameters=function_calls[0]['arguments'],
+            function_name=function_calls[0]["tool"],
+            function_parameters=function_calls[0]["arguments"],
         )
         if "<function_call>" in function_calls_string:
             chat_gpt.messages[-1].content = (
@@ -639,20 +668,25 @@ def validate_and_parse_function_call(
             )
     return function_calls[0] if len(function_calls) > 0 else None
 
-def create_user_message( # TODO: has non-deterministic behavior
-        fcrs: list[FileChangeRequest],
-        request: str,
-        cloned_repo: ClonedRepo,
-        relevant_filepaths: list[str] = None,
-        modify_files_dict: dict[str, dict[str, str]] = None
-    ) -> str:
+
+def create_user_message(  # TODO: has non-deterministic behavior
+    fcrs: list[FileChangeRequest],
+    request: str,
+    cloned_repo: ClonedRepo,
+    relevant_filepaths: list[str] = None,
+    modify_files_dict: dict[str, dict[str, str]] = None,
+) -> str:
     current_fcr_index = (
         [i for i, fcr in enumerate(fcrs) if not fcr.is_completed][0]
         if any(not fcr.is_completed for fcr in fcrs)
         else 0
     )
     combined_request_unformatted = "{relevant_files}# Plan of Code Changes\n\nIn order to solve the user's request you will need to modify or create {files_to_modify_list}.{completed_prompt} Here are the instructions for the edits you need to make:\n\n<files_to_change>\n{files_to_modify}\n</files_to_change>"
-    completed_prompt = "" if current_fcr_index == 0 else f" You have already completed {current_fcr_index} of the {len(fcrs)} required changes."
+    completed_prompt = (
+        ""
+        if current_fcr_index == 0
+        else f" You have already completed {current_fcr_index} of the {len(fcrs)} required changes."
+    )
     if modify_files_dict:
         combined_request_unformatted += "\nThe above files reflect the latest updates you have already made. READ THROUGH THEM CAREFULLY TO FIGURE OUT WHAT YOUR NEXT STEPS ARE. Call the make_change, create_file or submit_task tools."
     files_to_modify_string = ""
@@ -660,12 +694,18 @@ def create_user_message( # TODO: has non-deterministic behavior
     files_to_modify_messages = {fcr.filename: "" for fcr in fcrs}
     for i, fcr in enumerate(fcrs):
         # first add the instructions to the user message
-        if i < current_fcr_index: # already done
-            files_to_modify_messages[fcr.filename] += f"\n\nYou have already {past_tense_mapping[fcr.change_type]} {fcr.filename}, where the specific instructions were to:\n\n{fcr.instructions}"
+        if i < current_fcr_index:  # already done
+            files_to_modify_messages[
+                fcr.filename
+            ] += f"\n\nYou have already {past_tense_mapping[fcr.change_type]} {fcr.filename}, where the specific instructions were to:\n\n{fcr.instructions}"
         elif i == current_fcr_index:
-            files_to_modify_messages[fcr.filename] += f"\n\nYour current task is to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n{fcr.instructions}"
+            files_to_modify_messages[
+                fcr.filename
+            ] += f"\n\nYour current task is to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n{fcr.instructions}"
         else:
-            files_to_modify_messages[fcr.filename] += f"\n\nYou will later need to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n{fcr.instructions}"
+            files_to_modify_messages[
+                fcr.filename
+            ] += f"\n\nYou will later need to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n{fcr.instructions}"
         # now add the contents of the file to the user message
         # only add the contents if this is the last fcr for the filename
         last_occurence = i
@@ -676,12 +716,20 @@ def create_user_message( # TODO: has non-deterministic behavior
         if last_occurence == i:
             if fcr.change_type == "modify":
                 if not modify_files_dict:
-                    files_to_modify_messages[fcr.filename] += f"\n\n<file_to_modify filename=\"{fcr.filename}\">\n{cloned_repo.get_file_contents(file_path=fcr.filename)}\n</file_to_modify>"
-                else: # show the latest contents of the file
-                    latest_file_contents = get_latest_contents(fcr.filename, cloned_repo, modify_files_dict)
-                    files_to_modify_messages[fcr.filename] += f"\n\n<file_to_modify filename=\"{fcr.filename}\">\n{latest_file_contents}\n</file_to_modify>"
+                    files_to_modify_messages[
+                        fcr.filename
+                    ] += f'\n\n<file_to_modify filename="{fcr.filename}">\n{cloned_repo.get_file_contents(file_path=fcr.filename)}\n</file_to_modify>'
+                else:  # show the latest contents of the file
+                    latest_file_contents = get_latest_contents(
+                        fcr.filename, cloned_repo, modify_files_dict
+                    )
+                    files_to_modify_messages[
+                        fcr.filename
+                    ] += f'\n\n<file_to_modify filename="{fcr.filename}">\n{latest_file_contents}\n</file_to_modify>'
             elif fcr.change_type == "create":
-                files_to_modify_messages[fcr.filename] += f"\n<file_to_create filename=\"{fcr.filename}\">\n{fcr.instructions}\n</file_to_create>"
+                files_to_modify_messages[
+                    fcr.filename
+                ] += f'\n<file_to_create filename="{fcr.filename}">\n{fcr.instructions}\n</file_to_create>'
     # now we combine the messages into a single string
     already_added_files = set([])
     for fcr in fcrs[::-1]:
@@ -694,49 +742,74 @@ def create_user_message( # TODO: has non-deterministic behavior
     for fcr in fcrs:
         if fcr.filename not in deduped_file_names:
             deduped_file_names.append(fcr.filename)
-    combined_request_message = combined_request_unformatted \
-        .replace("{files_to_modify}", files_to_modify_string.lstrip('\n')) \
-        .replace("{files_to_modify_list}", english_join(deduped_file_names)) \
+    combined_request_message = (
+        combined_request_unformatted.replace(
+            "{files_to_modify}", files_to_modify_string.lstrip("\n")
+        )
+        .replace("{files_to_modify_list}", english_join(deduped_file_names))
         .replace("{completed_prompt}", completed_prompt)
+    )
     precomputed_file_list = cloned_repo.get_file_list()
     if relevant_filepaths:
         relevant_file_paths_string = ""
         for relevant_file_path in relevant_filepaths:
             if relevant_file_path not in precomputed_file_list:
-                logger.warning(f"Relevant file path {relevant_file_path} not found in cloned repo.") # the relevant file paths aren't well formatted, so we get some issues here
+                logger.warning(
+                    f"Relevant file path {relevant_file_path} not found in cloned repo."
+                )  # the relevant file paths aren't well formatted, so we get some issues here
                 continue
             if relevant_file_path in [fcr.filename for fcr in fcrs]:
-                logger.warning(f"Relevant file path {relevant_file_path} is already in the list of files to modify.")
+                logger.warning(
+                    f"Relevant file path {relevant_file_path} is already in the list of files to modify."
+                )
                 continue
-            relevant_file_paths_string += f"\n\n<relevant_module filename=\"{relevant_file_path}\">\n{cloned_repo.get_file_contents(file_path=relevant_file_path)}\n</relevant_module>"
-        relevant_file_paths_string = f"<relevant_files>\n{relevant_file_paths_string}\n</relevant_files>"
-        combined_request_message = combined_request_message.replace("{relevant_files}", f'\nHere are some relevant modules, such as useful helper functions for resolving this issue. You likely will not need to edit these modules but may need to import them or understand their usage interface: {relevant_file_paths_string}\n')
+            relevant_file_paths_string += f'\n\n<relevant_module filename="{relevant_file_path}">\n{cloned_repo.get_file_contents(file_path=relevant_file_path)}\n</relevant_module>'
+        relevant_file_paths_string = (
+            f"<relevant_files>\n{relevant_file_paths_string}\n</relevant_files>"
+        )
+        combined_request_message = combined_request_message.replace(
+            "{relevant_files}",
+            f"\nHere are some relevant modules, such as useful helper functions for resolving this issue. You likely will not need to edit these modules but may need to import them or understand their usage interface: {relevant_file_paths_string}\n",
+        )
     else:
-        combined_request_message = combined_request_message.replace("{relevant_files}", "")
-    user_message = f"<user_request>\n{request}\n</user_request>\n{combined_request_message}"
+        combined_request_message = combined_request_message.replace(
+            "{relevant_files}", ""
+        )
+    user_message = (
+        f"<user_request>\n{request}\n</user_request>\n{combined_request_message}"
+    )
     return user_message
 
+
 # find out if any changes were made by matching the contents of the files
-def changes_made(modify_files_dict: dict[str, dict[str, str]], previous_modify_files_dict) -> bool:
+def changes_made(
+    modify_files_dict: dict[str, dict[str, str]], previous_modify_files_dict
+) -> bool:
     # check if there are any changes made
     for file_name, file_data in modify_files_dict.items():
         if file_name not in previous_modify_files_dict:
-            if file_data['contents'] != file_data["original_contents"]:
+            if file_data["contents"] != file_data["original_contents"]:
                 return True
             else:
                 continue
-        if file_data['contents'] != previous_modify_files_dict[file_name]['contents']:
+        if file_data["contents"] != previous_modify_files_dict[file_name]["contents"]:
             return True
     return False
+
 
 past_tense_mapping = {
     "modify": "modified",
     "create": "created",
 }
 
+
 # Magic
 def ordinal(n: int):
-    return "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4]) # noqa
+    return "%d%s" % (
+        n,
+        "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4],
+    )  # noqa
+
 
 def render_plan(fcrs: list[FileChangeRequest]) -> str:
     current_fcr_index = (
@@ -752,7 +825,8 @@ def render_plan(fcrs: list[FileChangeRequest]) -> str:
             plan += f"\n\nTask {i}: Your CURRENT TASK is to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n{fcr.instructions}"
         else:
             plan += f"\n\nTask {i}: You will later need to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n{fcr.instructions}"
-    return plan.strip('\n')
+    return plan.strip("\n")
+
 
 # get current task being worked on
 def get_current_task_index(fcrs: list[FileChangeRequest]) -> str:
@@ -762,6 +836,7 @@ def get_current_task_index(fcrs: list[FileChangeRequest]) -> str:
             break
     return current_fcr_index
 
+
 def render_current_task(fcrs: list[FileChangeRequest]) -> str:
     current_fcr_index = 0
     for current_fcr_index, fcr in enumerate(fcrs):
@@ -770,18 +845,26 @@ def render_current_task(fcrs: list[FileChangeRequest]) -> str:
     fcr = fcrs[current_fcr_index]
     return f"The CURRENT TASK is to {fcr.change_type} {fcr.filename}. The specific instructions to do so are listed below:\n\n<current_task>\n{fcr.instructions}\n</current_task>"
 
+
 # return replaces per fcr, -1 if there are any issues
 def get_replaces_per_fcr(fcr: FileChangeRequest) -> int:
     if fcr.change_type == "create":
         return 1
     original_code_pattern = r"<original_code(?: file_path=\".*?\")?(?: index=\"\d+\")?>(.*?)</original_code>"
-    new_code_pattern = r"<new_code(?: file_path=\".*?\")?(?: index=\"\d+\")?>(.*?)</new_code>"
-    original_code_matches = list(re.finditer(original_code_pattern, fcr.instructions, re.DOTALL))
+    new_code_pattern = (
+        r"<new_code(?: file_path=\".*?\")?(?: index=\"\d+\")?>(.*?)</new_code>"
+    )
+    original_code_matches = list(
+        re.finditer(original_code_pattern, fcr.instructions, re.DOTALL)
+    )
     new_code_matches = list(re.finditer(new_code_pattern, fcr.instructions, re.DOTALL))
     if len(original_code_matches) != len(new_code_matches):
-        logger.error(f"Mismatched old/new code sections in fcr! {len(original_code_matches)} to {len(new_code_matches)}")
+        logger.error(
+            f"Mismatched old/new code sections in fcr! {len(original_code_matches)} to {len(new_code_matches)}"
+        )
         return -1
     return len(original_code_matches)
+
 
 # returns the old/new code change as a function call
 def compile_fcr(fcr: FileChangeRequest, index: int) -> str:
@@ -803,12 +886,19 @@ def compile_fcr(fcr: FileChangeRequest, index: int) -> str:
         flags = "\n<replace_all>true</replace_all>"
     else:
         flags = ""
-    return DEFAULT_FUNCTION_CALL.format(justification=parsed_fcr["justification"], file_path=parsed_fcr["file_path"], original_code=parsed_fcr["original_code"][index], new_code=parsed_fcr["new_code"][index], flags=flags)
+    return DEFAULT_FUNCTION_CALL.format(
+        justification=parsed_fcr["justification"],
+        file_path=parsed_fcr["file_path"],
+        original_code=parsed_fcr["original_code"][index],
+        new_code=parsed_fcr["new_code"][index],
+        flags=flags,
+    )
+
 
 # return the number of tasks completed
 def tasks_completed(fcrs: list[FileChangeRequest]):
-    return sum(bool(fcr.is_completed)
-           for fcr in fcrs)
+    return sum(bool(fcr.is_completed) for fcr in fcrs)
+
 
 def generate_diffs(modify_files_dict: dict[str, dict[str, str]]) -> dict[str, str]:
     changes_made = False
@@ -820,25 +910,35 @@ def generate_diffs(modify_files_dict: dict[str, dict[str, str]]) -> dict[str, st
             changes_made = True
     return changes_made
 
-def generate_diff_string(modify_files_dict: dict[str, dict[str, str]]) -> dict[str, str]:
+
+def generate_diff_string(
+    modify_files_dict: dict[str, dict[str, str]]
+) -> dict[str, str]:
     diff_string = ""
     for file_name, file_data in modify_files_dict.items():
         new_contents = file_data["contents"]
         original_contents = file_data["original_contents"]
-        diff_string += f"{file_name}\n{generate_diff(original_contents, new_contents)}\n"
+        diff_string += (
+            f"{file_name}\n{generate_diff(original_contents, new_contents)}\n"
+        )
     return diff_string
+
 
 def create_tool_call_response(tool_name: str, tool_call_response_contents: str) -> str:
     return f"<function_results>\n<result>\n<tool_name>{tool_name}<tool_name>\n<stdout>\n{tool_call_response_contents}\n</stdout>\n</result>\n</function_results>"
 
-def get_latest_contents(file_name: str, cloned_repo: ClonedRepo, modify_files_dict: dict) -> str:
+
+def get_latest_contents(
+    file_name: str, cloned_repo: ClonedRepo, modify_files_dict: dict
+) -> str:
     if file_name in modify_files_dict and "contents" in modify_files_dict[file_name]:
         return modify_files_dict[file_name]["contents"]
     try:
         return cloned_repo.get_file_contents(file_name)
     except FileNotFoundError:
         return ""
-    
+
+
 def get_surrounding_lines(file_contents: str, best_match: str) -> tuple[str, str]:
     best_match_index = file_contents.find(best_match)
     surrounding_lines_before = "\n"
@@ -853,7 +953,9 @@ def get_surrounding_lines(file_contents: str, best_match: str) -> tuple[str, str
 
         # Find the index of the fifth \n after the best_match_index
         best_match_end = best_match_index + len(best_match)
-        for _ in range(NUM_LINES_SURROUNDING * 2): # 2x the number of lines surrounding after for now
+        for _ in range(
+            NUM_LINES_SURROUNDING * 2
+        ):  # 2x the number of lines surrounding after for now
             best_match_end = file_contents.find("\n", best_match_end + 1)
             if best_match_end == -1:
                 best_match_end = len(file_contents)
@@ -863,6 +965,7 @@ def get_surrounding_lines(file_contents: str, best_match: str) -> tuple[str, str
         surrounding_lines_after = file_contents[best_match_index:best_match_end]
     return surrounding_lines_before, surrounding_lines_after
 
+
 def check_make_change_tool_call(tool_call, error_message):
     for key in ["file_name", "original_code", "new_code"]:
         if key not in tool_call:
@@ -870,10 +973,15 @@ def check_make_change_tool_call(tool_call, error_message):
             if key in ["new_code", "original_code"]:
                 error_message += "\n\nIt is likely the reason why you have missed these keys is because the original_code block you provided is WAY TOO LARGE and as such you have missed the closing xml tags. REDUCE the original_code block to be under 10 lines of code!"
     if not tool_call.get("original_code", "").strip():
-        error_message = EMPTY_ORIGINAL_CODE_PROMPT # TODO: write a custom prompt for this
+        error_message = (
+            EMPTY_ORIGINAL_CODE_PROMPT  # TODO: write a custom prompt for this
+        )
     return error_message
 
-def validate_indents(original_code, new_code, file_contents, correct_indent, rstrip_original_code):
+
+def validate_indents(
+    original_code, new_code, file_contents, correct_indent, rstrip_original_code
+):
     new_code_lines = new_code.split("\n")
     original_code_lines = original_code.split("\n")
     if len(original_code_lines) > 1:
@@ -894,6 +1002,7 @@ def validate_indents(original_code, new_code, file_contents, correct_indent, rst
         original_code = f'{correct_indent * " "}{original_code.lstrip()}'
     return original_code, new_code, original_code_lines
 
+
 def handle_submit_task(modify_files_dict, llm_state):
     current_fcr_index = get_current_task_index(llm_state["fcrs"])
     llm_state["completed_changes_per_fcr"][current_fcr_index] += 1
@@ -905,13 +1014,17 @@ def handle_submit_task(modify_files_dict, llm_state):
         if llm_state["done_counter"] > 3:
             llm_response = "DONE"
         else:
-            llm_response = "ERROR\n\nNo changes were made. Please continue working on your task."
+            llm_response = (
+                "ERROR\n\nNo changes were made. Please continue working on your task."
+            )
     for fcr in llm_state["fcrs"]:
         if not fcr.is_completed:
             fcr.is_completed = True
             break
     llm_state["attempt_count"] = 0
-    llm_state['current_task'] = render_current_task(llm_state["fcrs"]) # rerender the current task
+    llm_state["current_task"] = render_current_task(
+        llm_state["fcrs"]
+    )  # rerender the current task
     llm_response = f"SUCCESS\n\nThe previous task is now complete. Please move on to the next task. {llm_state['current_task']}"
     if all(fcr.is_completed for fcr in llm_state["fcrs"]):
         llm_response = "DONE"
@@ -919,7 +1032,10 @@ def handle_submit_task(modify_files_dict, llm_state):
     llm_state["visited_set"] = set()
     return llm_response, llm_state
 
-def handle_create_file(cloned_repo, modify_files_dict, tool_name, tool_call, llm_state) -> tuple[str, dict]:
+
+def handle_create_file(
+    cloned_repo, modify_files_dict, tool_name, tool_call, llm_state
+) -> tuple[str, dict]:
     error_message = "".join(
         f"No {key} was provided in the {tool_name} tool call. Call the tool again but this time provide the {key}.\n"
         for key in tool_call_parameters[tool_name]
@@ -942,7 +1058,10 @@ def handle_create_file(cloned_repo, modify_files_dict, tool_name, tool_call, llm
             error_message = f"The directory {new_file_path} does not exist. Make sure the new file you want to create exists within an existing directory!"
             # if no issues, create the file by placing it in modify_files_dict
     if not error_message:
-        modify_files_dict[new_file_name] = {"contents": new_file_contents, "original_contents": ""}
+        modify_files_dict[new_file_name] = {
+            "contents": new_file_contents,
+            "original_contents": "",
+        }
         current_fcr_index = get_current_task_index(llm_state["fcrs"])
         # set contents
         if new_file_name not in modify_files_dict:
@@ -951,31 +1070,40 @@ def handle_create_file(cloned_repo, modify_files_dict, tool_name, tool_call, llm
                 "original_contents": new_file_contents,
             }
         llm_response = f"SUCCESS\n\nThe following changes have been applied:\n\n```diff\n{generate_diff(new_file_contents, new_file_contents, n=25)}\n```\n{self_review_prompt.format(current_task=llm_state['current_task'])}"
-        modify_files_dict[new_file_name]['contents'] = new_file_contents
-        llm_response, llm_state = finish_applying_changes(modify_files_dict, llm_state, current_fcr_index)
+        modify_files_dict[new_file_name]["contents"] = new_file_contents
+        llm_response, llm_state = finish_applying_changes(
+            modify_files_dict, llm_state, current_fcr_index
+        )
     else:
         llm_response = f"ERROR\n\n{error_message}"
     return llm_response, modify_files_dict, llm_state
 
-def finish_applying_changes(modify_files_dict, llm_state, current_fcr_index):
 
-    if generate_diffs(modify_files_dict): # check if there are any changes made
+def finish_applying_changes(modify_files_dict, llm_state, current_fcr_index):
+    if generate_diffs(modify_files_dict):  # check if there are any changes made
         llm_response = "DONE"
     else:
-        llm_response = "ERROR\n\nNo changes were made. Please continue working on your task."
+        llm_response = (
+            "ERROR\n\nNo changes were made. Please continue working on your task."
+        )
     for fcr in llm_state["fcrs"]:
         if not fcr.is_completed:
             fcr.is_completed = True
             break
-    llm_state['current_task'] = render_current_task(llm_state["fcrs"]) # rerender the current task
+    llm_state["current_task"] = render_current_task(
+        llm_state["fcrs"]
+    )  # rerender the current task
     llm_state["attempt_count"] = 0
     llm_response = f"SUCCESS\n\nThe previous task is now complete. Please move on to the next task. {llm_state['current_task']}"
     if all(fcr.is_completed for fcr in llm_state["fcrs"]):
         llm_response = "DONE"
 
-    llm_state["attempt_lazy_change"] = True # successful application with no warning message means we can attempt lazy change again
+    llm_state[
+        "attempt_lazy_change"
+    ] = True  # successful application with no warning message means we can attempt lazy change again
     llm_state["completed_changes_per_fcr"][current_fcr_index] += 1
     return llm_response, llm_state
+
 
 def handle_function_call(
     cloned_repo: ClonedRepo,
@@ -991,29 +1119,48 @@ def handle_function_call(
     if tool_name == "submit_task" or tool_name == "submit_result":
         llm_response, llm_state = handle_submit_task(modify_files_dict, llm_state)
     elif tool_name == "no_tool_call":
-        llm_response = NO_TOOL_CALL_PROMPT  
+        llm_response = NO_TOOL_CALL_PROMPT
     elif tool_name == "make_change":
         error_message = ""
         error_message = check_make_change_tool_call(tool_call, error_message)
         warning_message = ""
         if not error_message:
-            for _ in range(1): # this is super jank code but it works for now - only for easier error message handling
+            for _ in range(
+                1
+            ):  # this is super jank code but it works for now - only for easier error message handling
                 # ensure the file we are editting exists and is in modify_files_dict
                 if "file_name" in tool_call:
                     file_name = tool_call["file_name"].strip()
                     # if not in codebase or has not been created
-                    if not os.path.exists(os.path.join(cloned_repo.repo_dir, file_name)) and file_name not in modify_files_dict:
+                    if (
+                        not os.path.exists(
+                            os.path.join(cloned_repo.repo_dir, file_name)
+                        )
+                        and file_name not in modify_files_dict
+                    ):
                         error_message += f"The file {file_name} does not exist. Make sure that you have spelled the file name correctly!\n"
                         break
-                llm_state['initial_check_results'][file_name] = get_check_results(file_name, get_latest_contents(file_name, cloned_repo, modify_files_dict)) # TODO: consider not overriding this when we see the same file twice
-                original_code = strip_triple_quotes(tool_call["original_code"]).strip("\n")
-                new_code = rstrip_lines(strip_triple_quotes(tool_call["new_code"]).strip("\n"))
+                llm_state["initial_check_results"][file_name] = get_check_results(
+                    file_name,
+                    get_latest_contents(file_name, cloned_repo, modify_files_dict),
+                )  # TODO: consider not overriding this when we see the same file twice
+                original_code = strip_triple_quotes(tool_call["original_code"]).strip(
+                    "\n"
+                )
+                new_code = rstrip_lines(
+                    strip_triple_quotes(tool_call["new_code"]).strip("\n")
+                )
                 replace_all = tool_call.get("replace_all", "false").strip() == "true"
                 # get the latest contents of the file
-                file_contents = get_latest_contents(file_name, cloned_repo, modify_files_dict)
+                file_contents = get_latest_contents(
+                    file_name, cloned_repo, modify_files_dict
+                )
                 # if the file is not in modify_files_dict, add it
                 if file_name not in modify_files_dict:
-                    modify_files_dict[file_name] = {"contents": file_contents, "original_contents": file_contents}
+                    modify_files_dict[file_name] = {
+                        "contents": file_contents,
+                        "original_contents": file_contents,
+                    }
                 warning_message = ""
 
                 # handle special case where there are \r\n characters in the current chunk as this will cause search and replace to ALWAYS fail
@@ -1021,16 +1168,25 @@ def handle_function_call(
                     # replace in current chunk
                     file_contents = file_contents.replace("\r\n", "\n")
                 # check to see that the original_code is in the new_code by trying all possible indentations
-                correct_indent, rstrip_original_code = manual_code_check(file_contents, original_code)
+                correct_indent, rstrip_original_code = manual_code_check(
+                    file_contents, original_code
+                )
                 # if the original_code couldn't be found in the chunk we need to let the llm know
                 if original_code not in file_contents and correct_indent == -1:
-                    if new_code.strip() and contains_ignoring_whitespace(new_code, file_contents): # TODO: this should go after checking if it's in a different file
+                    if new_code.strip() and contains_ignoring_whitespace(
+                        new_code, file_contents
+                    ):  # TODO: this should go after checking if it's in a different file
                         error_message = "Your original_code was not found in the file but your new_code was found. This is likely because this fix has already been applied. Validate that this requested feature has already been applied. If so, call the submit_task tool."
                         break
                     # TODO: add weighted ratio to the choices, penalize whitespace less
-                    best_match, best_score = find_best_match(original_code, file_contents) # TODO: this should check other files for exact to 90% match
+                    best_match, best_score = find_best_match(
+                        original_code, file_contents
+                    )  # TODO: this should check other files for exact to 90% match
                     if best_score > 80:
-                        surrounding_lines_before, surrounding_lines_after = get_surrounding_lines(file_contents, best_match)
+                        (
+                            surrounding_lines_before,
+                            surrounding_lines_after,
+                        ) = get_surrounding_lines(file_contents, best_match)
                         START_MARKER = "\n===== START =====\n"
                         END_MARKER = "\n===== END =====\n"
 
@@ -1039,43 +1195,111 @@ def handle_function_call(
 
                         for indentation in range(0, 10):
                             indented_original_code = indent(original_code, indentation)
-                            score = rapidfuzz.fuzz.ratio(indented_original_code, best_match)
+                            score = rapidfuzz.fuzz.ratio(
+                                indented_original_code, best_match
+                            )
                             if score > best_indent_score:
                                 best_indent_score = score
                                 best_indent = indentation
 
-                        first_diff_text = surrounding_lines_before + START_MARKER + indent(original_code, best_indent) + END_MARKER + surrounding_lines_after
-                        second_diff_text = surrounding_lines_before + START_MARKER + best_match + END_MARKER + surrounding_lines_after
-                        best_match_diff = generate_diff(first_diff_text, second_diff_text, n=20) # this is bounded to 14 * 2 lines of context
-                        error_message = f"The original_code provided does not appear to be present in file {file_name}. Your provided original_code contains:\n```\n{tool_call['original_code']}\n```\nDid you mean the following?\n```\n{best_match}\n```\nHere is the difference between the original_code and the most similar existing code from the file, along with its surrounding code:\n```\n{best_match_diff}\n```\n" + DID_YOU_MEAN_PROMPT
+                        first_diff_text = (
+                            surrounding_lines_before
+                            + START_MARKER
+                            + indent(original_code, best_indent)
+                            + END_MARKER
+                            + surrounding_lines_after
+                        )
+                        second_diff_text = (
+                            surrounding_lines_before
+                            + START_MARKER
+                            + best_match
+                            + END_MARKER
+                            + surrounding_lines_after
+                        )
+                        best_match_diff = generate_diff(
+                            first_diff_text, second_diff_text, n=20
+                        )  # this is bounded to 14 * 2 lines of context
+                        error_message = (
+                            f"The original_code provided does not appear to be present in file {file_name}. Your provided original_code contains:\n```\n{tool_call['original_code']}\n```\nDid you mean the following?\n```\n{best_match}\n```\nHere is the difference between the original_code and the most similar existing code from the file, along with its surrounding code:\n```\n{best_match_diff}\n```\n"
+                            + DID_YOU_MEAN_PROMPT
+                        )
                     else:
                         # check other files, this code should skip if there are no other files
-                        all_file_contents = list(dict.fromkeys([get_latest_contents(fcr.filename, cloned_repo, modify_files_dict) for fcr in llm_state["fcrs"] if fcr.filename != file_name]))
-                        all_file_names = list(dict.fromkeys([fcr.filename for fcr in llm_state["fcrs"] if fcr.filename != file_name]))
-                        best_matches = [find_best_match(original_code, file_contents) for file_contents in all_file_contents]
-                        for (best_match, best_score), other_file_name in zip(best_matches, all_file_names):
+                        all_file_contents = list(
+                            dict.fromkeys(
+                                [
+                                    get_latest_contents(
+                                        fcr.filename, cloned_repo, modify_files_dict
+                                    )
+                                    for fcr in llm_state["fcrs"]
+                                    if fcr.filename != file_name
+                                ]
+                            )
+                        )
+                        all_file_names = list(
+                            dict.fromkeys(
+                                [
+                                    fcr.filename
+                                    for fcr in llm_state["fcrs"]
+                                    if fcr.filename != file_name
+                                ]
+                            )
+                        )
+                        best_matches = [
+                            find_best_match(original_code, file_contents)
+                            for file_contents in all_file_contents
+                        ]
+                        for (best_match, best_score), other_file_name in zip(
+                            best_matches, all_file_names
+                        ):
                             if best_score > 80:
-                                surrounding_lines_before, surrounding_lines_after = get_surrounding_lines(file_contents, best_match)
+                                (
+                                    surrounding_lines_before,
+                                    surrounding_lines_after,
+                                ) = get_surrounding_lines(file_contents, best_match)
                                 START_MARKER = "\n===== START =====\n"
                                 END_MARKER = "\n===== END =====\n"
-                                first_diff_text = surrounding_lines_before + START_MARKER + tool_call['original_code'] + END_MARKER + surrounding_lines_after
-                                second_diff_text = surrounding_lines_before + START_MARKER + best_match + END_MARKER + surrounding_lines_after
-                                best_match_diff = generate_diff(first_diff_text, second_diff_text, n=14) # this is bounded to 14 * 2 lines of 
-                                if first_diff_text == second_diff_text or best_match_diff.strip() == "":
+                                first_diff_text = (
+                                    surrounding_lines_before
+                                    + START_MARKER
+                                    + tool_call["original_code"]
+                                    + END_MARKER
+                                    + surrounding_lines_after
+                                )
+                                second_diff_text = (
+                                    surrounding_lines_before
+                                    + START_MARKER
+                                    + best_match
+                                    + END_MARKER
+                                    + surrounding_lines_after
+                                )
+                                best_match_diff = generate_diff(
+                                    first_diff_text, second_diff_text, n=14
+                                )  # this is bounded to 14 * 2 lines of
+                                if (
+                                    first_diff_text == second_diff_text
+                                    or best_match_diff.strip() == ""
+                                ):
                                     error_message = f"The original_code provided does not appear to be present in file {file_name}. Your provided original_code contains:\n```\n{tool_call['original_code']}\n```\nThe code was found in {other_file_name}. Call make_changes again with the correct file name."
                                 else:
                                     error_message = f"The original_code provided does not appear to be present in file {file_name}. Your provided original_code contains:\n```\n{tool_call['original_code']}\n```\nDid you mean the {other_file_name} file?\n```\n{best_match}\n```\nHere is the diff and surrounding code:\n```\n{best_match_diff}\n```"
                                 break
-                        else: # if no other file match was found then return this block
+                        else:  # if no other file match was found then return this block
                             error_message = ORIGINAL_CODE_NOT_FOUND_PROMPT.format(
-                                original_code=tool_call['original_code'],
-                                file_path=file_name
+                                original_code=tool_call["original_code"],
+                                file_path=file_name,
                             )
                             # print(error_message)
                             # breakpoint()
                     break
                 # ensure original_code and new_code has the correct indents
-                original_code, new_code, original_code_lines = validate_indents(original_code, new_code, file_contents, correct_indent, rstrip_original_code)
+                original_code, new_code, original_code_lines = validate_indents(
+                    original_code,
+                    new_code,
+                    file_contents,
+                    correct_indent,
+                    rstrip_original_code,
+                )
                 # before we apply changes make sure original_code is unique inside current_chunk
                 current_chunk_occurences = file_contents.count(original_code)
                 if current_chunk_occurences > 1 and not replace_all:
@@ -1087,9 +1311,25 @@ def handle_function_call(
                         min_diff = inf
                         file_contents_lines = file_contents.split("\n")
                         for index, _line in enumerate(file_contents_lines):
-                            if all(original_line.lstrip() == file_contents_line.lstrip() for original_line, file_contents_line in zip(original_code_lines, file_contents_lines[index:index + len(original_code_lines)])):
+                            if all(
+                                original_line.lstrip() == file_contents_line.lstrip()
+                                for original_line, file_contents_line in zip(
+                                    original_code_lines,
+                                    file_contents_lines[
+                                        index : index + len(original_code_lines)
+                                    ],
+                                )
+                            ):
                                 # if abs(len(line) - len(first_line)) < min_diff:
-                                current_diff = sum(abs(len(original_line) - len(file_contents_line)) for original_line, file_contents_line in zip(original_code_lines, file_contents_lines[index:index + len(original_code_lines)]))
+                                current_diff = sum(
+                                    abs(len(original_line) - len(file_contents_line))
+                                    for original_line, file_contents_line in zip(
+                                        original_code_lines,
+                                        file_contents_lines[
+                                            index : index + len(original_code_lines)
+                                        ],
+                                    )
+                                )
                                 if current_diff < min_diff:
                                     min_diff = current_diff
                                     start_line = index
@@ -1097,10 +1337,15 @@ def handle_function_call(
                                         break
 
                         if start_line == -1:
-                            error_message = f"The original_code is not unique to the file `{file_name}`. It appears {current_chunk_occurences} times in the file. If you would like to replace all occurrences, add a `replace_all` parameter set to `true`. Otherwise, for the `original_code` to be valid, it must be unique within the file.\n\n" + MULTIPLE_OCCURRENCES_PROMPT
+                            error_message = (
+                                f"The original_code is not unique to the file `{file_name}`. It appears {current_chunk_occurences} times in the file. If you would like to replace all occurrences, add a `replace_all` parameter set to `true`. Otherwise, for the `original_code` to be valid, it must be unique within the file.\n\n"
+                                + MULTIPLE_OCCURRENCES_PROMPT
+                            )
                             break
 
-                        original_code_lines = file_contents_lines[start_line:start_line + len(original_code_lines)]
+                        original_code_lines = file_contents_lines[
+                            start_line : start_line + len(original_code_lines)
+                        ]
                         # INDENTATION FIX END #
 
                         # Then we find all the matches and their surrounding lines.
@@ -1108,21 +1353,53 @@ def handle_function_call(
                         surrounding_lines = 10
 
                         for i in range(len(file_contents_lines)):
-                            if "\n".join(original_code_lines) == "\n".join(file_contents_lines[i:i + len(original_code_lines)]):
-                                match_ = "\n".join(file_contents_lines[max(0, i - surrounding_lines):i])
+                            if "\n".join(original_code_lines) == "\n".join(
+                                file_contents_lines[i : i + len(original_code_lines)]
+                            ):
+                                match_ = "\n".join(
+                                    file_contents_lines[
+                                        max(0, i - surrounding_lines) : i
+                                    ]
+                                )
                                 match_ += "\n" + "===== START =====" + "\n"
-                                match_ += "\n".join(file_contents_lines[i:i + len(original_code_lines)])
+                                match_ += "\n".join(
+                                    file_contents_lines[
+                                        i : i + len(original_code_lines)
+                                    ]
+                                )
                                 match_ += "\n" + "===== END =====" + "\n"
-                                match_ += "\n".join(file_contents_lines[i + len(original_code_lines):i + len(original_code_lines) + surrounding_lines])
+                                match_ += "\n".join(
+                                    file_contents_lines[
+                                        i
+                                        + len(original_code_lines) : i
+                                        + len(original_code_lines)
+                                        + surrounding_lines
+                                    ]
+                                )
                                 matches.append(match_)
 
-                        error_message = f"The original_code is not unique to the file `{file_name}`. It appears {current_chunk_occurences} times in the file. If you would like to replace all occurrences, add a `replace_all` parameter set to `true`. Otherwise, for the `original_code` to be valid, it must be unique within the file.\n\nTo resolve this issue, please provide a unique `original_code` by including some surrounding lines for context. Make sure the selected code snippet appears only once in the file. Here are the {current_chunk_occurences} occurences of the `original_code` in the file with their surrounding lines:\n\n" + "\n\n".join([f"Occurrence {i + 1}:\n```\n{match_}\n```" for i, match_ in enumerate(matches)]) + "\n" + MULTIPLE_OCCURRENCES_PROMPT
+                        error_message = (
+                            f"The original_code is not unique to the file `{file_name}`. It appears {current_chunk_occurences} times in the file. If you would like to replace all occurrences, add a `replace_all` parameter set to `true`. Otherwise, for the `original_code` to be valid, it must be unique within the file.\n\nTo resolve this issue, please provide a unique `original_code` by including some surrounding lines for context. Make sure the selected code snippet appears only once in the file. Here are the {current_chunk_occurences} occurences of the `original_code` in the file with their surrounding lines:\n\n"
+                            + "\n\n".join(
+                                [
+                                    f"Occurrence {i + 1}:\n```\n{match_}\n```"
+                                    for i, match_ in enumerate(matches)
+                                ]
+                            )
+                            + "\n"
+                            + MULTIPLE_OCCURRENCES_PROMPT
+                        )
                     else:
-                        error_message = f"The original_code is not unique to the file `{file_name}`. It appears {current_chunk_occurences} times in the file. If you would like to replace all occurrences, add a `replace_all` parameter set to `true`. Otherwise, for the `original_code` to be valid, it must be unique within the file.\n\n" + MULTIPLE_OCCURRENCES_PROMPT
+                        error_message = (
+                            f"The original_code is not unique to the file `{file_name}`. It appears {current_chunk_occurences} times in the file. If you would like to replace all occurrences, add a `replace_all` parameter set to `true`. Otherwise, for the `original_code` to be valid, it must be unique within the file.\n\n"
+                            + MULTIPLE_OCCURRENCES_PROMPT
+                        )
                     break
 
                 if original_code not in file_contents:
-                    new_correct_indent, new_rstrip_original_code = manual_code_check(file_contents, new_code)
+                    new_correct_indent, new_rstrip_original_code = manual_code_check(
+                        file_contents, new_code
+                    )
                     if new_correct_indent == -1:
                         error_message = f"The original_code provided does not appear to be present in file {file_name}. Your provided original_code contains:\n```\n{tool_call['original_code']}\n```\nBut this section of code was not found anywhere inside the current file."
                     else:
@@ -1137,7 +1414,9 @@ def handle_function_call(
                 if replace_all:
                     new_file_contents = file_contents.replace(original_code, new_code)
                 else:
-                    new_file_contents = file_contents.replace(original_code, new_code, 1)
+                    new_file_contents = file_contents.replace(
+                        original_code, new_code, 1
+                    )
                 # Check if changes were made
                 if new_file_contents == file_contents:
                     logger.warning("No changes were made to the code.")
@@ -1146,32 +1425,56 @@ def handle_function_call(
 
                 # Check if the changes are valid
                 if not error_message:
-                    is_last_fcr_for_file = False # TODO: check if this is the last fcr for this file
-                    check_results = get_check_results(file_name, new_file_contents, last_fcr_for_file=is_last_fcr_for_file)
-                    check_results_message = check_results.is_worse_than_message(llm_state['initial_check_results'][file_name])
-                    failing_parse = check_results.parse_error_message if not llm_state['initial_check_results'][file_name].parse_error_message else ""
-                    current_diff = generate_diff(
-                        file_contents, new_file_contents, n=10
+                    is_last_fcr_for_file = (
+                        False  # TODO: check if this is the last fcr for this file
                     )
+                    check_results = get_check_results(
+                        file_name,
+                        new_file_contents,
+                        last_fcr_for_file=is_last_fcr_for_file,
+                    )
+                    check_results_message = check_results.is_worse_than_message(
+                        llm_state["initial_check_results"][file_name]
+                    )
+                    failing_parse = (
+                        check_results.parse_error_message
+                        if not llm_state["initial_check_results"][
+                            file_name
+                        ].parse_error_message
+                        else ""
+                    )
+                    current_diff = generate_diff(file_contents, new_file_contents, n=10)
                     if failing_parse:
                         parentheses_message = ""
                         for parentheses in ["()", "{}", "[]"]:
                             left, right = parentheses
-                            old_parentheses_diff = original_code.count(left) - original_code.count(right)
-                            new_parentheses_diff = new_code.count(left) - new_code.count(right)
+                            old_parentheses_diff = original_code.count(
+                                left
+                            ) - original_code.count(right)
+                            new_parentheses_diff = new_code.count(
+                                left
+                            ) - new_code.count(right)
                             if old_parentheses_diff != new_parentheses_diff:
                                 # handle this logic more precisely
-                                diff_parentheses = abs(old_parentheses_diff - new_parentheses_diff)
+                                diff_parentheses = abs(
+                                    old_parentheses_diff - new_parentheses_diff
+                                )
                                 parentheses_message = fix_parentheses_prompt.format(
                                     diff_parentheses=diff_parentheses,
-                                    parenthesis=left if old_parentheses_diff < new_parentheses_diff else right,
+                                    parenthesis=left
+                                    if old_parentheses_diff < new_parentheses_diff
+                                    else right,
                                     old_left_parentheses=original_code.count(left),
                                     old_right_parentheses=original_code.count(right),
                                     new_left_parentheses=new_code.count(left),
                                     new_right_parentheses=new_code.count(right),
                                 )
                                 break
-                        error_message = f"Error: Invalid code changes have been applied. You requested the following changes:\n\n```diff\n{current_diff}\n```\n\nBut it produces invalid code with the following error logs:\n```\n{failing_parse}\n```\n\n" + parentheses_message or fix_syntax_prompt
+                        error_message = (
+                            f"Error: Invalid code changes have been applied. You requested the following changes:\n\n```diff\n{current_diff}\n```\n\nBut it produces invalid code with the following error logs:\n```\n{failing_parse}\n```\n\n"
+                            + parentheses_message
+                            or fix_syntax_prompt
+                        )
                         # print(error_message)
                         break
                     elif check_results_message:
@@ -1187,12 +1490,16 @@ def handle_function_call(
                     if not fcr.is_completed:
                         fcr.is_completed = True
                         break
-                llm_state['current_task'] = render_current_task(llm_state["fcrs"]) # rerender the current task
+                llm_state["current_task"] = render_current_task(
+                    llm_state["fcrs"]
+                )  # rerender the current task
                 llm_state["attempt_count"] = 0
                 llm_response = f"SKIPPED\n\nThe previous task took too many attempts so we gave up. Please move on to the next task. {llm_state['current_task']}"
                 if all([fcr.is_completed for fcr in llm_state["fcrs"]]):
                     llm_response = "DONE"
-                llm_state["attempt_lazy_change"] = True # successful application with no warning message means we can attempt lazy change again
+                llm_state[
+                    "attempt_lazy_change"
+                ] = True  # successful application with no warning message means we can attempt lazy change again
         if not error_message:
             _diff_string = generate_diff(file_contents, new_file_contents)
             current_fcr_index = get_current_task_index(llm_state["fcrs"])
@@ -1210,24 +1517,34 @@ def handle_function_call(
                 else:
                     llm_response = f"SUCCESS\n\nThe following changes have been applied:\n\n```diff\n{generate_diff(file_contents, new_file_contents, n=25)}\n```\nThe code changes also yield the following warnings:\n```\n{warning_message}\n```\n\n{linter_warning_prompt.format(current_task=llm_state['current_task'])}"
 
-                modify_files_dict[file_name]['contents'] = new_file_contents
-                llm_state["attempt_lazy_change"] = False # no longer attempt lazy change
-            elif llm_state["completed_changes_per_fcr"][current_fcr_index] + 1 < llm_state["changes_per_fcr"][current_fcr_index]:
+                modify_files_dict[file_name]["contents"] = new_file_contents
+                llm_state[
+                    "attempt_lazy_change"
+                ] = False  # no longer attempt lazy change
+            elif (
+                llm_state["completed_changes_per_fcr"][current_fcr_index] + 1
+                < llm_state["changes_per_fcr"][current_fcr_index]
+            ):
                 # Incomplete changes, should use a different prompt realistically
                 llm_response = f"SUCCESS\n\nThe following changes have been applied:\n\n```diff\n{generate_diff(file_contents, new_file_contents, n=25)}\n```\n{self_review_prompt.format(current_task=llm_state['current_task'])}"
-                modify_files_dict[file_name]['contents'] = new_file_contents
+                modify_files_dict[file_name]["contents"] = new_file_contents
                 llm_state["attempt_lazy_change"] = False
 
                 llm_state["completed_changes_per_fcr"][current_fcr_index] += 1
             else:
                 # automatically continue case
-                modify_files_dict[file_name]['contents'] = new_file_contents
-                llm_response, llm_state = finish_applying_changes(modify_files_dict, llm_state, current_fcr_index)
+                modify_files_dict[file_name]["contents"] = new_file_contents
+                llm_response, llm_state = finish_applying_changes(
+                    modify_files_dict, llm_state, current_fcr_index
+                )
     elif tool_name == "create_file":
-        llm_response, modify_files_dict, llm_state = handle_create_file(cloned_repo, modify_files_dict, tool_name, tool_call, llm_state)
+        llm_response, modify_files_dict, llm_state = handle_create_file(
+            cloned_repo, modify_files_dict, tool_name, tool_call, llm_state
+        )
     else:
         llm_response = f"ERROR\nUnexpected tool name: {tool_name}"
     return llm_response, modify_files_dict, llm_state
+
 
 def set_fcr_change_type(
     file_change_requests: list[FileChangeRequest],
@@ -1235,37 +1552,55 @@ def set_fcr_change_type(
     renames_dict: dict[str, str] = {},
 ):
     reverse_renames = {v: k for k, v in renames_dict.items()}
+
     def get_file_contents(file_path):
         return cloned_repo.get_file_contents(reverse_renames.get(file_path, file_path))
+
     # TODO: add better suffixing
     for fcr in file_change_requests:
         if fcr.change_type == "modify":
             try:
                 get_file_contents(fcr.filename)
             except FileNotFoundError as e:
-                logger.info(f"Failed to get file contents for {fcr.filename} due to {e}")
+                logger.info(
+                    f"Failed to get file contents for {fcr.filename} due to {e}"
+                )
                 fcr.change_type = "create"
         elif fcr.change_type == "create":
             try:
                 cloned_repo.get_file_contents(fcr.filename)
-                fcr.change_type = "modify" # need better handling
+                fcr.change_type = "modify"  # need better handling
             except FileNotFoundError:
                 pass
 
-def validate_file_path(cloned_repo: ClonedRepo, file_name: str, file_dir: str, full_file_dir: str, full_file_name: str, i):
+
+def validate_file_path(
+    cloned_repo: ClonedRepo,
+    file_name: str,
+    file_dir: str,
+    full_file_dir: str,
+    full_file_name: str,
+    i,
+):
     current_error_message = ""
 
     if os.path.exists(full_file_name):
         current_error_message = f"You are trying to create the file {file_name}, which already exists. If you want to modify this file, be sure to include the <original_code></original_code> block. Otherwise, you may drop this task using the <drop>{i}</drop> marker."
     if not os.path.isdir(full_file_dir):
-        current_error_message = f"{file_dir} is a file. Make sure you have the correct directory path!"
+        current_error_message = (
+            f"{file_dir} is a file. Make sure you have the correct directory path!"
+        )
     if not os.path.exists(full_file_dir):
         similar_directories = cloned_repo.get_similar_directories(file_dir)
         if similar_directories:
-            current_error_message = f"The directory {file_dir} does not exist. Select one of the following directories:\n\n" + "\n".join(f"- {d}" for d in similar_directories)
+            current_error_message = (
+                f"The directory {file_dir} does not exist. Select one of the following directories:\n\n"
+                + "\n".join(f"- {d}" for d in similar_directories)
+            )
         else:
             current_error_message = f"The directory {file_dir} does not exist. Make sure the new file you want to create exists within an existing directory!"
     return current_error_message
+
 
 # todo: integrate this into the main function
 def get_error_message_formatted(
@@ -1275,12 +1610,14 @@ def get_error_message_formatted(
     renames_dict: dict[str, str] = {},
 ):
     set_fcr_change_type(file_change_requests, cloned_repo, renames_dict=renames_dict)
+
     def get_file_contents(file_path):
         if file_path in renames_dict.values():
             file_path = [k for k, v in renames_dict.items() if v == file_path][0]
         if file_path in updated_files:
             return updated_files[file_path]["contents"]
         return cloned_repo.get_file_contents(file_path)
+
     error_indices = []
     error_messages = []
     previous_parsed_fcrs = []
@@ -1291,14 +1628,23 @@ def get_error_message_formatted(
             except FileNotFoundError as e:
                 for file_path in cloned_repo.get_file_list():
                     if file_path.endswith(file_change_request.filename):
-                        logger.info(f"Found similar file {file_change_request.filename} at {file_path}")
+                        logger.info(
+                            f"Found similar file {file_change_request.filename} at {file_path}"
+                        )
                         file_contents = get_file_contents(file_path)
                         file_change_request.filename = file_path
                 else:
                     parsed_fcr = parse_fcr(file_change_request)
-                    if parsed_fcr["original_code"] and parsed_fcr["original_code"][0].strip():
-                        logger.warning(f"Failed to get file contents for {file_change_request.filename} due to {e}")
-                        error_messages.append(f"The file `{file_change_request.filename}` does not exist. Double-check your spelling.")
+                    if (
+                        parsed_fcr["original_code"]
+                        and parsed_fcr["original_code"][0].strip()
+                    ):
+                        logger.warning(
+                            f"Failed to get file contents for {file_change_request.filename} due to {e}"
+                        )
+                        error_messages.append(
+                            f"The file `{file_change_request.filename}` does not exist. Double-check your spelling."
+                        )
                         error_indices.append(i)
                     else:
                         file_change_request.change_type = "create"
@@ -1308,7 +1654,14 @@ def get_error_message_formatted(
                         full_file_dir = os.path.join(cloned_repo.repo_dir, file_dir)
                         full_file_name = os.path.join(cloned_repo.repo_dir, file_name)
 
-                        current_error_message = validate_file_path(cloned_repo, file_name, file_dir, full_file_dir, full_file_name, i)
+                        current_error_message = validate_file_path(
+                            cloned_repo,
+                            file_name,
+                            file_dir,
+                            full_file_dir,
+                            full_file_name,
+                            i,
+                        )
 
                         if current_error_message:
                             # error_message += f"<error index=\"{len(error_indices)}\">\n{current_error_message}\n</error>\n\n"
@@ -1318,88 +1671,173 @@ def get_error_message_formatted(
             parsed_fcr = parse_fcr(file_change_request)
             previous_parsed_fcrs.append(parsed_fcr)
             if not parsed_fcr["original_code"]:
-                error_messages.append(f"You forgot to provide an <original_code> block. Here is what you provided in the instructions:\n```\n{file_change_request.instructions}\n```\nIf you would like to drop this task, respond with <drop>{len(error_indices)}</drop>.")
+                error_messages.append(
+                    f"You forgot to provide an <original_code> block. Here is what you provided in the instructions:\n```\n{file_change_request.instructions}\n```\nIf you would like to drop this task, respond with <drop>{len(error_indices)}</drop>."
+                )
                 error_indices.append(i)
                 continue
             if not parsed_fcr["new_code"]:
-                error_messages.append(f"You forgot to provide a <new_code> block. Here is what you provided in the instructions:\n```\n{file_change_request.instructions}\n```\nIf you would like to drop this task, respond with <drop>{len(error_indices)}</drop>.")
+                error_messages.append(
+                    f"You forgot to provide a <new_code> block. Here is what you provided in the instructions:\n```\n{file_change_request.instructions}\n```\nIf you would like to drop this task, respond with <drop>{len(error_indices)}</drop>."
+                )
                 error_indices.append(i)
                 continue
             original_code = parsed_fcr["original_code"][0].strip("\n")
             new_code = parsed_fcr["new_code"][0].strip("\n")
             if original_code == new_code:
-                error_messages.append("<original_code> and <new_code> are the same. You must provide a different code snippet in <new_code>.")
+                error_messages.append(
+                    "<original_code> and <new_code> are the same. You must provide a different code snippet in <new_code>."
+                )
                 error_indices.append(i)
                 continue
             if not original_code:
-                error_messages.append("The <original_code> can not be empty. If you would like to append code, copy the code you want to append the new code after into the <original_code>, then copy the same code into <new_code>, then finally append the new code after <new_code>.")
+                error_messages.append(
+                    "The <original_code> can not be empty. If you would like to append code, copy the code you want to append the new code after into the <original_code>, then copy the same code into <new_code>, then finally append the new code after <new_code>."
+                )
                 error_indices.append(i)
             else:
                 # if it's present in a previous fcr's new_code, we're not concerned about it
-                original_code_in_previous_fcr = any(contains_ignoring_whitespace(original_code, fcr["new_code"][0]) for fcr in previous_parsed_fcrs[:-1])
-                
+                original_code_in_previous_fcr = any(
+                    contains_ignoring_whitespace(original_code, fcr["new_code"][0])
+                    for fcr in previous_parsed_fcrs[:-1]
+                )
+
                 # checking previous fcr in original code can lead to false positives if the previous fcr is VERY small and occurs
                 # but in practice it doesn't seem likely
                 # so we check if the previous fcr comprises > 50% of the original code
                 previous_fcr_in_original_code = False
-                previous_fcr_occurrences = [contains_ignoring_whitespace(fcr["new_code"][0], original_code) for fcr in previous_parsed_fcrs[:-1]]
+                previous_fcr_occurrences = [
+                    contains_ignoring_whitespace(fcr["new_code"][0], original_code)
+                    for fcr in previous_parsed_fcrs[:-1]
+                ]
 
                 # check if the previous fcr comprises > 50% of the original code's lines
                 # this means that it has a high chance to be valid once the previous diffs are applied
-                all_previous_occurrences = [x[1] - x[0] if x else 0 for x in previous_fcr_occurrences]
-                if all_previous_occurrences and max(all_previous_occurrences) > len(original_code.splitlines()) // 2:
+                all_previous_occurrences = [
+                    x[1] - x[0] if x else 0 for x in previous_fcr_occurrences
+                ]
+                if (
+                    all_previous_occurrences
+                    and max(all_previous_occurrences)
+                    > len(original_code.splitlines()) // 2
+                ):
                     previous_fcr_in_original_code = True
-                if not contains_ignoring_whitespace(original_code, file_contents) and not original_code_in_previous_fcr and not previous_fcr_in_original_code:
+                if (
+                    not contains_ignoring_whitespace(original_code, file_contents)
+                    and not original_code_in_previous_fcr
+                    and not previous_fcr_in_original_code
+                ):
                     threshold = 50
-                    best_match, current_best_score = find_best_match(original_code, file_contents, threshold=threshold, tokenized=True)
+                    best_match, current_best_score = find_best_match(
+                        original_code,
+                        file_contents,
+                        threshold=threshold,
+                        tokenized=True,
+                    )
                     max_indentation = find_max_indentation(file_contents)
 
                     best_score = 0
                     best_indent = 0
                     for indent_count in range(0, max_indentation, 2):
-                        match_score = fuzz.ratio(indent(original_code, indent_count), best_match)
+                        match_score = fuzz.ratio(
+                            indent(original_code, indent_count), best_match
+                        )
                         if match_score > best_score:
                             best_score = match_score
                             best_indent = indent_count
-                    
-                    too_long_message = f"\nAlso, the <original_code> block you provided is quite long, with {len(original_code.splitlines())} lines of code. Consider isolating <original_code> and <updated_code> to only the section you want to edit to avoid errors copying the code." if len(original_code.splitlines()) > 50 else ""
-                    ellipses_message = "\nYou must copy code out in full and may not use ellipses, abbreviations, or any short-hand notation in your code." if "# ..." in original_code or "// ..." in original_code else ""
+
+                    too_long_message = (
+                        f"\nAlso, the <original_code> block you provided is quite long, with {len(original_code.splitlines())} lines of code. Consider isolating <original_code> and <updated_code> to only the section you want to edit to avoid errors copying the code."
+                        if len(original_code.splitlines()) > 50
+                        else ""
+                    )
+                    ellipses_message = (
+                        "\nYou must copy code out in full and may not use ellipses, abbreviations, or any short-hand notation in your code."
+                        if "# ..." in original_code or "// ..." in original_code
+                        else ""
+                    )
 
                     if not best_match.strip():
-                        error_messages.append(f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nBut the code is no where to be found in the file. There are also no similar code snippets in this file.{too_long_message}{ellipses_message}")
+                        error_messages.append(
+                            f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nBut the code is no where to be found in the file. There are also no similar code snippets in this file.{too_long_message}{ellipses_message}"
+                        )
                         error_indices.append(i)
                         continue
                     if best_score != 100:
                         if not check_valid_parentheses(best_match):
-                            extended_match = find_smallest_valid_superspan(best_match, file_contents)
-                            if extended_match and extended_match.count("\n") - best_match.count('\n') < 20:
+                            extended_match = find_smallest_valid_superspan(
+                                best_match, file_contents
+                            )
+                            if (
+                                extended_match
+                                and extended_match.count("\n") - best_match.count("\n")
+                                < 20
+                            ):
                                 best_match = extended_match
                         if best_score > 80:
-                            error_messages.append(f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nDid you mean to modify the following code instead?\n```\n{best_match}\n```\nHere is the diff between your proposed <original_code> and the most similar code in the file:\n```diff\n{generate_diff(indent(original_code, best_indent), best_match, n=10)}\n```{too_long_message}{ellipses_message}")
+                            error_messages.append(
+                                f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nDid you mean to modify the following code instead?\n```\n{best_match}\n```\nHere is the diff between your proposed <original_code> and the most similar code in the file:\n```diff\n{generate_diff(indent(original_code, best_indent), best_match, n=10)}\n```{too_long_message}{ellipses_message}"
+                            )
                         else:
-                            best_matches = find_best_matches(original_code, file_contents, threshold=threshold, tokenized=True)
+                            best_matches = find_best_matches(
+                                original_code,
+                                file_contents,
+                                threshold=threshold,
+                                tokenized=True,
+                            )
                             if len(best_matches) > 1:
-                                best_matches_string = "\n\n".join([f"Code match {i}:\n```\n{match_}\n```" for i, (match_, score) in enumerate(best_matches)])
-                                error_messages.append(f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nDid you mean to modify one of the following pieces of code instead?\n{best_matches_string}{too_long_message}{ellipses_message}")
+                                best_matches_string = "\n\n".join(
+                                    [
+                                        f"Code match {i}:\n```\n{match_}\n```"
+                                        for i, (match_, score) in enumerate(
+                                            best_matches
+                                        )
+                                    ]
+                                )
+                                error_messages.append(
+                                    f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nDid you mean to modify one of the following pieces of code instead?\n{best_matches_string}{too_long_message}{ellipses_message}"
+                                )
                             else:
                                 # Same as case > 80
-                                error_messages.append(f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nDid you mean to modify the following code instead?\n```\n{best_match}\n```\nHere is the diff between your proposed <original_code> and the most similar code in the file:\n```diff\n{generate_diff(indent(original_code, best_indent), best_match, n=10)}\n```{too_long_message}{ellipses_message}")
+                                error_messages.append(
+                                    f"<original_code> does not exist in `{file_change_request.filename}`. Your proposed <original_code> contains:\n```\n{indent(original_code, best_indent)}\n```\nDid you mean to modify the following code instead?\n```\n{best_match}\n```\nHere is the diff between your proposed <original_code> and the most similar code in the file:\n```diff\n{generate_diff(indent(original_code, best_indent), best_match, n=10)}\n```{too_long_message}{ellipses_message}"
+                                )
                         error_indices.append(i)
                 else:
                     # Check for parentheses mismatch, helps catch downstream syntax errors
                     file_path, ext = os.path.splitext(file_change_request.filename)
-                    if ext.removeprefix(".") in ["java", "c", "cpp", "h", "hpp", "js", "ts", "jsx", "tsx", "go", "rs"]:
+                    if ext.removeprefix(".") in [
+                        "java",
+                        "c",
+                        "cpp",
+                        "h",
+                        "hpp",
+                        "js",
+                        "ts",
+                        "jsx",
+                        "tsx",
+                        "go",
+                        "rs",
+                    ]:
                         for parentheses in ["()", "{}", "[]"]:
                             left, right = parentheses
-                            old_parentheses_diff = original_code.count(left) - original_code.count(right)
-                            new_parentheses_diff = new_code.count(left) - new_code.count(right)
+                            old_parentheses_diff = original_code.count(
+                                left
+                            ) - original_code.count(right)
+                            new_parentheses_diff = new_code.count(
+                                left
+                            ) - new_code.count(right)
                             if old_parentheses_diff != new_parentheses_diff:
                                 # check for smallest surrounding span with corrected parentheses
                                 best_superspan = ""
                                 if new_parentheses_diff == 0:
-                                    best_superspan = find_smallest_valid_superspan(original_code, file_contents)
+                                    best_superspan = find_smallest_valid_superspan(
+                                        original_code, file_contents
+                                    )
                                     if best_superspan:
-                                        error_messages.append(f"You have a mismatch in parentheses in <original_code>. Your <original_code> has {original_code.count(left)} opening and {original_code.count(right)} closing parentheses:\n```\n{original_code}\n```\nYou can correct this by extending the code to the following:\n```\n{best_superspan}\n```")
+                                        error_messages.append(
+                                            f"You have a mismatch in parentheses in <original_code>. Your <original_code> has {original_code.count(left)} opening and {original_code.count(right)} closing parentheses:\n```\n{original_code}\n```\nYou can correct this by extending the code to the following:\n```\n{best_superspan}\n```"
+                                        )
                                 if not best_superspan:
                                     # use naive error message otherwise
                                     current_error_message = "You have a mismatch in parentheses in <original_code> and <new_code>."
@@ -1418,17 +1856,29 @@ def get_error_message_formatted(
             full_file_dir = os.path.join(cloned_repo.repo_dir, file_dir)
             full_file_name = os.path.join(cloned_repo.repo_dir, file_name)
 
-            current_error_message = validate_file_path(cloned_repo, file_name, file_dir, full_file_dir, full_file_name, i)
+            current_error_message = validate_file_path(
+                cloned_repo, file_name, file_dir, full_file_dir, full_file_name, i
+            )
 
             if current_error_message:
                 error_messages.append(current_error_message)
                 error_indices.append(i)
     return error_messages, error_indices
 
+
 def get_error_message_dict(*args, **kwargs):
     error_messages, error_indices = get_error_message_formatted(*args, **kwargs)
     return {i: message for i, message in zip(error_indices, error_messages)}
 
+
 def get_error_message(*args, **kwargs):
     error_messages, error_indices = get_error_message_formatted(*args, **kwargs)
-    return "\n\n".join([f"<error index=\"{i}\">\n{message}\n</error>" for i, message in enumerate(error_messages)]), error_indices
+    return (
+        "\n\n".join(
+            [
+                f'<error index="{i}">\n{message}\n</error>'
+                for i, message in enumerate(error_messages)
+            ]
+        ),
+        error_indices,
+    )

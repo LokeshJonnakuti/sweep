@@ -9,7 +9,8 @@ class CodeReviewIssue:
 
     def __hash__(self):
         return hash((self.file_name, self.issue_description, self.line_number))
-    
+
+
 @dataclass
 class PRReviewComment:
     thread_id: str
@@ -19,6 +20,7 @@ class PRReviewComment:
     is_resolved: bool
     is_outdated: bool
     author: str
+
 
 @dataclass
 class PRReviewCommentThread:
@@ -37,6 +39,7 @@ class CodeReview:
     issues: list[CodeReviewIssue]
     potential_issues: list[CodeReviewIssue]
 
+
 @dataclass
 class CodeReviewByGroup:
     file_names: list[str]
@@ -51,6 +54,7 @@ class CodeReviewByGroup:
     def get_all_file_names(self):
         return ", ".join(self.file_names)
 
+
 @dataclass
 class Patch:
     file_name: str
@@ -59,6 +63,7 @@ class Patch:
     new_start: int
     new_count: int
     changes: str
+
 
 @dataclass
 class PRChange:
@@ -70,6 +75,7 @@ class PRChange:
     patches: list[Patch]
     annotations: list[str] = field(default_factory=list)
 
+
 @dataclass
 class FunctionDef:
     file_name: str
@@ -77,20 +83,21 @@ class FunctionDef:
     start_line: int
     end_line: int
 
+
 @dataclass
 class GroupedFilesForReview:
     file_names: list[str]
-    rendered_changes: str # full rendered changes
-    rendered_patches: str # only has rendered patches
-    rendered_source_code: str # only has rendered patches
+    rendered_changes: str  # full rendered changes
+    rendered_patches: str  # only has rendered patches
+    rendered_source_code: str  # only has rendered patches
 
     @property
     def group_name(self):
         return ",".join(self.file_names)
-    
+
     def get_group_name(self):
         return ",".join(self.file_names)
-    
+
     def get_all_file_names(self):
         return ", ".join(self.file_names)
 

@@ -17,7 +17,7 @@ RUN gem install github-linguist
 
 RUN curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb && \
     dpkg -i ripgrep_13.0.0_amd64.deb && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y 
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 RUN git clone https://github.com/BurntSushi/ripgrep
 RUN cd ripgrep && \
@@ -31,7 +31,7 @@ COPY requirements.txt ./
 
 RUN pip install --no-cache -r requirements.txt
 
-RUN npm install -g prettier@2.0.4 @types/react @types/react-dom typescript eslint@8.57.0 
+RUN npm install -g prettier@2.0.4 @types/react @types/react-dom typescript eslint@8.57.0
 RUN npm install react react-dom
 RUN npm install @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-react --save-dev
 

@@ -17,22 +17,21 @@ import requests
 #         print(response)
 #         print(response.text)
 
-import json
-import time
 
-import requests
 
 if __name__ == "__main__":
-
     start_time = time.time()
 
     from fastapi.testclient import TestClient
+
     from sweepai.api import app
+
     def send_request(issue_request):
         with TestClient(app) as client:
             response = client.post(
                 "/", json=issue_request, headers={"X-GitHub-Event": "pull_request"}
             )
             print(response)  # or return response, depending on your needs
+
     issue_request = json.loads(open("tests/jsons/pull_request_closed.json", "r").read())
     send_request(issue_request)

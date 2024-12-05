@@ -1,4 +1,5 @@
-from typing import Optional, Literal, TypedDict
+from typing import Literal, Optional, TypedDict
+
 
 class CheckStatus(TypedDict):
     message: str
@@ -7,6 +8,7 @@ class CheckStatus(TypedDict):
     status: Literal["pending", "running", "success", "failure", "cancelled"]
     llm_message: str
     container_name: str
+
 
 # Status can be one of: completed, action_required, cancelled, failure, neutral, skipped, stale, success, timed_out, in_progress, queued, requested, waiting, pending.
 gha_to_check_status = {

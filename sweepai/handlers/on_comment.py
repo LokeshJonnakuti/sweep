@@ -8,32 +8,42 @@ import time
 import traceback
 from typing import Any
 
+from github.PullRequest import PullRequest
+from github.Repository import Repository
 from loguru import logger
-
 from sentry_sdk import set_user
+
+from sweepai.agents.modify_utils import set_fcr_change_type
 from sweepai.chat.api import posthog_trace
-from sweepai.config.server import (
-    ENV,
-    GITHUB_BOT_USERNAME,
-    MONGODB_URI,
-)
+from sweepai.config.server import ENV, GITHUB_BOT_USERNAME, MONGODB_URI
 from sweepai.core.entities import MockPR, NoFilesException, Snippet, render_fcrs
 from sweepai.core.pull_request_bot import PRSummaryBot
+from sweepai.core.review_utils import (
+    format_pr_info,
+    get_pr_changes,
+    smart_prune_file_based_on_patches,
+)
 from sweepai.core.sweep_bot import get_files_to_change_for_on_comment
-from sweepai.agents.modify_utils import set_fcr_change_type
 from sweepai.handlers.create_pr import handle_file_change_requests
-from sweepai.core.review_utils import format_pr_info, get_pr_changes, smart_prune_file_based_on_patches
 from sweepai.utils.chat_logger import ChatLogger
 from sweepai.utils.concurrency_utils import fire_and_forget_wrapper
 from sweepai.utils.diff import generate_diff
 from sweepai.utils.event_logger import posthog
-from sweepai.utils.github_utils import ClonedRepo, commit_multi_file_changes, get_github_client, sanitize_string_for_github, validate_and_sanitize_multi_file_changes
-from sweepai.utils.str_utils import BOT_SUFFIX, FASTER_MODEL_MESSAGE, add_line_numbers, blockquote
+from sweepai.utils.github_utils import (
+    ClonedRepo,
+    commit_multi_file_changes,
+    get_github_client,
+    sanitize_string_for_github,
+    validate_and_sanitize_multi_file_changes,
+)
+from sweepai.utils.str_utils import (
+    BOT_SUFFIX,
+    FASTER_MODEL_MESSAGE,
+    add_line_numbers,
+    blockquote,
+)
 from sweepai.utils.ticket_rendering_utils import center, sweeping_gif
 from sweepai.utils.ticket_utils import prep_snippets
-
-from github.Repository import Repository
-from github.PullRequest import PullRequest
 
 num_of_snippets_to_query = 30
 total_number_of_snippet_tokens = 15_000
@@ -42,6 +52,7 @@ num_extended_snippets = 2
 
 ERROR_FORMAT = "❌ {title}\n\nPlease report this on our [community forum](https://community.sweep.dev/)."
 SWEEPING_GIF = f"{center(sweeping_gif)}\n\n<div align='center'><h3>Sweep is working on resolving your comment...<h3/></div>\n\n"
+
 
 @posthog_trace
 def on_comment(
@@ -138,7 +149,7 @@ def on_comment(
             # Todo: chat_logger is None for MockPRs, which will cause all comments to use GPT-4
             is_paying_user = True
             use_faster_model = False
-        
+
         if use_faster_model:
             raise Exception(FASTER_MODEL_MESSAGE)
         # Payment logic end
@@ -228,22 +239,37 @@ def on_comment(
                 for file_name, pr_change in pr_changes.items():
                     if pr_change.status == "modified":
                         # Get the entire file contents, not just the patch
-                        numbered_source_code = add_line_numbers(pr_change.new_code, start=1)
-                        pruned_source_code = smart_prune_file_based_on_patches(numbered_source_code, pr_change.patches)
-                        source_codes.append(f'<file_with_patches_applied file_name="{file_name}">\n{pruned_source_code}\n</file>')
+                        numbered_source_code = add_line_numbers(
+                            pr_change.new_code, start=1
+                        )
+                        pruned_source_code = smart_prune_file_based_on_patches(
+                            numbered_source_code, pr_change.patches
+                        )
+                        source_codes.append(
+                            f'<file_with_patches_applied file_name="{file_name}">\n{pruned_source_code}\n</file>'
+                        )
                         patch_changes = [patch.changes for patch in pr_change.patches]
                         patch_annotations = pr_change.annotations
-                        patches_with_annotations = [f'<patch index="{i}">\n{patch}\n</patch>\n<patch_description index="{i}">\n{patch_annotations[i]}\n<patch_description>' for i, patch in enumerate(patch_changes)]
+                        patches_with_annotations = [
+                            f'<patch index="{i}">\n{patch}\n</patch>\n<patch_description index="{i}">\n{patch_annotations[i]}\n<patch_description>'
+                            for i, patch in enumerate(patch_changes)
+                        ]
                         patches_string = "\n".join(patches_with_annotations)
                         patches.append(
                             f'<patches file_name="{file_name}">\n{patches_string}\n</patches>'
                         )
                 # create source code string
                 source_code_string = (
-                    "<code_files_with_patches_applied>\n" + "\n".join(source_codes) + "\n</code_files_with_patches_applied>"
+                    "<code_files_with_patches_applied>\n"
+                    + "\n".join(source_codes)
+                    + "\n</code_files_with_patches_applied>"
                 )
                 pr_diff_string = (
-                    "<pr_changes>\n" + "\n".join(patches) + "\n\n# Here is the current state of the codebase with the above patches applied:\n\n" + source_code_string + "</pr_changes>"
+                    "<pr_changes>\n"
+                    + "\n".join(patches)
+                    + "\n\n# Here is the current state of the codebase with the above patches applied:\n\n"
+                    + source_code_string
+                    + "</pr_changes>"
                 )
 
             # This means it's a comment on a file
@@ -252,7 +278,7 @@ def on_comment(
                     pr_path, ref=branch_name
                 ).decoded_content.decode("utf-8")
                 # splitlines returns empty array if the string is empty, split(\n) returns ['']
-                pr_lines = pr_file.split('\n')
+                pr_lines = pr_file.split("\n")
                 start = max(0, pr_line_position - 11)
                 end = min(len(pr_lines), pr_line_position + 10)
                 pr_chunk = "\n".join(pr_lines[start:end])
@@ -264,22 +290,28 @@ def on_comment(
                 )
                 if comment_id:
                     bot_comment = pr.create_review_comment_reply(
-                        comment_id, SWEEPING_GIF + "Searching for relevant snippets..." + BOT_SUFFIX
+                        comment_id,
+                        SWEEPING_GIF
+                        + "Searching for relevant snippets..."
+                        + BOT_SUFFIX,
                     )
             else:
                 formatted_pr_chunk = None  # pr_file
-                bot_comment = pr.create_issue_comment(SWEEPING_GIF + "Searching for relevant snippets..." + BOT_SUFFIX)
+                bot_comment = pr.create_issue_comment(
+                    SWEEPING_GIF + "Searching for relevant snippets..." + BOT_SUFFIX
+                )
 
             search_query = comment.strip("\n")
             formatted_query = comment.strip("\n")
-            snippets = prep_snippets(
-                cloned_repo, search_query, use_multi_query=False
-            )
+            snippets = prep_snippets(cloned_repo, search_query, use_multi_query=False)
 
-            pr_diffs, _dropped_files, _unsuitable_files = get_pr_changes(repo, pr, cloned_repo)
-            snippets_modified = [Snippet.from_file(
-                pr_diff, cloned_repo.get_file_contents(pr_diff)
-            ) for pr_diff in pr_diffs]
+            pr_diffs, _dropped_files, _unsuitable_files = get_pr_changes(
+                repo, pr, cloned_repo
+            )
+            snippets_modified = [
+                Snippet.from_file(pr_diff, cloned_repo.get_file_contents(pr_diff))
+                for pr_diff in pr_diffs
+            ]
             snippets = snippets_modified + snippets
             snippets = snippets[:num_of_snippets_to_query]
         except Exception as e:
@@ -297,16 +329,27 @@ def on_comment(
                     **metadata,
                 },
             )
-            edit_comment(ERROR_FORMAT.format(title=f"An error occured!\n\nThe exception message is:{str(e)}\n\nThe stack trace is:{stack_trace}"))
+            edit_comment(
+                ERROR_FORMAT.format(
+                    title=f"An error occured!\n\nThe exception message is:{str(e)}\n\nThe stack trace is:{stack_trace}"
+                )
+            )
             raise e
 
         try:
             logger.info("Fetching files to modify/create...")
-            edit_comment(SWEEPING_GIF + "I just completed searching for relevant files, now I'm making changes...")
+            edit_comment(
+                SWEEPING_GIF
+                + "I just completed searching for relevant files, now I'm making changes..."
+            )
             if file_comment:
                 formatted_query = f"The user left this GitHub PR Review comment in `{pr_path}`:\n<comment>\n{comment}\n</comment>\nThis was where they left their comment on the PR:\n<review_code_chunk>\n{formatted_pr_chunk}\n</review_code_chunk>.\n\nResolve their comment."
             pull_request_info = format_pr_info(pr)
-            renames_dict, file_change_requests, plan = get_files_to_change_for_on_comment(
+            (
+                renames_dict,
+                file_change_requests,
+                plan,
+            ) = get_files_to_change_for_on_comment(
                 relevant_snippets=snippets,
                 read_only_snippets=[],
                 problem_statement=formatted_query,
@@ -317,7 +360,9 @@ def on_comment(
             )
             set_fcr_change_type(file_change_requests, cloned_repo)
 
-            assert file_change_requests, NoFilesException("I couldn't find any relevant files to change.")
+            assert file_change_requests, NoFilesException(
+                "I couldn't find any relevant files to change."
+            )
 
             planning_markdown = render_fcrs(file_change_requests)
             sweep_response = f"I'm going to make the following changes:\n\n{planning_markdown}\n\nI'm currently validating these changes using parsers and linters to check for syntax errors and undefined variables..."
@@ -327,8 +372,12 @@ def on_comment(
                 f"{quoted_comment}\n\nHi @{username},\n\n{sweep_response}"
             )
             edit_comment(SWEEPING_GIF + response_for_user)
-            
-            modify_files_dict, changes_made, file_change_requests = handle_file_change_requests(
+
+            (
+                modify_files_dict,
+                changes_made,
+                file_change_requests,
+            ) = handle_file_change_requests(
                 file_change_requests=file_change_requests,
                 request=file_comment,
                 cloned_repo=cloned_repo,
@@ -336,22 +385,41 @@ def on_comment(
                 installation_id=installation_id,
                 renames_dict=renames_dict,
             )
-            logger.info("\n".join(generate_diff(file_data["original_contents"], file_data["contents"]) for file_data in modify_files_dict.values()))
+            logger.info(
+                "\n".join(
+                    generate_diff(file_data["original_contents"], file_data["contents"])
+                    for file_data in modify_files_dict.values()
+                )
+            )
             pull_request_bot = PRSummaryBot()
-            commit_message = pull_request_bot.get_commit_message(modify_files_dict, renames_dict=renames_dict, chat_logger=chat_logger)[:50]
-            new_file_contents_to_commit = {file_path: file_data["contents"] for file_path, file_data in modify_files_dict.items()}
-            previous_file_contents_to_commit = copy.deepcopy(new_file_contents_to_commit)
-            new_file_contents_to_commit, files_removed = validate_and_sanitize_multi_file_changes(cloned_repo.repo, new_file_contents_to_commit, file_change_requests)
+            commit_message = pull_request_bot.get_commit_message(
+                modify_files_dict, renames_dict=renames_dict, chat_logger=chat_logger
+            )[:50]
+            new_file_contents_to_commit = {
+                file_path: file_data["contents"]
+                for file_path, file_data in modify_files_dict.items()
+            }
+            previous_file_contents_to_commit = copy.deepcopy(
+                new_file_contents_to_commit
+            )
+            (
+                new_file_contents_to_commit,
+                files_removed,
+            ) = validate_and_sanitize_multi_file_changes(
+                cloned_repo.repo, new_file_contents_to_commit, file_change_requests
+            )
             if files_removed and username:
                 posthog.capture(
                     username,
                     "polluted_commits_error",
                     properties={
                         "old_keys": ",".join(previous_file_contents_to_commit.keys()),
-                        "new_keys": ",".join(new_file_contents_to_commit.keys()) 
+                        "new_keys": ",".join(new_file_contents_to_commit.keys()),
                     },
                 )
-            commit = commit_multi_file_changes(cloned_repo, new_file_contents_to_commit, commit_message, branch_name)
+            commit = commit_multi_file_changes(
+                cloned_repo, new_file_contents_to_commit, commit_message, branch_name
+            )
             logger.info("Done!")
         except Exception as e:
             stack_trace = traceback.format_exc()
@@ -367,7 +435,11 @@ def on_comment(
                     **metadata,
                 },
             )
-            edit_comment(ERROR_FORMAT.format(title=f"Failed to make changes:\n\nThe exception message is:{str(e)}\n\nThe stack trace is:{stack_trace}"))
+            edit_comment(
+                ERROR_FORMAT.format(
+                    title=f"Failed to make changes:\n\nThe exception message is:{str(e)}\n\nThe stack trace is:{stack_trace}"
+                )
+            )
             raise e
 
         # Delete eyes
@@ -388,12 +460,15 @@ def on_comment(
         for file_path, file_data in modify_files_dict.items():
             if file_path in new_file_contents_to_commit:
                 patch_diff += f"--- {file_path}\n+++ {file_path}\n{generate_diff(file_data['original_contents'], file_data['contents'])}\n\n"
-        
-        if patch_diff:
-            edit_comment(f"### 🚀 Resolved via [{commit.sha[:7]}](https://github.com/{repo_full_name}/commit/{commit.sha})\n\nHere were the changes I made:\n```diff\n{patch_diff}\n```")
-        else:
-            edit_comment(f"### 🚀 Resolved via [{commit.sha[:7]}](https://github.com/{repo_full_name}/commit/{commit.sha})")
 
+        if patch_diff:
+            edit_comment(
+                f"### 🚀 Resolved via [{commit.sha[:7]}](https://github.com/{repo_full_name}/commit/{commit.sha})\n\nHere were the changes I made:\n```diff\n{patch_diff}\n```"
+            )
+        else:
+            edit_comment(
+                f"### 🚀 Resolved via [{commit.sha[:7]}](https://github.com/{repo_full_name}/commit/{commit.sha})"
+            )
 
         elapsed_time = time.time() - start_time
         # make async

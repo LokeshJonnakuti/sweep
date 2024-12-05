@@ -7,10 +7,8 @@ from sweepai.config.server import WEBHOOK_SECRET
 def hash_sha256(text: str):
     return hashlib.sha256(text.encode("utf-8", "ignore")).hexdigest()
 
-def verify_signature(
-    payload_body: bytes,
-    signature_header: str | None
-):
+
+def verify_signature(payload_body: bytes, signature_header: str | None):
     """Verify that the payload was sent from GitHub by validating SHA256.
 
     Raise and return 403 if not authorized.
@@ -25,9 +23,7 @@ def verify_signature(
     if not signature_header:
         return False
     hash_object = hmac.new(
-        WEBHOOK_SECRET.encode('utf-8'),
-        msg=payload_body,
-        digestmod=hashlib.sha256
+        WEBHOOK_SECRET.encode("utf-8"), msg=payload_body, digestmod=hashlib.sha256
     )
     expected_signature = "sha256=" + hash_object.hexdigest()
     if not hmac.compare_digest(expected_signature, signature_header):

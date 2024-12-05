@@ -19,7 +19,8 @@ Where is the structure of the Post model in the blog module?
 
 The above are just illustrative examples. Make sure to provide detailed, specific questions to search for relevant snippets in the codebase and only make one function call."""
 
-function_response = """The above is the output of the function call.
+function_response = (
+    """The above is the output of the function call.
 
 First, list and summarize each file from the codebase provided that is relevant to the user's question. List all beliefs and assumptions previously made that are invalidated by the new information.
 
@@ -61,7 +62,9 @@ Otherwise, if the user's question is specific, and asks to implement a feature o
 Then, make each a function call like so:
 <function_call>
 [the function call goes here, using the valid XML format for function calls]
-</function_call>""" + example_tool_calls
+</function_call>"""
+    + example_tool_calls
+)
 
 anthropic_format_message = """### Guidelines
 
@@ -127,7 +130,8 @@ When suggesting code changes, you add <code_change> blocks inside the <user_resp
 </user_response>"""
 
 # improve these prompts
-anthropic_system_message = """You are a helpful assistant that will answer a user's questions about a codebase to resolve their issue. You are provided with a list of relevant code snippets from the codebase that you can refer to. You can use this information to help the user solve their issue. You may also make function calls to retrieve additional information from the codebase. 
+anthropic_system_message = (
+    """You are a helpful assistant that will answer a user's questions about a codebase to resolve their issue. You are provided with a list of relevant code snippets from the codebase that you can refer to. You can use this information to help the user solve their issue. You may also make function calls to retrieve additional information from the codebase.
 
 # Guidelines
 
@@ -179,7 +183,9 @@ class Rectangle:
 </new_code>
 </code_change>
 
-""" + anthropic_format_message
+"""
+    + anthropic_format_message
+)
 
 action_items_system_prompt = """You are a tech lead helping to break down a conversation about an issue into subtasks for an intern to solve. Identify every single one of the suggested changes. Be complete. The changes should be atomic.
 
@@ -214,7 +220,8 @@ A relevant, subtask from the user's issue.
 [additional sub tasks as needed]
 </subtasks>"""
 
-openai_system_message = """You are a helpful assistant that will answer a user's questions about a codebase to resolve their issue. You are provided with a list of relevant code snippets from the codebase that you can refer to. You can use this information to help the user solve their issue.
+openai_system_message = (
+    """You are a helpful assistant that will answer a user's questions about a codebase to resolve their issue. You are provided with a list of relevant code snippets from the codebase that you can refer to. You can use this information to help the user solve their issue.
 
 # Guidelines
 
@@ -222,7 +229,7 @@ openai_system_message = """You are a helpful assistant that will answer a user's
 - Only show code as supplementary evidence or to enhance the explanations. When doing so, only show MINIMAL excerpts of code that address the user's question. Do NOT copy the whole file, but only the lines that are relevant to the user's question. Be concise, it's hard for a user to read entire files worth of content.
 - Use markdown for your responses, using headers where applicable to improve clarity and lists to enumerate examples.
 - Wherever possible, you should suggest code changes. To do so, you must add <code_change> blocks to the <user_response> block following the format provided below.
-- Code changes must be atomic. Each code change must be in its own block, unless they are contiguous changes in the same file. 
+- Code changes must be atomic. Each code change must be in its own block, unless they are contiguous changes in the same file.
 
 # <code_change> Format
 First, indicate whether you want to modify an existing file or create a new file, then write in the following format:
@@ -265,7 +272,9 @@ class Rectangle:
 </new_code>
 </code_change>
 
-""" + openai_format_message
+"""
+    + openai_format_message
+)
 
 relevant_snippets_message = """# Codebase
 Repo: {repo_name}
@@ -277,14 +286,14 @@ Here are the initial search results from the codebase. These will be your primar
 {joined_relevant_snippets}
 </relevant_files>"""
 
-relevant_snippet_template = '''<relevant_file index="{i}">
+relevant_snippet_template = """<relevant_file index="{i}">
 <file_path>
 {file_path}
 </file_path>
 <source>
 {content}
 </source>
-</relevant_file>'''
+</relevant_file>"""
 
 pr_format = """Here are the contents of the referenced pull request {url}:
 
@@ -342,4 +351,3 @@ Search query: mobile app chat real-time updates WebSockets long-polling
 Just respond with the search query, nothing else."""
 
 query_optimizer_user_prompt = """Question: {query}"""
-

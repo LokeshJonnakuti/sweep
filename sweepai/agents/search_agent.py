@@ -1,5 +1,15 @@
-from sweepai.agents.agent_utils import Parameter, handle_function_call, tool, validate_and_parse_function_call
-from sweepai.agents.question_answerer import QuestionAnswererException, rag, parse_sources, search_codebase
+from sweepai.agents.agent_utils import (
+    Parameter,
+    handle_function_call,
+    tool,
+    validate_and_parse_function_call,
+)
+from sweepai.agents.question_answerer import (
+    QuestionAnswererException,
+    parse_sources,
+    rag,
+    search_codebase,
+)
 from sweepai.core.chat import ChatGPT, continuous_llm_calls
 from sweepai.core.entities import Snippet
 from sweepai.utils.github_utils import ClonedRepo, MockClonedRepo
@@ -148,7 +158,7 @@ For each snippet, summarize the contents and what it deals with. Indicate all se
 </analysis>
 <answer>
 Provide a detailed response to the user's question.
-Reference all relevant entities in the codebase, and provide examples of usages and implementations whenever possible. 
+Reference all relevant entities in the codebase, and provide examples of usages and implementations whenever possible.
 When you mention an entity, be precise and clear by indicating the file they are from. For example, you may say: this functionality is accomplished by calling `foo.bar(x, y)` (from the `Foo` class in `src/modules/foo.py`).
 </answer>
 <sources>
@@ -186,19 +196,24 @@ And here is your planning in your scratchpad prior to the last `ask_question_abo
 {scratchpad}
 </scratchpad>"""
 
+
 @tool()
 def ask_question_about_codebase(
-    question: Parameter("A directed natural language search question to ask about the codebase. This should be in the form of a natural language question, like 'How does the user authentication service handle authentication and logout?'"),
+    question: Parameter(
+        "A directed natural language search question to ask about the codebase. This should be in the form of a natural language question, like 'How does the user authentication service handle authentication and logout?'"
+    ),
     cloned_repo: ClonedRepo,
     github_issue: str,
-    llm_state: dict
+    llm_state: dict,
 ):
     results = ""
     relevant_snippets = []
     try:
         answer, sources = rag(question, cloned_repo)
     except QuestionAnswererException as e:
-        results += f"<question>\n{question}\n</question>\n<error>\n{e.message}\n</error>\n\n"
+        results += (
+            f"<question>\n{question}\n</question>\n<error>\n{e.message}\n</error>\n\n"
+        )
     relevant_snippets = parse_sources(sources, cloned_repo)
     results += f"<question>\n{question}\n</question>\n<answer>\n{answer}\n\nSources:\n{sources}\n</answer>\n\n"
     llm_state["questions_and_answers"].append((question, answer, sources))
@@ -209,18 +224,31 @@ def ask_question_about_codebase(
     if relevant_files_string:
         relevant_files_string = f"Here is a list of files cited in the answers to the questions:\n{relevant_files_string}\n\n"
     scratchpad = llm_state["scratchpad"]
-    results = relevant_files_string + results.strip() + ASK_QUESTION_RESULT_INSTRUCTIONS.format(
-        request=github_issue,
-        scratchpad=SCRATCHPAD_PROMPT.format(scratchpad=scratchpad) if scratchpad.strip() else ""
+    results = (
+        relevant_files_string
+        + results.strip()
+        + ASK_QUESTION_RESULT_INSTRUCTIONS.format(
+            request=github_issue,
+            scratchpad=SCRATCHPAD_PROMPT.format(scratchpad=scratchpad)
+            if scratchpad.strip()
+            else "",
+        )
     )
     return results
 
+
 @tool()
 def submit_task(
-    plan: Parameter("Extremely detailed step-by-step plan of the code changes you will make in the repo to fix the bug or implement the feature to resolve the user's issue."),
-    explanation: Parameter("List each snippet mentioned in the plan and the role it plays in the plan."),
-    sources: Parameter("Code files you referenced in your <answer>. Only include sources that are DIRECTLY REFERENCED in your answer, do not provide anything vaguely related."),
-    cloned_repo: ClonedRepo
+    plan: Parameter(
+        "Extremely detailed step-by-step plan of the code changes you will make in the repo to fix the bug or implement the feature to resolve the user's issue."
+    ),
+    explanation: Parameter(
+        "List each snippet mentioned in the plan and the role it plays in the plan."
+    ),
+    sources: Parameter(
+        "Code files you referenced in your <answer>. Only include sources that are DIRECTLY REFERENCED in your answer, do not provide anything vaguely related."
+    ),
+    cloned_repo: ClonedRepo,
 ):
     error_message = ""
     try:
@@ -232,45 +260,44 @@ def submit_task(
     else:
         return "DONE"
 
-tools = [
-    ask_question_about_codebase,
-    submit_task
-]
+
+tools = [ask_question_about_codebase, submit_task]
 
 tools_available = """You have access to the following tools to assist in fulfilling the user request:
-""" + "\n".join([tool.get_xml() for tool in tools])
+""" + "\n".join(
+    [tool.get_xml() for tool in tools]
+)
+
 
 def search(
     github_issue: str,
     cloned_repo: ClonedRepo,
-    snippets: list[Snippet]=[],
+    snippets: list[Snippet] = [],
 ):
     chat_gpt = ChatGPT.from_system_message_string(
-        prompt_string=search_agent_instructions + tools_available + "\n\n" + example_tool_calls,
+        prompt_string=search_agent_instructions
+        + tools_available
+        + "\n\n"
+        + example_tool_calls,
     )
 
     user_message = search_agent_user_message.format(
         repo_name=cloned_repo.repo_full_name,
         github_issue=github_issue,
-        snippets="\n".join([snippet.xml for snippet in snippets])
+        snippets="\n".join([snippet.xml for snippet in snippets]),
     )
-    llm_state = {
-        "scratchpad": "",
-        "questions_and_answers": []
-    }
+    llm_state = {"scratchpad": "", "questions_and_answers": []}
 
     for _ in range(10):
         response = continuous_llm_calls(
             chat_gpt,
             content=user_message,
             stop_sequences=["\n</function_call>"],
-            use_openai=True
+            use_openai=True,
         )
 
         function_call = validate_and_parse_function_call(
-            response,
-            chat_gpt,
-            tools=tools
+            response, chat_gpt, tools=tools
         )
 
         scratchpad = extract_xml_tag(response, "scratchpad") or ""
@@ -280,21 +307,32 @@ def search(
             function_call_response = ""
             user_message = NO_TOOL_CALL_PROMPT
         else:
-            function_call_response = handle_function_call(function_call, tools, cloned_repo=cloned_repo, github_issue=github_issue, llm_state=llm_state)
-            user_message = f"<function_output>\n{function_call_response}\n</function_output>"
-        
+            function_call_response = handle_function_call(
+                function_call,
+                tools,
+                cloned_repo=cloned_repo,
+                github_issue=github_issue,
+                llm_state=llm_state,
+            )
+            user_message = (
+                f"<function_output>\n{function_call_response}\n</function_output>"
+            )
+
         if "DONE" == function_call_response:
             for question, answer, sources in llm_state["questions_and_answers"]:
                 print(f"Question: {question}")
                 print(f"Answer:\n{answer}")
                 print(f"Sources:\n{sources}")
-                print('\n\n')
+                print("\n\n")
             return {
                 "questions_and_answers": llm_state["questions_and_answers"],
                 "explanation": function_call.function_parameters.get("explanation"),
-                "sources": parse_sources(function_call.function_parameters.get("sources"), cloned_repo)
+                "sources": parse_sources(
+                    function_call.function_parameters.get("sources"), cloned_repo
+                ),
             }
     raise Exception("Failed to complete the task.")
+
 
 if __name__ == "__main__":
     import os
@@ -317,10 +355,11 @@ if __name__ == "__main__":
             # "In vector_db.py, migrate our KNN algorithm to use HNSW instead",
             QUERY,
             cloned_repo,
-            snippets=snippets
+            snippets=snippets,
         )
-        breakpoint() # noqa
+        breakpoint()  # noqa
     except Exception as e:
-        import pdb # noqa
+        import pdb  # noqa
+
         pdb.post_mortem()
         raise e

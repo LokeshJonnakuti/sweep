@@ -40,7 +40,7 @@ def test_issue_url(
         org_name=org_name,
         repo_name=repo_name,
         issue_number=issue_number,
-        issue_url=issue_url
+        issue_url=issue_url,
     )
     print("Sending request...")
 
@@ -55,12 +55,12 @@ def test_issue_url(
     if debug:
         client = TestClient(app)
         response = client.post(
-            "/", 
+            "/",
             json=issue_request.dict(),
             headers={
                 "X-GitHub-Event": "issues",
-                "X-Hub-Signature-256": f"sha256={sha}"
-            }
+                "X-Hub-Signature-256": f"sha256={sha}",
+            },
         )
         print(response)
     else:

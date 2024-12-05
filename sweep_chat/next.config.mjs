@@ -17,7 +17,7 @@ const nextConfig = {
         },
     ]
   },
-  skipTrailingSlashRedirect: true, 
+  skipTrailingSlashRedirect: true,
 };
 
 export default withSentryConfig(nextConfig, {
